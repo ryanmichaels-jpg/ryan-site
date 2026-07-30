@@ -1,0 +1,245 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { site } from '../site';
+
+interface Heading { depth: number; slug: string; text: string }
+
+interface Props {
+  title: string;
+  dek: string;
+  date: Date;
+  draft?: boolean;
+  words: number;
+  headings: Heading[];
+}
+
+const { title, dek, date, draft = false, words, headings } = Astro.props;
+// depth 2 is a chapter. The footnotes heading is injected by GFM and is
+// screen-reader-only, so it never belongs in the rail.
+const chapters = headings.filter((h) => h.depth === 2 && h.slug !== 'footnote-label');
+const stamp = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={title} description={dek} wide>
+  <article class="shell post">
+    <header class="post__head">
+      <h1>{title}</h1>
+      <p class="post__byline">
+        <span>By {site.name}</span>
+        <span aria-hidden="true">·</span>
+        <span>{stamp}</span>
+        {draft && <><span aria-hidden="true">·</span><span class="post__draft">Draft</span></>}
+      </p>
+    </header>
+
+    {
+      chapters.length > 1 && (
+        <nav class="rail" aria-label="Chapters">
+          <ol>
+            {chapters.map((c, i) => (
+              <li>
+                <a href={`#${c.slug}`} data-rail={c.slug}>
+                  <span class="rail__n">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="rail__t">{c.text}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+
+    <div class="prose prose--chaptered">
+      <slot />
+    </div>
+
+    <div class="sidenotes" aria-hidden="true"></div>
+  </article>
+</BaseLayout>
+
+<script>
+  // Highlight the chapter you're currently reading.
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-rail]');
+  if (links.length) {
+    const map = new Map<string, HTMLAnchorElement>();
+    links.forEach((l) => map.set(l.dataset.rail!, l));
+    const targets = [...map.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+
+    const setActive = (id: string) => {
+      links.forEach((l) => l.removeAttribute('aria-current'));
+      map.get(id)?.setAttribute('aria-current', 'true');
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (visible) setActive(visible.target.id);
+      },
+      { rootMargin: '-12% 0px -70% 0px', threshold: 0 }
+    );
+    targets.forEach((t) => io.observe(t));
+  }
+
+  // Footnotes as margin notes, leerob-style: each note sits in the right
+  // margin, aligned with its reference. Falls back to the bottom list on
+  // narrow screens or without JS.
+  const post = document.querySelector<HTMLElement>('.post');
+  const holder = document.querySelector<HTMLElement>('.sidenotes');
+  const wide = window.matchMedia('(min-width: 78rem)');
+
+  const placeSidenotes = () => {
+    if (!post || !holder) return;
+    holder.innerHTML = '';
+    document.body.classList.remove('has-sidenotes');
+    if (!wide.matches) return;
+
+    const refs = post.querySelectorAll<HTMLAnchorElement>('sup a[data-footnote-ref], sup a[href^="#user-content-fn"]');
+    if (!refs.length) return;
+
+    post.style.position = 'relative';
+    const postTop = post.getBoundingClientRect().top + window.scrollY;
+
+    // Wide blocks (figures + their captions) own the margin too, so notes
+    // must never sit beside them. Collect their vertical spans and push any
+    // colliding note below.
+    const blocked = [...post.querySelectorAll<HTMLElement>('.bleed')]
+      .map((el) => {
+        const r = el.getBoundingClientRect();
+        return { top: r.top + window.scrollY - postTop - 10, bottom: r.bottom + window.scrollY - postTop + 20 };
+      })
+      .sort((a, b) => a.top - b.top);
+
+    let lastBottom = 0;
+    let placed = 0;
+
+    refs.forEach((ref) => {
+      const id = decodeURIComponent((ref.getAttribute('href') || '').slice(1));
+      const li = id ? document.getElementById(id) : null;
+      if (!li) return;
+
+      const note = document.createElement('div');
+      note.className = 'sidenote';
+
+      const n = document.createElement('span');
+      n.className = 'sidenote__n';
+      n.textContent = `${(ref.textContent || '').trim()}: `;
+      note.appendChild(n);
+
+      const body = li.cloneNode(true) as HTMLElement;
+      body.querySelectorAll('[data-footnote-backref]').forEach((b) => b.remove());
+      while (body.firstChild) note.appendChild(body.firstChild);
+
+      holder.appendChild(note);
+      const refTop = ref.getBoundingClientRect().top + window.scrollY - postTop;
+      let top = Math.max(refTop, lastBottom + 14);
+      const h = note.offsetHeight;
+      for (const b of blocked) {
+        if (top < b.bottom && top + h > b.top) top = b.bottom;
+      }
+      note.style.top = `${top}px`;
+      lastBottom = top + h;
+      placed++;
+    });
+
+    if (placed) document.body.classList.add('has-sidenotes');
+  };
+
+  let raf = 0;
+  const schedule = () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(placeSidenotes);
+  };
+  window.addEventListener('load', schedule);
+  window.addEventListener('resize', schedule);
+  wide.addEventListener('change', schedule);
+  // Lazy-loaded images change the page's height as they arrive, which moves
+  // every reference below them — re-place the notes whenever the prose
+  // resizes for any reason.
+  const prose = document.querySelector('.prose');
+  if (prose && 'ResizeObserver' in window) new ResizeObserver(schedule).observe(prose);
+  post?.querySelectorAll('img').forEach((img) => img.addEventListener('load', schedule));
+  schedule();
+</script>
+
+<style is:global>
+  .post__head {
+    max-width: var(--measure);
+    margin-inline: auto;
+    margin-bottom: 2.6rem;
+  }
+  .post__head h1 {
+    font-family: var(--serif);
+    font-size: var(--step-4);
+    font-variation-settings: 'opsz' 44;
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.012em;
+    margin: 0 0 0.45rem;
+    text-wrap: balance;
+  }
+  .post__byline {
+    display: flex;
+    gap: 0.45rem;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 1.02rem;
+    color: var(--ink-mute);
+  }
+  .post__draft { color: var(--ink-soft); }
+
+  /* Numbered chapters, numeral hung in the left margin when there's room. */
+  .prose--chaptered { counter-reset: chapter; }
+  .prose--chaptered h2 { counter-increment: chapter; position: relative; }
+  .prose--chaptered h2::before {
+    content: counter(chapter, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  @media (min-width: 62rem) {
+    .prose--chaptered h2::before {
+      position: absolute;
+      left: -3.9rem;
+      top: 0.7em;
+      margin: 0;
+    }
+  }
+
+  /* Chapter rail — only where it can't crowd the reading column. */
+  .rail { display: none; }
+  @media (min-width: 86rem) {
+    .rail {
+      display: block;
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      left: max(1.5rem, calc(50vw - 43rem));
+      width: 12rem;
+    }
+    .rail ol { list-style: none; margin: 0; padding: 0; }
+    .rail li + li { margin-top: 0.28rem; }
+    .rail a {
+      display: flex;
+      gap: 0.6rem;
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      line-height: 1.45;
+      color: var(--ink-mute);
+      opacity: 0.65;
+      transition: opacity 150ms ease, color 150ms ease;
+    }
+    .rail a:hover { opacity: 1; color: var(--ink); }
+    .rail a[aria-current='true'] { opacity: 1; color: var(--ink); }
+    .rail__n { flex: none; }
+    .rail__t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rail a[aria-current='true'] .rail__t { white-space: normal; }
+  }
+</style>

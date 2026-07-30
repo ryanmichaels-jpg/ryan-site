@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../site';
+---
+
+<BaseLayout home>
+  <div class="shell page">
+    <h1>Ryan Michaels</h1>
+
+    <p>
+      I'm a builder of GTM systems. I generate pipeline for Pave.
+    </p>
+
+    <p>I write about what I've <a href="/writing">built</a>.</p>
+
+    <p>
+      The other two things I spend time on are sabermetrics and synthesizers. Both are
+      taking the back off to see the parts, which is the only way I've ever learned
+      anything I kept.
+    </p>
+
+    <p>
+      My code is on <a href={site.github}>GitHub</a>, the rest of me is on{' '}
+      <a href={site.linkedin}>LinkedIn</a>, and the best way to reach me is{' '}
+      <a href={`mailto:${site.email}`}>email</a>. I read everything and answer most
+      things.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .page { padding-top: 4.5rem; }
+
+  h1 {
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    margin: 0 0 1.6rem;
+  }
+
+  p { margin: 0 0 1.15rem; }
+  .page > p:last-child { margin-bottom: 0; }
+</style>

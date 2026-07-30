@@ -1,0 +1,30 @@
+---
+/**
+ * A sidenote. Sits in the right margin on wide screens, inline on phones.
+ *   <Marginal>Franklin's Junto met Friday nights to pool what they knew.</Marginal>
+ */
+---
+<aside class="marginal"><slot /></aside>
+
+<style>
+  .marginal {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    color: var(--ink-mute);
+    border-left: 1px solid var(--accent);
+    padding-left: 0.8rem;
+    margin-block: 1.6rem;
+  }
+  @media (min-width: 76rem) {
+    .marginal {
+      float: right;
+      width: 13rem;
+      margin-right: -15.5rem;
+      margin-top: 0.4rem;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+      padding: 0.5rem 0 0;
+    }
+  }
+</style>

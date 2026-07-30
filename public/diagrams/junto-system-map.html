@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Junto — System Map</title>
+<style>
+  :root {
+    --bg: #0d0d0f; --panel: #141418; --card: #1b1b20; --border: #2a2a31;
+    --text: #f5f5f7; --muted: #9a9aa2; --faint: #6d6d75; --amber: #f5a623;
+    --blue: #60a5fa; --gold: #fbbf24; --green: #34d399; --purple: #c084fc; --indigo: #818cf8; --red: #f87171;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); -webkit-font-smoothing: antialiased; padding: 44px 24px 64px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; color: var(--amber); text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: 30px; font-weight: 700; letter-spacing: -.01em; margin-bottom: 8px; }
+  .lede { color: var(--muted); font-size: 15px; line-height: 1.55; max-width: 720px; margin-bottom: 36px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+  .role { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 20px; border-top: 3px solid var(--border); }
+  .role h2 { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
+  .role .def { font-size: 11.5px; color: var(--faint); margin-bottom: 14px; line-height: 1.45; }
+  .role ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .role li { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; font-size: 13px; line-height: 1.45; }
+  .role li b { font-weight: 650; }
+  .role li .m { display: block; font-size: 11px; color: var(--faint); margin-top: 2px; }
+  .role li .tn { font-family: var(--mono); font-size: 12.5px; }
+
+  .role.triggers { border-top-color: var(--blue); }   .role.triggers h2 { color: var(--blue); }
+  .role.tools { border-top-color: var(--gold); }      .role.tools h2 { color: var(--gold); }
+  .role.processing { border-top-color: var(--green);} .role.processing h2 { color: var(--green); }
+  .role.decisions { border-top-color: var(--purple);} .role.decisions h2 { color: var(--purple); }
+  .role.stores { border-top-color: var(--indigo); }   .role.stores h2 { color: var(--indigo); }
+  .role.outputs { border-top-color: var(--red); }     .role.outputs h2 { color: var(--red); }
+
+  .loopnote {
+    margin-top: 18px; border: 1.5px dashed rgba(245,166,35,.5); background: rgba(245,166,35,.05);
+    border-radius: 12px; padding: 14px 18px; font-size: 13px; color: var(--muted); line-height: 1.55;
+  }
+  .loopnote b { color: var(--text); }
+  .loopnote .sym { color: var(--amber); margin-right: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Junto · GTM OS · Data Layer</div>
+  <h1>System Map</h1>
+  <p class="lede">Every component of the planned data layer, sorted by role. Read it as a parts list for the Sources-to-Surfaces flow: triggers start work, tools hold the data, processing moves and shapes it, one decision routes it, stores keep it, outputs are where people meet it.</p>
+
+  <div class="grid">
+    <div class="role triggers">
+      <h2>Triggers</h2>
+      <div class="def">what starts work</div>
+      <ul>
+        <li><b>Rep asks in Slack</b><span class="m">@mention &middot; thread reply (mention-to-join) &middot; /play syntax</span></li>
+        <li><b>Per-connector schedules</b><span class="m">nightly (sfdc_history) &middot; hourly (gong_ingest) &middot; daily (usage_shift) &middot; weekly (harvestapi)</span></li>
+        <li><b>Thread goes quiet</b><span class="m">fires the distiller on finished conversations</span></li>
+      </ul>
+    </div>
+
+    <div class="role tools">
+      <h2>Tools</h2>
+      <div class="def">where the data lives</div>
+      <ul>
+        <li><span class="tn">Salesforce</span><span class="m">accounts &middot; opps &middot; activities &middot; field history</span></li>
+        <li><span class="tn">Gong</span><span class="m">call transcripts, by call type</span></li>
+        <li><span class="tn">Slack</span><span class="m">team channels + Junto run threads</span></li>
+        <li><span class="tn">BigQuery</span><span class="m">product usage telemetry</span></li>
+        <li><b>External feeds</b><span class="m">HarvestAPI &middot; Marketo &middot; Outreach &middot; NPS &middot; doc-08 catalog</span></li>
+      </ul>
+    </div>
+
+    <div class="role processing">
+      <h2>Processing</h2>
+      <div class="def">moves + shapes data</div>
+      <ul>
+        <li><b>Connector jobs</b><span class="m">deterministic: fetch since watermark &rarr; qualify &rarr; map &rarr; validate &rarr; write</span></li>
+        <li><b>Distillers</b><span class="m">LLM extractors: call / thread &rarr; tagged artifact, schema-validated</span></li>
+        <li><b>Read primitives</b><span class="m">LLM-free queries, visibility-filtered before any model sees data</span></li>
+        <li><b>Synthesis</b><span class="m">evidence rows &rarr; cited answer; gaps declared, denominators shown</span></li>
+      </ul>
+    </div>
+
+    <div class="role decisions">
+      <h2>Decisions</h2>
+      <div class="def">routing, never silent</div>
+      <ul>
+        <li><b>Planner over the capability catalog</b><span class="m">selects plays + sources explicitly &middot; DISCOVER on partial match &middot; HELP on none</span></li>
+        <li><b>Catalog miss &rarr; source request</b><span class="m">"no source covers NPS" &rarr; Request-this-source button &rarr; Composer form</span></li>
+      </ul>
+    </div>
+
+    <div class="role stores">
+      <h2>Data stores</h2>
+      <div class="def">Postgres on the VM &middot; every row carries visibility</div>
+      <ul>
+        <li><b>Signals ledger</b><span class="m">curated, attention-worthy events (frozen contract)</span></li>
+        <li><b>Activity rows</b><span class="m">every touch: emails, calls, LinkedIn, stage moves</span></li>
+        <li><b>Knowledge artifacts</b><span class="m">distilled + embedded, permalinked, Pain.PointDB-tagged</span></li>
+        <li><b>Canonical docs</b><span class="m">read-only truth, evolved by PR</span></li>
+        <li><b>One retrieval index</b><span class="m">all four project into {kind, subject, text, date, source_ref, visibility, embedding}</span></li>
+      </ul>
+    </div>
+
+    <div class="role outputs">
+      <h2>Outputs</h2>
+      <div class="def">where people meet the system</div>
+      <ul>
+        <li><b>Slack reply</b><span class="m">cited facts + provenance line + journey diagram + reactions</span></li>
+        <li><b>Composer workspace</b><span class="m">Tables &middot; Files &middot; Knowledge base &middot; Sources &middot; Logs &middot; Pending actions &middot; Review labeling</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="loopnote"><span class="sym">&#8635;</span><b>The loop that makes it compound:</b> finished Slack threads are themselves a source &mdash; the distiller turns them into knowledge artifacts, so today's runs become tomorrow's retrievable, citable, credited context.</div>
+</div>
+</body>
+</html>

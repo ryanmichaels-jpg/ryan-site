@@ -1,0 +1,42 @@
+---
+/**
+ * A visible placeholder for a chapter you haven't drafted yet. Only ever appears
+ * while `draft: true` — delete each one as you fill the chapter in.
+ *   <Tk points={['what this chapter argues', 'the receipt it uses']} />
+ */
+interface Props { points: string[] }
+const { points } = Astro.props;
+---
+
+<div class="tk">
+  <p class="tk__label">TK — to draft</p>
+  <ul>{points.map((p) => <li>{p}</li>)}</ul>
+</div>
+
+<style>
+  .tk {
+    margin-block: 1.6rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px dashed var(--rule);
+    border-left: 2px solid var(--accent);
+    border-radius: 2px;
+    background: var(--accent-wash);
+  }
+  .tk__label {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.6rem;
+  }
+  .tk ul { margin: 0; padding-left: 1.1rem; }
+  .tk li {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 0.3rem;
+  }
+  .tk li:last-child { margin-bottom: 0; }
+</style>

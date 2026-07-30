@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Not found">
+  <div class="shell">
+    <h1>This one didn't survive either.</h1>
+    <p>Nothing lives at that address. <a href="/">Start over from the top.</a></p>
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    margin: 0 0 1rem;
+  }
+  p { margin: 0; }
+</style>

@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../site';
+
+const posts = (await getCollection('posts'))
+  .filter((p) => site.showDrafts || !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout home title="Writing" description="Build journals: how a thing was made, with the wrong turns left in.">
+  <div class="shell page">
+    <h1>Writing</h1>
+    <p class="page__byline">By {site.name}</p>
+
+    <p class="page__intro">Here&rsquo;s a list of my writing:</p>
+
+    <ul class="entries">
+      {
+        posts.map((p) => (
+          <li>
+            <a href={`/${p.id}`}>{p.data.title}</a>
+            {p.data.draft && <span class="entries__note">draft</span>}
+          </li>
+        ))
+      }
+      {posts.length === 0 && <li class="entries__empty">Nothing published yet.</li>}
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .page { padding-top: 8rem; }
+
+  h1 {
+    font-size: var(--step-3);
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    margin: 0 0 0.15rem;
+  }
+  .page__byline {
+    margin: 0 0 1.9rem;
+    color: var(--ink-mute);
+  }
+
+  .page__intro { margin: 0 0 1.1rem; }
+
+  .entries {
+    list-style: square;
+    margin: 0;
+    padding-left: 1.3rem;
+  }
+  .entries li { margin-bottom: 0.42em; }
+  .entries li::marker { color: var(--ink-mute); font-size: 0.8em; }
+
+  .entries__note {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-left: 0.5rem;
+    vertical-align: 0.12em;
+  }
+  .entries__empty { color: var(--ink-mute); list-style: none; }
+</style>

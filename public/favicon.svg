@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="10" fill="#FBF9F4"/>
+  <text x="32" y="45" text-anchor="middle"
+        font-family="Iowan Old Style, Palatino, Georgia, serif"
+        font-size="42" font-style="italic" fill="#B23A22">R</text>
+</svg>

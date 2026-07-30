@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What happens when you ask Junto something</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --ink: #1a1a1f; --muted: #77777e; --line: #1a1a1f;
+    --red: #c0392b; --blue: #2456c8; --yellow: #b0781a; --green: #1e7e4c; --purple: #7a3fc0;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); padding: 48px 22px 60px; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 620px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 36px; }
+
+  .step { display: flex; gap: 18px; align-items: flex-start; }
+  .num {
+    flex-shrink: 0; width: 34px; height: 34px; border: 1.5px solid var(--line); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; background: #fff; margin-top: 2px;
+  }
+  .txt { padding-bottom: 6px; }
+  .txt b { font-size: 16px; display: block; margin-bottom: 3px; }
+  .txt p { font-size: 14px; line-height: 1.55; color: var(--ink); }
+  .txt .side { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+
+  .joint { margin-left: 16px; width: 1.5px; height: 26px; background: var(--line); }
+
+  .two { display: flex; gap: 14px; margin: 4px 0 4px 52px; flex-wrap: wrap; }
+  .half { flex: 1; min-width: 220px; background: #fff; border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 15px; }
+  .half b { font-size: 14px; display: block; margin-bottom: 3px; }
+  .half p { font-size: 13px; line-height: 1.5; }
+  .half.rules b { color: var(--purple); } .half.facts b { color: var(--green); }
+  .twolabel { margin-left: 52px; font-size: 12px; color: var(--muted); padding: 2px 0 8px; }
+
+  .accent-1 b { color: var(--red); } .accent-2 b { color: var(--blue); }
+  .accent-5 b { color: var(--yellow); } .accent-6 b { color: var(--ink); } .accent-7 b { color: var(--red); }
+
+  .footer { margin-top: 36px; border-top: 1px solid #dcdcd8; padding-top: 18px; text-align: center; }
+  .footer p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>What happens when you ask Junto something</h1>
+
+  <div class="step accent-1">
+    <div class="num">1</div>
+    <div class="txt">
+      <b>Junto hears you.</b>
+      <p>It says "got it" right away, writes down who asked and where, and skips anything that wasn't meant for it — normal channel chatter never becomes work.</p>
+      <p class="side">If Slack accidentally sends the same message twice, Junto notices and only does it once.</p>
+    </div>
+  </div>
+  <div class="joint"></div>
+
+  <div class="step accent-2">
+    <div class="num">2</div>
+    <div class="txt">
+      <b>Junto picks the right play for the job.</b>
+      <p>It compares your words against the list of plays the team has built. Sure it found the match? It runs it. Not sure? It shows you one or two options and lets you choose — it never guesses.</p>
+      <p class="side">If nothing on the list covers your ask, it says so honestly instead of making something up.</p>
+    </div>
+  </div>
+  <div class="joint"></div>
+
+  <div class="twolabel">Then it gathers two things at once:</div>
+  <div class="two">
+    <div class="half rules">
+      <b>3a. The rules</b>
+      <p>How it's supposed to talk and behave — the company's shared truth, your team's preferences, your personal ones, and the ground rules that apply to every single answer.</p>
+    </div>
+    <div class="half facts">
+      <b>3b. The facts</b>
+      <p>Only data you're allowed to see, pulled fresh, each fact carrying where it came from and when. If a source couldn't be reached, that gets said out loud — never hidden.</p>
+    </div>
+  </div>
+  <div class="joint" style="margin-left:16px"></div>
+
+  <div class="step accent-5">
+    <div class="num">4</div>
+    <div class="txt">
+      <b>Junto writes the answer.</b>
+      <p>Using only those facts, following only those rules. This is the one place actual thinking happens — everything before and after is careful bookkeeping.</p>
+      <p class="side">Published plays run on the workflow engine, and they run whatever's on the canvas right now — so if someone edited the play this morning, the edit counts.</p>
+    </div>
+  </div>
+  <div class="joint"></div>
+
+  <div class="step accent-6">
+    <div class="num">5</div>
+    <div class="txt">
+      <b>The answer gets checked and signed.</b>
+      <p>A style check makes sure it reads the way Junto is supposed to sound, and the name of whoever built the play gets attached — credit travels with every answer.</p>
+    </div>
+  </div>
+  <div class="joint"></div>
+
+  <div class="step accent-7">
+    <div class="num">6</div>
+    <div class="txt">
+      <b>The answer lands in your thread — and the receipts get saved.</b>
+      <p>You get the reply plus a little diagram of the path it took. The system keeps a full record of the run: what was asked, what was used, how long it took.</p>
+      <p class="side">Junto is the only thing allowed to post — nothing sneaks a message into Slack around it.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>One step thinks. Every other step exists to make sure that thinking<br>uses real facts, follows the rules, gives credit, and leaves receipts.</p>
+  </div>
+</div>
+</body>
+</html>

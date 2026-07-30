@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Junto — Data Layer: Sources to Surfaces</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --bg-elev: #141417;
+    --surface: #1a1a1e;
+    --surface-2: #202024;
+    --border: #26262c;
+    --border-soft: #1d1d22;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --text-faint: #6b6b73;
+    --accent: #F59E0B;
+    --accent-soft: rgba(245,158,11,0.12);
+
+    --role-trigger: #60A5FA;
+    --role-tool: #FBBF24;
+    --role-processing: #34D399;
+    --role-decision: #C084FC;
+    --role-store: #818CF8;
+    --role-output: #F87171;
+
+    --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    padding: 32px 16px;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 36px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  header {
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 24px;
+    margin-bottom: 28px;
+  }
+  header .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  header p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 760px;
+  }
+
+  .diagram {
+    padding: 28px 0 8px;
+    position: relative;
+  }
+
+  .node {
+    background: var(--bg-elev);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    min-width: 168px;
+    max-width: 232px;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+    position: relative;
+    flex: 1 1 168px;
+  }
+  .node:hover { transform: translateY(-2px); border-color: var(--text-faint); }
+  .node.dim { opacity: 0.25; }
+  .node.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  .node .role {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .node .label { font-size: 15px; font-weight: 600; line-height: 1.25; color: var(--text); margin-bottom: 4px; }
+  .node .label.tool-name { font-family: var(--font-mono); font-size: 14px; font-weight: 600; }
+  .node .sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+  .node.trigger     { border-left: 3px solid var(--role-trigger); }
+  .node.trigger .role     { color: var(--role-trigger); }
+  .node.tool        { border-left: 3px solid var(--role-tool); }
+  .node.tool .role        { color: var(--role-tool); }
+  .node.processing  { border-left: 3px solid var(--role-processing); }
+  .node.processing .role  { color: var(--role-processing); }
+  .node.decision    { border-left: 3px solid var(--role-decision); }
+  .node.decision .role    { color: var(--role-decision); }
+  .node.store       { border-left: 3px solid var(--role-store); }
+  .node.store .role       { color: var(--role-store); }
+  .node.output      { border-left: 3px solid var(--role-output); }
+  .node.output .role      { color: var(--role-output); }
+
+  /* Swimlane */
+  .diagram.swimlane { display: grid; grid-template-columns: 150px 1fr; gap: 0; }
+  .diagram.swimlane .lane { display: contents; }
+  .diagram.swimlane .lane-label {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    padding: 18px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 700;
+    display: flex; align-items: center;
+    line-height: 1.5;
+  }
+  .diagram.swimlane .lane-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 1px solid var(--border-soft);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 18px;
+    display: flex; align-items: stretch; gap: 14px;
+    flex-wrap: wrap;
+    min-height: 90px;
+  }
+
+  /* Flow band between lanes: labeled vertical arrows */
+  .flow-band { display: grid; grid-template-columns: 150px 1fr; }
+  .flow-band .spacer {}
+  .flow-band .flows {
+    display: flex; gap: 56px; justify-content: center;
+    padding: 6px 18px 8px; flex-wrap: wrap;
+  }
+  .flow { display: flex; flex-direction: column; align-items: center; position: relative; }
+
+  .arrow-v {
+    width: 1.5px; height: 40px;
+    background: var(--border);
+    margin: 2px 0;
+    position: relative;
+  }
+  .arrow-v::after {
+    content: "";
+    position: absolute; bottom: -2px; left: -4px;
+    border: 5px solid transparent;
+    border-top-color: var(--border);
+  }
+  .arrow-v .lbl {
+    position: absolute; left: 10px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+  .arrow-v.lit { background: var(--accent); }
+  .arrow-v.lit::after { border-top-color: var(--accent); }
+  .arrow-v.lit .lbl { color: var(--accent); }
+  .arrow-v.dim { opacity: 0.25; }
+
+  .arrow-v.loop { background: transparent; border-left: 1.5px dashed var(--role-output); }
+  .arrow-v.loop::after { border-top-color: var(--role-output); }
+  .arrow-v.loop .lbl { color: var(--role-output); }
+  .arrow-v.loop.lit { border-left-color: var(--accent); }
+  .arrow-v.loop.lit .lbl { color: var(--accent); }
+
+  /* In-lane horizontal arrows */
+  .arrow-h {
+    flex: 0 0 60px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 0 2px; align-self: center;
+  }
+  .arrow-h .data {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+    text-align: center;
+    max-width: 76px;
+    line-height: 1.3;
+  }
+  .arrow-h .line { height: 1.5px; background: var(--border); width: 100%; position: relative; }
+  .arrow-h .line::after {
+    content: "";
+    position: absolute; right: -2px; top: -4px;
+    border: 5px solid transparent;
+    border-left-color: var(--border);
+  }
+  .arrow-h.lit .line { background: var(--accent); }
+  .arrow-h.lit .line::after { border-left-color: var(--accent); }
+  .arrow-h.lit .data { color: var(--accent); }
+  .arrow-h.dim { opacity: 0.25; }
+
+  .legend {
+    margin-top: 32px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .legend .item {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .legend .swatch {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    background: var(--surface);
+    border-left: 3px solid;
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Visibility panels */
+  .visibility {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 800px) { .visibility { grid-template-columns: 1fr; } }
+  .vis-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+  .vis-card h2 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+  .vis-card.rep h2 { color: var(--role-processing); }
+  .vis-card.owner h2 { color: var(--accent); }
+  .vis-card ul { list-style: none; }
+  .vis-card li {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    padding: 5px 0 5px 16px;
+    position: relative;
+  }
+  .vis-card li::before {
+    content: "";
+    position: absolute; left: 0; top: 12px;
+    width: 6px; height: 1.5px;
+  }
+  .vis-card.rep li::before { background: var(--role-processing); }
+  .vis-card.owner li::before { background: var(--accent); }
+  .vis-card li strong { color: var(--text); font-weight: 600; }
+
+  .tooltip {
+    position: fixed;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.45;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 1000;
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  .tooltip.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="eyebrow">JUNTO · GTM OS · DATA LAYER</div>
+    <h1>Sources to Surfaces</h1>
+    <p>How data flows into the shared layer (three ingestion paths), how a rep's ask flows through it (planner &rarr; primitives &rarr; evidence &rarr; cited answer), and how finished runs loop back in as team knowledge. Click any node to trace its connections. Hover for details.</p>
+  </header>
+
+  <main class="diagram swimlane" id="diagram">
+
+    <!-- LANE 1: SOURCES -->
+    <div class="lane">
+      <div class="lane-label">Sources<br>(where data lives)</div>
+      <div class="lane-content">
+        <div class="node tool" data-id="s1" data-tip="System of record. Current state (accounts, opps, contacts) is queried LIVE at run time via the adapter. History + activities (stage changes, emails logged, calls made) are ingested nightly as rows.">
+          <div class="role">Tool</div>
+          <div class="label tool-name">Salesforce</div>
+          <div class="sub">accounts, opps, activities, history</div>
+        </div>
+        <div class="node tool" data-id="s2" data-tip="Calls are immutable once recorded — only NEW calls are ever ingested (hourly poll on a watermark). Transcripts are distilled per call type, never embedded raw.">
+          <div class="role">Tool</div>
+          <div class="label tool-name">Gong</div>
+          <div class="sub">call transcripts, per call type</div>
+        </div>
+        <div class="node tool" data-id="s3" data-tip="Team channels + Junto's own run threads. Gateway already receives every message via Socket Mode; ingestion taps tracked channels before the intent-gate drop. Every artifact keeps the thread permalink.">
+          <div class="role">Tool</div>
+          <div class="label tool-name">Slack</div>
+          <div class="sub">team channels + Junto run threads</div>
+        </div>
+        <div class="node tool" data-id="s4" data-tip="Product usage telemetry (how customers use Pave to get aggregated comp data). A scheduled SQL job aggregates events and emits usage_spike / usage_drop / team_formation signal rows.">
+          <div class="role">Tool</div>
+          <div class="label tool-name">BigQuery</div>
+          <div class="sub">product usage telemetry</div>
+        </div>
+        <div class="node tool" data-id="s5" data-tip="HarvestAPI job postings (live today), plus the doc-08 catalog: ATS pay-range APIs, EDGAR, funding feeds, NPS exports, Marketo activity, Outreach events. Each is one small connector module.">
+          <div class="role">Tool</div>
+          <div class="label">External feeds</div>
+          <div class="sub">HarvestAPI, Marketo, Outreach, NPS&hellip;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-band">
+      <div class="spacer"></div>
+      <div class="flows">
+        <div class="flow"><div class="arrow-v" data-from="s1" data-to="c1"><span class="lbl">history + activity events</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="s4" data-to="c1"><span class="lbl">usage aggregates</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="s5" data-to="c1"><span class="lbl">postings / feeds</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="s2" data-to="c2"><span class="lbl">new transcripts</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="s3" data-to="c2"><span class="lbl">quiet threads</span></div></div>
+      </div>
+    </div>
+
+    <!-- LANE 2: INGESTION -->
+    <div class="lane">
+      <div class="lane-label">Ingestion<br>(keeps the store stocked)</div>
+      <div class="lane-content">
+        <div class="node processing" data-id="c1" data-tip="Live in connectors/ in the repo: one module + manifest {source, cadence, owner} per source. Each run: fetch since watermark, qualify, map to contract shape, validate (isValidSignalRow), write. Idempotent via dedupe keys. New source = one small PR.">
+          <div class="role">Processing</div>
+          <div class="label">Connector jobs</div>
+          <div class="sub">scheduled + deterministic: fetch &rarr; qualify &rarr; map &rarr; write, per-source cadence</div>
+        </div>
+        <div class="node processing" data-id="c2" data-tip="LLM extractors, one schema per content type: new-business calls {pains, objections, competitors, triggers}, AM/CS calls {adoption blockers, expansion cues, renewal risk}, threads {question, answer, human additions, reactions}. Embed the artifact, never the raw transcript. Reactions gate what gets kept.">
+          <div class="role">Processing</div>
+          <div class="label">Distillers</div>
+          <div class="sub">LLM extractors: thread / call &rarr; structured artifact + embedding</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-band">
+      <div class="spacer"></div>
+      <div class="flows">
+        <div class="flow"><div class="arrow-v" data-from="c1" data-to="d1"><span class="lbl">valid SignalRows</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="c1" data-to="d2"><span class="lbl">activity events</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="c2" data-to="d3"><span class="lbl">artifacts + vectors</span></div></div>
+      </div>
+    </div>
+
+    <!-- LANE 3: SHARED DATA LAYER -->
+    <div class="lane">
+      <div class="lane-label">Shared layer<br>(Postgres on the VM)</div>
+      <div class="lane-content">
+        <div class="node store" data-id="d1" data-tip="The frozen contract (contract/src/signals.ts). Curated, attention-worthy events only — comp-leader hires, usage spikes, funding. Every row: subject, evidence with url + summary, detected_at, freshness, source. Composer: Tables tab.">
+          <div class="role">Data store</div>
+          <div class="label">Signals ledger</div>
+          <div class="sub">curated, attention-worthy events</div>
+        </div>
+        <div class="node store" data-id="d2" data-tip="The uncurated record: every email sent, call made, LinkedIn touch, stage change — with actor, ts, direction, outcome. Powers coverage and history questions ('when did we last touch them?') without spamming the signals ledger. Composer: Tables tab.">
+          <div class="role">Data store</div>
+          <div class="label">Activity rows</div>
+          <div class="sub">every touch: emails, calls, stage moves</div>
+        </div>
+        <div class="node store" data-id="d3" data-tip="Distilled threads + calls with embeddings for semantic search. Each row: kind, subject accounts, distilled text, structured details, Slack permalink / Gong link, participants, reactions, visibility, embedding. Composer: Knowledge base tab (team knowledge section).">
+          <div class="role">Data store</div>
+          <div class="label">Knowledge artifacts</div>
+          <div class="sub">distilled + embedded, permalinked to source</div>
+        </div>
+        <div class="node store" data-id="d4" data-tip="Read-only truth: ICP, personas, positioning, competitor radar, playbooks, reference customers. Evolved by PR only. Overlays change the lens, never these facts. Composer: Knowledge base tab (canonical section).">
+          <div class="role">Data store</div>
+          <div class="label">Canonical docs</div>
+          <div class="sub">ICP, personas, playbooks &mdash; read-only</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-band">
+      <div class="spacer"></div>
+      <div class="flows">
+        <div class="flow"><div class="arrow-v" data-from="d1" data-to="q3"><span class="lbl">signals</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="d2" data-to="q3"><span class="lbl">touch history</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="d3" data-to="q3"><span class="lbl">team knowledge</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="d4" data-to="q3"><span class="lbl">canonical context</span></div></div>
+      </div>
+    </div>
+
+    <!-- LANE 4: QUERY SIDE -->
+    <div class="lane">
+      <div class="lane-label">Query side<br>(per run)</div>
+      <div class="lane-content">
+        <div class="node trigger" data-id="q1" data-tip="@Junto in a team channel, a thread reply (mention-to-join), or /play syntax. The gateway acks in under 3s, queues the work, and passes the speaker's Slack identity into the run.">
+          <div class="role">Trigger</div>
+          <div class="label">Rep asks in Slack</div>
+          <div class="sub">@Junto &hellip; / thread reply / slash syntax</div>
+        </div>
+        <div class="arrow-h" data-from="q1" data-to="q2"><div class="data">ask + speaker identity</div><div class="line"></div></div>
+        <div class="node decision" data-id="q2" data-tip="Runs AFTER the intent gate. Reads the capability catalog (derived from the skills registry: what each play is good for, what it needs) and must select explicitly — or fall through to DISCOVER / HELP. Never a silent default. Can fan out to several tools in parallel.">
+          <div class="role">Decision</div>
+          <div class="label">Planner</div>
+          <div class="sub">selects tools from the capability catalog</div>
+        </div>
+        <div class="arrow-h" data-from="q2" data-to="q3"><div class="data">tool selections</div><div class="line"></div></div>
+        <div class="node processing" data-id="q3" data-tip="Deterministic, LLM-free reads over the shared layer AND live adapters (Salesforce current state, Calendar) — the hybrid: stored knowledge + live truth. Every read is filtered by the requester's visibility BEFORE any LLM sees it. Same primitives exposed over MCP later.">
+          <div class="role">Processing</div>
+          <div class="label">Read primitives</div>
+          <div class="sub">stored + live reads, visibility-filtered</div>
+        </div>
+        <div class="arrow-h" data-from="q3" data-to="q4"><div class="data">evidence rows</div><div class="line"></div></div>
+        <div class="node processing" data-id="q4" data-tip="Every fetched item is normalized to one shape: {source, snippet, date, subject_id, confidence, visibility}. The skill's LLM consumes ONLY these rows — every claim traces to a row, citations and denominators (scanned N, matched M) fall out for free. Failed fetches are declared, not hidden.">
+          <div class="role">Processing</div>
+          <div class="label">Synthesis</div>
+          <div class="sub">evidence rows &rarr; cited, constitution-safe answer</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-band">
+      <div class="spacer"></div>
+      <div class="flows">
+        <div class="flow"><div class="arrow-v" data-from="q4" data-to="o1"><span class="lbl">answer + citations</span></div></div>
+        <div class="flow"><div class="arrow-v" data-from="q4" data-to="o2"><span class="lbl">run log + evidence panel</span></div></div>
+        <div class="flow"><div class="arrow-v loop" data-from="o1" data-to="c2"><span class="lbl">&#8635; finished thread &rarr; distiller (the loop)</span></div></div>
+      </div>
+    </div>
+
+    <!-- LANE 5: SURFACES -->
+    <div class="lane">
+      <div class="lane-label">Surfaces<br>(what people see)</div>
+      <div class="lane-content">
+        <div class="node output" data-id="o1" data-tip="In-thread reply: cited facts with source + date, provenance line ('Signal Scanner by Dan Webb · 214 runs'), run-path journey diagram, seeded reactions. The thread itself later becomes a knowledge artifact — that's the compounding loop.">
+          <div class="role">Output</div>
+          <div class="label">Slack reply</div>
+          <div class="sub">cited answer + provenance + run diagram</div>
+        </div>
+        <div class="node output" data-id="o2" data-tip="Rep-facing web app. Tables (signals, activity, canonical data), Knowledge base (canonical + team knowledge), Sources (connector registry: owner, cadence, last run, rows emitted), Logs (runs + evidence panels), Pending actions (write path, empty in MVP), Review labeling (owner).">
+          <div class="role">Output</div>
+          <div class="label">Composer</div>
+          <div class="sub">Tables &middot; Knowledge &middot; Sources &middot; Logs &middot; Review</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="legend">
+    <div class="item"><div class="swatch" style="border-left-color: var(--role-trigger);"></div>Trigger</div>
+    <div class="item"><div class="swatch" style="border-left-color: var(--role-tool);"></div>Tool</div>
+    <div class="item"><div class="swatch" style="border-left-color: var(--role-processing);"></div>Processing</div>
+    <div class="item"><div class="swatch" style="border-left-color: var(--role-decision);"></div>Decision</div>
+    <div class="item"><div class="swatch" style="border-left-color: var(--role-store);"></div>Data Store</div>
+    <div class="item"><div class="swatch" style="border-left-color: var(--role-output);"></div>Output</div>
+  </div>
+
+  <div class="visibility">
+    <div class="vis-card rep">
+      <h2>What a rep sees</h2>
+      <ul>
+        <li><strong>Their book, scoped:</strong> every adapter read is filtered by their Slack identity (already in the contract) &mdash; accounts, opps, activity they're allowed to see.</li>
+        <li><strong>Team knowledge they can see:</strong> artifacts inherit visibility from origin &mdash; a #sdr-team thread is visible to #sdr-team; a Gmail thread belongs to its owner.</li>
+        <li><strong>Tables + Knowledge base:</strong> read-only canonical truth, signals for visible accounts.</li>
+        <li><strong>Logs:</strong> real executions (public to the channel), plus a private "My activity" view of their own runs.</li>
+        <li><strong>Provenance everywhere:</strong> who built each play, who answered each cited thread.</li>
+      </ul>
+    </div>
+    <div class="vis-card owner">
+      <h2>What the owner (Ryan) additionally sees</h2>
+      <ul>
+        <li><strong>Sources / connector health:</strong> every connector's owner, cadence, watermark, last run, failure state, rows emitted.</li>
+        <li><strong>Review labeling:</strong> the docs-18 grading studio &mdash; labels double as the gate for what knowledge is kept and the source-gap queue.</li>
+        <li><strong>Pending actions:</strong> the write-path approval queue (empty in MVP; RevOps-veto seam at hackweek; connector PRs awaiting review can surface here).</li>
+        <li><strong>Audit trail:</strong> which evidence rows each run returned to whom (the evidence panel doubles as this).</li>
+        <li><strong>Sim back office:</strong> engine admin, schedules, keys &mdash; reps never see raw Sim.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  const tooltip = document.getElementById('tooltip');
+  const diagram = document.getElementById('diagram');
+
+  function getAllNodes() { return diagram.querySelectorAll('.node'); }
+  function getAllArrows() { return diagram.querySelectorAll('.arrow-h, .arrow-v'); }
+
+  function reset() {
+    getAllNodes().forEach(n => n.classList.remove('active', 'dim'));
+    getAllArrows().forEach(a => a.classList.remove('lit', 'dim'));
+  }
+
+  getAllNodes().forEach(n => {
+    n.addEventListener('mouseenter', () => {
+      if (n.dataset.tip) {
+        tooltip.textContent = n.dataset.tip;
+        tooltip.classList.add('visible');
+      }
+    });
+    n.addEventListener('mousemove', e => {
+      tooltip.style.left = Math.min(e.clientX + 14, window.innerWidth - 300) + 'px';
+      tooltip.style.top = (e.clientY + 14) + 'px';
+    });
+    n.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+
+    n.addEventListener('click', e => {
+      e.stopPropagation();
+      const wasActive = n.classList.contains('active');
+      reset();
+      if (wasActive) return;
+
+      const id = n.dataset.id;
+      const connected = new Set([id]);
+      getAllArrows().forEach(a => {
+        if (a.dataset.from === id) connected.add(a.dataset.to);
+        if (a.dataset.to === id) connected.add(a.dataset.from);
+      });
+      getAllNodes().forEach(other => {
+        if (connected.has(other.dataset.id)) {
+          if (other === n) other.classList.add('active');
+        } else {
+          other.classList.add('dim');
+        }
+      });
+      getAllArrows().forEach(a => {
+        if (a.dataset.from === id || a.dataset.to === id) {
+          a.classList.add('lit');
+        } else {
+          a.classList.add('dim');
+        }
+      });
+      n.classList.add('active');
+    });
+  });
+
+  document.addEventListener('click', reset);
+</script>
+
+</body>
+</html>
