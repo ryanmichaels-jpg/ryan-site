@@ -85,6 +85,8 @@ There's a second-order effect here that I missed at first, and it's the reason t
 
 Creation used to be expensive, so not many people did it. Now it's cheap, so everyone (including myself) does, which sounds like progress and mostly is. But every creation carries its own private copy of the context it needs: its own definition of who we sell to, its own instructions, its own lessons about what works. And the copies don't just duplicate, they diverge. The AI era is relearning this the hard way: the current push to give coding agents one canonical instructions file exists precisely because agents reading different copies of the truth act on different truths.[^c1-3] Two reps' definitions of the same customer drift apart quietly, and nobody can tell which one is right, because no version is the version. Then the creation dies, and its copy dies with it.
 
+Stripe just published what this looks like at enterprise scale. Before they consolidated onto Kai, their internal knowledge platform, anyone at the company could build and deploy workflow agents, and over 4,000 got built. Their write-up says teams were writing conceptually similar prompts with varying levels of quality, and that the proliferation became increasingly hard to monitor and maintain.[^c1-4] Four thousand agents is four thousand private copies of the context, drifting.
+
 So cheap creation doesn't solve the death problem, it multiplies it, and what the company knows fragments across a graveyard that grows faster every quarter. In my opinion, the scarce thing is now shared memory, and building is exactly what doesn't produce it.
 
 ### The question
@@ -97,6 +99,8 @@ I had no idea what that would look like, but I knew what world I wanted to live 
 
 [^c1-3]: The older evidence is a 2007 study of copied code (Jens Krinke) finding roughly half of later changes landed in one copy and not the other. The 2026 version is the AGENTS.md movement: one canonical instruction file per repo, adopted precisely because duplicated context drifts and agents act on whichever copy they read.
 
+[^c1-4]: Stripe's engineering write-up of Kai, "Meet Stripe's Knowledge AI Platform" (stripe.dev, 2026). It's the largest public deployment of the shape this post is about, and the adoption numbers are worth the read on their own: most of Stripe using it within two weeks of launch, and 83% of the company weekly active, including nearly all of GTM.
+
 
 ## A layer, not a tool
 
@@ -104,7 +108,12 @@ So our hypothesis was now: the scarce thing is shared memory. So could we just c
 
 Lay chapter 1's map out as a matrix, tools down one side and the four relationships across the top, and the survivors make a clean diagonal. Slack has location. Gong has learning. Outreach and GitHub have sharing. Salesforce has compounding. A clean diagonal invited a thought: wire the survivors together and collect the shared memory at the seams.
 
-{/* [D5 · why no combination of the survivors gets you there] */}
+
+<Diagram
+  src="junto-punnett.png"
+  label="Fig. 2"
+  caption="No combination of the survivors reaches a green square. The layer and the social loop are the squares the rest of this post is about."
+/>
 
 But the trap in that move was that the four relationships belong to a tool's own content. They don't transfer to whatever you attach. Post your dashboard's output to Slack and the message gets location but the dashboard doesn't. Write your results to Salesforce and the rows compound, but the outreach your team does the next day doesn't, because it's not a tool system that was built for discovery. Read call data out of Gong and you get the benefit of everything Gong learned, but your own tool never learns a thing, because nobody can grade it. Create an email sequence in Outreach and the sequence is shared, but the learning isn't. Integration isn't inheritance.
 
@@ -120,6 +129,8 @@ So could one tool hold all four relationships at once? The answer is probably no
 
 Every corpse on that list was a destination: a thing you opened on purpose, that showed you something, that you may or may not have taken actions within, that you then closed. And a destination competes for attention every single morning, and it loses that competition eventually, because attention is the one budget nobody can grow.
 
+Stripe's team wrote down the same conclusion while building Kai, their internal knowledge platform: a standalone agent product wouldn't work, because it would force users out of their natural workflows and into a new app. The platform has to meet the user where they are. Their sentence, my corpses.
+
 The fix was a growing, actionable layer underneath the destinations.
 
 ### The principle
@@ -127,6 +138,8 @@ The fix was a growing, actionable layer underneath the destinations.
 Centralize the data. Decentralize the builders.
 
 One shared memory underneath, and many hands building on top. The phrasing comes from a talk Chris Prinz, a former colleague, now a GTM Engineer at Modal, gave in Modal's session with Deepline, where he put his team's core philosophy on a slide: centralize the data, decentralize the agents. Consolidate the data and the business logic into one warehouse, then give everyone access to it through their agents, and he presented it as the philosophy that lets a small team iterate fast without getting blindsided. Every decision in the rest of this post is that sentence applied to something.
+
+Stripe reached the same principle from the other direction. Their write-up of Kai says building it required getting three things right: scaling expertise without centralizing it, meeting users wherever they work, and enforcing guardrails that don't exist in code. That first one is this exact sentence. The people who know how to triage an escalation or model a revenue scenario are, in their words, certainly not on the team building the agent infrastructure. The expertise stays where it lives, and the platform carries everything else.
 
 One thing to clarify. Centralizing the data doesn't mean centralizing the interface. "One place to go for everything" is a destination, and destinations were a factor in other tools failing. So the data is what gets pooled. Where you stand when you ask for it should stay wherever you already were.
 
@@ -176,7 +189,7 @@ So that's where the design came from. Mapping the survivors as a matrix showed w
 
 <Diagram
   src="junto-structure.png"
-  label="Fig. 2"
+  label="Fig. 3"
   caption="Centralize the data, decentralize the builders. Sources in, one shared layer, and every surface feeding back into it."
 />
 
@@ -225,7 +238,7 @@ The logic behind my rule was this: a deep change would be a loan taken out again
 
 <Diagram
   src="junto-stay-thin.png"
-  label="Fig. 3"
+  label="Fig. 4"
   caption="Thin changes are paid for once. A deep one is re-merged at every release after it."
 />
 
@@ -271,7 +284,7 @@ None of that demos well. All of it's why the demos worked.
 
 <Diagram
   src="junto-mention-flow.png"
-  label="Fig. 4"
+  label="Fig. 5"
   caption="What happens between the mention and the reply. One place does the thinking; everything around it is bookkeeping."
 />
 
@@ -286,7 +299,7 @@ The fix was to stop guessing. One classifier at the front, and ten explicit exit
 
 <Diagram
   src="junto-ten-exits.png"
-  label="Fig. 5"
+  label="Fig. 6"
   caption="One classifier at the front, ten explicit exits. A default path does not exist."
 />
 
@@ -335,7 +348,7 @@ The obvious way to apply a spec like that's to paste it into every prompt. I had
 
 <Diagram
   src="junto-one-seam.png"
-  label="Fig. 6"
+  label="Fig. 7"
   caption="Every prompt passes through the same wrapper. One place to audit, one version in every run log. The non-ideal version: 40 dialects of the same law."
 />
 
@@ -352,6 +365,8 @@ One rule mattered more than all the others. When a rep asks who to reach out to,
 The rule lives in the fetcher, the code that pulls candidate accounts before the model ever runs. Accounts with an open opportunity are filtered out of the query itself, so the model never sees them. It can't be talked out of data it never saw. You can argue with a prompt all day but you can't argue with a filter.
 
 That became my sorting test for every rule since. Anything that absolutely must hold goes below the model, where there's nothing to persuade. Anything that should usually hold can stay up in the prompt with the other requests.
+
+Stripe draws the same boundary in their write-up of Kai, their internal knowledge platform. Coding agents, they point out, work inside decades of fast, verifiable guardrails, where compilers reject invalid syntax, tests catch regressions, and git makes every mistake reversible. Knowledge work has almost none of that. Their example invariant is that data from two unrelated customer contexts must never appear in the same analysis, even when the person asking has legitimate access to both, because the boundary isn't what this person can see, it's what this task should see. That's a fetcher rule, not a prompt rule, and they know it too.
 
 ### The linter
 
@@ -411,7 +426,7 @@ Events are for acting. The index is for asking. A decent picture is a factory fl
 
 <Diagram
   src="junto-factory-library.png"
-  label="Fig. 7"
+  label="Fig. 8"
   caption="Events are for acting, the index is for asking. Work orders fire actions. The filing room answers questions."
 />
 
@@ -517,7 +532,7 @@ Ramp settled any doubt I had about this direction. In their tooling demo with De
 
 <Diagram
   src="junto-ramp-flywheel.png"
-  label="Fig. 8"
+  label="Fig. 9"
   caption="Ramp's flywheel, as Keyan Sarrafzadeh described it in their tooling demo with Deepline. Their loop, my redraw."
 />
 
@@ -545,6 +560,8 @@ What these tools lack is a memory, some record of context that anyone else can s
 The most common suggestion is the simplest: give every rep an AI chat window and let them go. The reps will love it, because the chats are genuinely good. I know, because I practically live in one. For one question on one afternoon, the chat wins.
 
 But a thousand brilliant private chats compound nothing. My best prompt dies in my history. The next rep's best answer dies in theirs. Nobody learns from a win they never see, and nothing anyone figures out today makes tomorrow's work cheaper. A solo tool dies all four deaths no matter how smart the model is.
+
+The strongest version of this warning comes from the far end of the road. Stripe's Kai, their internal knowledge platform, serves most of their company, and their own roadmap still names the problem: users generate a lot of context in their sessions that is currently locked in, and, in their words, that's not how work gets done. Thousands of sessions a day, and the private-chat death is still the one they're engineering against. That's how strong the default is.
 
 ### Why not enterprise search?
 
@@ -660,10 +677,7 @@ There's one extension of this rule I've not built yet, and I learned it from Ram
 
 The account org chart taught me the second rule, which is that a spec can render fine and still be wrong. My first spec drew department columns, with "reports to" written on every card. It rendered exactly as specified. It read terribly.
 
-The version worth copying came from a reference: Cursor's internal sales tool, ChatGTM, demo'd by George Hu at Cursor and covered by Brendan Short in his Substack, The Signal. What we took from it was the reporting-graph format. The arrow is the reporting line, and no label does the geometry's job.
-
-
-{/* TK: [NEEDS REF: George Hu's exact title] */}
+The version worth copying came from a reference: Cursor's internal sales tool, ChatGTM, demo'd by George Hou, Cursor's Head of Enterprise Growth, and covered by Brendan Short in his Substack, The Signal. What we took from it was the reporting-graph format. The arrow is the reporting line, and no label does the geometry's job.
 
 When the renderer is deterministic,[^c10-1] a bad spec is cheap, because redoing the picture means changing the spec, not arguing with a model about what it feels like drawing.
 
@@ -764,6 +778,8 @@ Those are outputs. Outputs are real, and they matter, because for a year nothing
 ### What isn't
 
 Here is what I can't show you yet: the loops closing on their own. No demo can prove that a second rep will build unprompted, or that credit will change anyone's behavior. None can prove that knowledge deposited this quarter will change a deal next quarter. Those are outcomes, and outcomes only exist in other people's behavior, over time.
+
+The outcomes are measurable, just not yet by me. Stripe measures them on Kai, their internal knowledge platform: account executives produce twice the sales activity and close 39% more deals in the weeks they use it than the same sellers do in the weeks they don't, and it has shifted 25,000 hours a year from admin work toward revenue work. I'm citing their numbers for one reason. They're what closed loops look like when a whole company keeps them closed. My demo proves the machine runs. Their numbers are the thing the bet is actually chasing.
 
 Could we fake one? Eh. Maybe? But where would the fun in that be? That'd be demo theater, possibly the same thing that eventually buried the vendor tools. Every one of those eight had a demo that worked, and every one died anyway. Here are the outcomes, defined.
 
