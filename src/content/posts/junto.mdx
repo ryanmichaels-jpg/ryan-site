@@ -1,6 +1,6 @@
 ---
 title: Talented and disposable
-dek: A build journal for Junto — the shared layer I built so that go-to-market work would stop dying at demo day.
+dek: A build journal for Junto, the shared layer I built so that go-to-market work would stop dying at demo day.
 date: 2026-07-30
 draft: true
 tags: ['build journal', 'gtm engineering']
@@ -45,6 +45,13 @@ Which makes it a different question. Not what did these projects lack, but what 
 
 An output that never becomes someone else's input is only half an output.
 
+
+<Diagram
+  src="junto-d6-systems.png"
+  label="Fig. 1"
+  caption="Eight projects, and every part of all eight of them worked. The frame is from Albert Rutherford: blame the parts, replace all of them, and get the same behavior back."
+/>
+
 ### 4 relationships
 
 When I thought about it this way, the causes sorted themselves into four, and each one was a relationship the project didn't have.
@@ -75,7 +82,7 @@ The map was almost too neat. Slack was location, Gong was learning, Outreach and
 
 <Diagram
   src="junto-four-relationships.png"
-  label="Fig. 1"
+  label="Fig. 2"
   caption="Between them the survivors cover all four. Not one of the eight covered any."
 />
 
@@ -97,7 +104,7 @@ I had no idea what that would look like, but I knew what world I wanted to live 
 
 [^c1-2]: This is the weakest of the four mappings and worth saying so. A deposit does happen in both tools: a sequence you write is visible to the team, a commit is visible to the repo. But discovery barely happens, and nobody browses Outreach to learn what worked. The sharing relationship needs both halves, and these two tools have one.
 
-[^c1-3]: The older evidence is a 2007 study of copied code (Jens Krinke) finding roughly half of later changes landed in one copy and not the other. The 2026 version is the AGENTS.md movement: one canonical instruction file per repo, adopted precisely because duplicated context drifts and agents act on whichever copy they read.
+[^c1-3]: The older evidence is a 2007 study of copied code (Jens Krinke) finding roughly half of later changes landed in one copy and not the other, and a 2009 study across five industrial systems (Juergens et al.) where inconsistent changes to clones were frequent enough to cause real faults. The newer version is the AGENTS.md movement: one canonical instruction file per repo. A 2025 study of 2,303 of those files (NAIST and Queen's) found they aren't static documentation but artifacts that evolve like configuration code, which is the same drift in a new costume. Neither paper proves why the convention caught on, and one 2026 ablation found context files can slightly reduce agent success, so take this as a pattern rhyming rather than a question settled.
 
 [^c1-4]: Stripe's engineering write-up of Kai, "Meet Stripe's Knowledge AI Platform" (stripe.dev, 2026). It's the largest public deployment of the shape this post is about, and the adoption numbers are worth the read on their own: most of Stripe using it within two weeks of launch, and 83% of the company weekly active, including nearly all of GTM.
 
@@ -111,7 +118,7 @@ Lay chapter 1's map out as a matrix, tools down one side and the four relationsh
 
 <Diagram
   src="junto-punnett.png"
-  label="Fig. 2"
+  label="Fig. 3"
   caption="No combination of the survivors reaches a green square. The layer and the social loop are the squares the rest of this post is about."
 />
 
@@ -189,7 +196,7 @@ So that's where the design came from. Mapping the survivors as a matrix showed w
 
 <Diagram
   src="junto-structure.png"
-  label="Fig. 3"
+  label="Fig. 4"
   caption="Centralize the data, decentralize the builders. Sources in, one shared layer, and every surface feeding back into it."
 />
 
@@ -208,10 +215,7 @@ So I went looking for an engine instead of writing one. What I found was an open
 
 The canvas would be how a rep sees what a play does without reading code. Tables would be where the shared memory lives. Scheduled runs would be how a play fires on a clock instead of waiting to be remembered. And the execution API would be how a bot runs something without a person clicking a button.
 
-Sim is an open source AI workspace, which means a place to build, deploy and run agents and workflows, visually on a canvas or in code. Waleed Latif and Emir Karabeg started it, it went through Y Combinator, and it raised a $7M Series A in November 2025.[^c3-1] In an interview, Emir recited Sim's mission as "democratize the way that anyone can build agents." Swap two words and it's close to being Junto's mission too: democratize the way that any rep can build plays.
-
-
-{/* TK: [NEEDS REF: verify the interview source and exact wording] */}
+Sim is an open source AI workspace, which means a place to build, deploy and run agents and workflows, visually on a canvas or in code. Waleed Latif and Emir Karabeg started it, it went through Y Combinator, and it raised a $7M Series A in November 2025.[^c3-1] In an interview, Emir described the aim as democratizing how agents get built, so that "anyone can build agents, not just developers."[^c3-4] Swap two words and it's close to being Junto's mission too: democratize the way that any rep can build plays.
 
 Junto is built on it, self-hosted as the execution engine, with attribution kept and the license respected.[^c3-2]
 
@@ -233,12 +237,12 @@ The deepest change I've made to Sim's code is a 43-line edit to the component th
 
 Everything that makes Junto Junto, the Slack layer, the behavior rules, the credit system, the play contract, lives outside the engine, in services of mine that talk to it over its APIs.
 
-The logic behind my rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges, forever. Thin changes keep the upgrade path cheap. A thin change is painting the walls of a rented apartment. A deep change is moving a load-bearing wall. When the landlord upgrades the building, the paint survives, and the moved wall has to be argued over again with every renovation.
+The logic behind my rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges, forever.[^c3-3] Thin changes keep the upgrade path cheap. A thin change is painting the walls of a rented apartment. A deep change is moving a load-bearing wall. When the landlord upgrades the building, the paint survives, and the moved wall has to be argued over again with every renovation.
 
 
 <Diagram
   src="junto-stay-thin.png"
-  label="Fig. 4"
+  label="Fig. 5"
   caption="Thin changes are paid for once. A deep one is re-merged at every release after it."
 />
 
@@ -264,12 +268,16 @@ Nobody had asked the bot anything (because there was no bot to ask) and nothing 
 
 [^c3-2]: Two bugs are worth naming, as feedback rather than complaint. The engine's live-update channel assumes a websocket it can reach directly, so behind a plain HTTP port it needs a reverse proxy in front before the canvas comes alive. And when self-hosting, the knowledge base's embedding key has to be set in two places, once in the container's environment and once in the engine's own settings store. Neither is really a defect. They're what happens when software runs somewhere it has never run, and finding them is part of what a self-hoster is for.
 
+[^c3-4]: "Sim: The Visual, End-to-End Agent Builder," on YouTube, at 19:26. He self-corrects mid-sentence, from "the way that developers build agents" to "anyone can build agents not just developers," so the quoted fragment is his words in his order with the stumble left out and nothing added.
+
+[^c3-3]: Ray and Kim measured this across eighteen years of the BSD forks (FSE 2012): between 10.7 and 15.5% of all patch lines were edits being re-ported between forks, work that occupied 26 to 59% of active developers in a release, and the porting rate does not necessarily decrease over time. That last clause is the whole point. The interest never tapers. Their setting is peer forks rather than a thin fork tracking an upstream, so what I'm borrowing is the shape and not the number.
+
 
 ## The front door
 
 A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot with one name, and that was a decision, not a default.
 
-The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust. It's the graveyard from the opening section rebuilt inside Slack, except now it pings you. Many bots is a coffee table with ten remote controls on it.
+The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust.[^c4-4] It's the graveyard from the opening section rebuilt inside Slack, except now it pings you. Many bots is a coffee table with ten remote controls on it.
 
 ### The plumbing
 
@@ -284,8 +292,8 @@ None of that demos well. All of it's why the demos worked.
 
 <Diagram
   src="junto-mention-flow.png"
-  label="Fig. 5"
-  caption="What happens between the mention and the reply. One place does the thinking; everything around it is bookkeeping."
+  label="Fig. 6"
+  caption="What happens between the mention and the reply. One place does the thinking. Everything around it is bookkeeping."
 />
 
 ### The router grew up
@@ -299,7 +307,7 @@ The fix was to stop guessing. One classifier at the front, and ten explicit exit
 
 <Diagram
   src="junto-ten-exits.png"
-  label="Fig. 6"
+  label="Fig. 7"
   caption="One classifier at the front, ten explicit exits. A default path does not exist."
 />
 
@@ -309,7 +317,7 @@ One rule kept the whole thing honest.
 
 > Deterministic post-rules outrank the model.
 
-If a mechanical check says this is a request to run a play, then no amount of model cleverness gets to overrule it. The classifier proposes and the rules dispose.[^c4-3] And every misroute that happened live became a pinned transcript in the test suite,[^c4-2] an actual test containing the real words a real person typed. The router can't quietly regress to a mistake it has already made once. That's a cheap property to buy and I'd buy it again.
+If a mechanical check says this is a request to run a play, then no amount of model cleverness gets to overrule it.[^c4-5] The classifier proposes and the rules dispose.[^c4-3] And every misroute that happened live became a pinned transcript in the test suite,[^c4-2] an actual test containing the real words a real person typed. The router can't quietly regress to a mistake it has already made once. That's a cheap property to buy and I'd buy it again.
 
 ### Loud beats silent
 
@@ -323,11 +331,24 @@ A silent failure is an invisible failure, and invisible is sometimes even worse 
 
 So the gate flipped. In any thread Junto is part of, it responds. Staying silent now requires positive evidence that a message was addressed to a human, and uncertainty means answer. That moved the failure mode from invisible to visible, which I think is the correct direction. It's also the same rule the nothing-broke section was about, at a much smaller scale. Nothing broke, nobody complained, and nobody decided anything, because nothing was ever loud enough to force a decision. A system that fails quietly gets to keep failing.
 
+
+<Diagram
+  src="junto-widget-seven-steps.html"
+  label="Fig. 8"
+  caption="Type anything. Seven cards settle as the run reaches each phase, and the routing card opens onto the five rules that get the last word."
+  height={840}
+/>
+
+
 [^c4-1]: In the code they're ANSWER, RUN, COMPOSE, REMIX, SCHEDULE, DISCOVER, CLARIFY, HELP, SOURCE_MISS and CHAT. Naming them as an enum rather than as behaviors was worth more than it sounds, because you can't add an eleventh exit by accident.
 
-[^c4-3]: The research points the same way. StateFlow (Wu et al., 2024) found that framing an LLM task as explicit states with allowed transitions raised success rates and cut costs versus letting the model act freely. And acpx, a protocol client for coding agents, states it as a design principle: routing is constrained choice, never open-ended generation.
+[^c4-3]: The research points the same way. StateFlow (Wu et al., 2024) found that framing an LLM task as explicit states with allowed transitions raised success rates and cut costs versus letting the model act freely. And acpx, a protocol client for coding agents, states it as a design principle: routing is constrained choice, never open-ended generation. Anthropic's engineering write-up on building effective agents names the same pattern: routing classifies an input and hands it to a specialized followup, and workflows buy predictability for well-defined tasks. It's a pattern note rather than an experiment, and the same document recommends the opposite for open-ended work. Mine is the well-defined case.
 
 [^c4-2]: The front door has 33 tests. Nine of them are named PIN, and those are the ones lifted verbatim out of live conversations, dated. The gate bug described below accounts for two on its own: one rule saying a clarify can't fire when the thread has already resolved to a single subject, and one saying the turn that answers Junto's own clarify can never draw another clarify. The whole gateway suite is 440 tests as I write this.
+
+[^c4-4]: Sclar et al. (ICLR 2024) found a single model's accuracy swinging by as much as 76 points on formatting alone, a different separator or a different casing. If differences that meaningless move results that far, differences on purpose certainly will. The effect shrinks on newer models without going away, and the paper says nothing about the other half of that sentence, which is three bots reading three different sets of sources.
+
+[^c4-5]: NVIDIA's NeMo Guardrails (EMNLP 2023) is this built as a product: rails that are written by a person, independent of whichever model is underneath, readable afterwards, and enforced while the thing runs. It's a design proof rather than a bake-off. Nobody has shown that rules beat models at routing, only that you can put the rules somewhere the model doesn't get a vote.
 
 
 ## Rules you can't prompt away
@@ -343,12 +364,12 @@ The first version had four rules:
 
 ### One seam
 
-The obvious way to apply a spec like that's to paste it into every prompt. I had prompts in about forty files, and I knew what forty copies would turn into. Each one gets edited in a hurry someday, and six months later you have forty dialects of the same law. So the constitution injects at exactly one place in the code, wrapped around every prompt on its way to the model. It works like an airport with exactly one security checkpoint: every passenger passes through the same doorway, so upgrading the scanner once upgrades it for every flight.
+The obvious way to apply a spec like that's to paste it into every prompt. I had prompts in about forty files, and I knew what forty copies would turn into. Each one gets edited in a hurry someday, and six months later you have forty dialects of the same law. So the constitution injects at exactly one place in the code, wrapped around every prompt on its way to the model.[^c5-3] It works like an airport with exactly one security checkpoint: every passenger passes through the same doorway, so upgrading the scanner once upgrades it for every flight.
 
 
 <Diagram
   src="junto-one-seam.png"
-  label="Fig. 7"
+  label="Fig. 9"
   caption="Every prompt passes through the same wrapper. One place to audit, one version in every run log. The non-ideal version: 40 dialects of the same law."
 />
 
@@ -364,19 +385,33 @@ One rule mattered more than all the others. When a rep asks who to reach out to,
 
 The rule lives in the fetcher, the code that pulls candidate accounts before the model ever runs. Accounts with an open opportunity are filtered out of the query itself, so the model never sees them. It can't be talked out of data it never saw. You can argue with a prompt all day but you can't argue with a filter.
 
-That became my sorting test for every rule since. Anything that absolutely must hold goes below the model, where there's nothing to persuade. Anything that should usually hold can stay up in the prompt with the other requests.
+That became my sorting test for every rule since. Anything that absolutely must hold goes below the model, where there's nothing to persuade.[^c5-4] Anything that should usually hold can stay up in the prompt with the other requests.
 
 Stripe draws the same boundary in their write-up of Kai, their internal knowledge platform. Coding agents, they point out, work inside decades of fast, verifiable guardrails, where compilers reject invalid syntax, tests catch regressions, and git makes every mistake reversible. Knowledge work has almost none of that. Their example invariant is that data from two unrelated customer contexts must never appear in the same analysis, even when the person asking has legitimate access to both, because the boundary isn't what this person can see, it's what this task should see. That's a fetcher rule, not a prompt rule, and they know it too.
 
 ### The linter
 
-The prompt carries the spirit of the spec, but something has to check the output, word for word. So every post Junto writes passes through a linter before it reaches Slack. The linter is deterministic: same post in, same verdict out, no model anywhere in it. It checks the voice rules, the formatting rules, and that every claim has its source and date attached.
+The prompt carries the spirit of the spec, but something has to check the output, word for word. So every post Junto writes passes through a linter before it reaches Slack. The linter is deterministic: same post in, same verdict out, no model anywhere in it.[^c5-5] It checks the voice rules, the formatting rules, and that every claim has its source and date attached.
 
 Why not let the model review its own work? Because a reviewer you can persuade is just another model, and I already had one of those. The linter fails the same way every time, so when it flags a post I can reproduce the flag and fix whichever side is wrong, the rule or the prompt. The model writes and the linter enforces.
 
+### When the enforcer lied
+
+That last sentence was too comfortable, and it cost me.
+
+I asked Junto what an account had said about pricing on past calls. It answered with a named person saying they would "blow through the per-user threshold." The call transcript says per-seat. The string per-user appears nowhere in my data.
+
+The model didn't do it. One of the vocabulary rules says the word seat never appears in rep-facing output, because reps say user. It was written as a whole-text replace. So an answer that quoted the buyer correctly tripped the rule, the retry couldn't drop the word because it sat inside a quotation, and then the mechanical fix rewrote it. The linter took a true quotation, made it false, and passed it.
+
+I caught it three times before I understood it, and the repetition was the clue I kept walking past. A model paraphrasing drifts a little differently each time. A regex does not. Three identical substitutions was a signature, and I read it as the model being stubborn.
+
+Determinism is what makes a linter worth having, and it's also what makes this worse than the model doing it. A model garbles a quote now and then. A script garbles it every time, in every answer that quotes the word, for as long as the rule exists, and it does it after the checking is finished. The same file had already made this mistake once. An earlier rule stripping dashes out of prose had mangled Salesforce opportunity names across every pipeline transcript. That got patched where it stood, and nobody asked the general question.
+
+The general question is which spans a style rule is allowed to touch at all. Quoted material is source, not prose. It belongs to whoever said it. So the style rules now skip anything inside quotation marks, and a separate gate checks that what sits inside them is a character-for-character copy of a cited row. The rules police how Junto writes. Nothing polices how a buyer talks.
+
 ### The pressure test
 
-A spec nobody has attacked is a guess. So I built a fleet of 15 synthetic personas, scripted rep personalities that fire messages at the live gateway through the same entry point Slack messages arrive at. They never had real Slack accounts. The harness drives the backend directly, which is the honest description. Some played impatient reps who wanted an answer right now. Some played confused reps who asked the wrong question in the wrong words. And some were hostile on purpose: prompt injection, direct orders to ignore the rules, bait built to pull a protected account out of hiding.
+A spec nobody has attacked is a guess. So I built a fleet of 15 synthetic personas, scripted rep personalities that fire messages at the live gateway through the same entry point Slack messages arrive at.[^c5-6] They never had real Slack accounts. The harness drives the backend directly, which is the honest description. Some played impatient reps who wanted an answer right now. Some played confused reps who asked the wrong question in the wrong words. And some were hostile on purpose: prompt injection, direct orders to ignore the rules, bait built to pull a protected account out of hiding.
 
 
 {/* TK: [ASSET: proof of the fleet, e.g. a persona run transcript or the harness output from the repo] */}
@@ -391,11 +426,21 @@ The same runs embarrassed the intent gate, the piece that decided whether channe
 
 The part that I was proud of was that the fleet caught it, for a few dollars, before anyone real got ignored.
 
-What stays with me is the symmetry. The hard rule held because it never depended on the model behaving. The gate failed because it did. Fifteen personas is fifteen imaginations, and a channel full of reps has more than that. The question I kept circling was which of my prompt rules were really data-path rules that hadn't been found yet. Put plainly: some rules I was asking the model to follow should instead be enforced in code, where following them stops being optional. It's the difference between a speed limit sign and a speed bump. Every rule starts as a sign, and the ones that really matter should end up as bumps.
+What stays with me is the symmetry. The hard rule held because it never depended on the model behaving. The gate failed because it did.[^c5-7] Fifteen personas is fifteen imaginations, and a channel full of reps has more than that. The question I kept circling was which of my prompt rules were really data-path rules that hadn't been found yet. Put plainly: some rules I was asking the model to follow should instead be enforced in code, where following them stops being optional. It's the difference between a speed limit sign and a speed bump. Every rule starts as a sign, and the ones that really matter should end up as bumps.
 
 [^c5-1]: Frozen doesn't mean forever. It means any change gets a new version number and a new date, so the citation in an old run log stays true.
 
 [^c5-2]: About twelve dollars covers model spend for both runs together. The time it took to build the fleet isn't in that number.
+
+[^c5-3]: The shape is borrowed from Anthropic's Constitutional AI (Bai et al., 2022), where the only human oversight is one explicit list of principles. Theirs is a training method and the principles end up in the weights. Mine is a string wrapped around a prompt, which is much weaker, and OpenAI's instruction-hierarchy work is the reason to say so out loud: a spec that lives in the prompt layer is soft governance unless the model was trained to privilege it. Which is why the rules that have to hold don't live here.
+
+[^c5-4]: DeepMind and ETH Zurich's CaMeL (2025) is this rule taken all the way: a code layer around the model built so untrusted data can never reach program flow, which holds even if the model is completely compromised. Theirs is a security architecture and mine is a WHERE clause, so only the principle carries over. They name their cost, 84% down to 77% on AgentDojo, so I should name mine: the filter can never surface an account that's genuinely relevant and happens to have an open opportunity.
+
+[^c5-5]: AgentSpec (ICSE 2026) is the same design written down as a system: trigger, predicate, enforcement, no model anywhere in the checker, overhead in milliseconds. Their numbers are about stopping unsafe agent actions rather than checking prose, so I'm citing the shape and leaving the score alone. The reason a model isn't doing the checking is that models are measurably soft graders of their own work: Panickssery et al. (NeurIPS 2024) found evaluators recognise their own output and prefer it, and the preference gets stronger the better they recognise it. A reviewer you can persuade, measured.
+
+[^c5-6]: Attacking your own system with generated users is established practice. Perez et al. did it at DeepMind (EMNLP 2022) by having one language model write test cases for another and mining the failures before users found them. Theirs ran to hundreds of thousands of cases and mine is fifteen hand-written personalities, so the technique is shared and the scale isn't. A fleet like this is good at finding bugs and bad at scoring them, which is why the 58% is a flag and not a measurement.
+
+[^c5-7]: RuLES (Berkeley and CAIS, 2023) found almost all models struggle to follow plainly written scenario rules even when nobody is attacking them, and much worse when someone is. My gate failed benignly rather than adversarially, so the paper backs the principle and not my diagnosis of this particular failure.
 
 
 ## The shared memory
@@ -406,7 +451,13 @@ Chapter 1 answers this in reverse. The dead projects all produced outputs that b
 
 ### Four shapes
 
-{/* [D3 · normalizing the business into events] */}
+
+<Diagram
+  src="junto-d3-normalization.png"
+  label="Fig. 10"
+  caption="Everything is qualified before a model touches it. Four questions, four shapes of row, one projection, and evidence filtered by who is asking."
+/>
+
 
 Everything arriving from every source gets qualified first: deduped, thresholded, the noise thrown out. That stage is deterministic, with no model and no judgment anywhere in it. What survives gets asked four questions:
 
@@ -415,9 +466,15 @@ Everything arriving from every source gets qualified first: deduped, thresholded
 3. Did someone say something that matters? That becomes a call insight, tagged and carrying the speaker's own words.
 4. Did a conversation conclude something? That becomes a knowledge artifact, linked back to where it happened. A knowledge artifact is like the minutes of a meeting stapled to the recording: the conclusion in one line, with the way back if anyone doubts the line.
 
-{/* [D4 · what a row actually looks like] */}
 
-So: four questions, four shapes of row. And every row carries the same spine: what it's about, when it happened, where it came from, who's allowed to see it. Two of those fields do more work than they look like they should. Visibility is stamped when the row is written, inherited from wherever the data was born, so a thread from a private channel stays private without anyone remembering to make it so. And the link back to the source is required.
+<Diagram
+  src="junto-d4-row-shapes.png"
+  label="Fig. 11"
+  caption="The four stores in full, and the two shapes everything narrows into on the way to an answer. Written once, cited forever."
+/>
+
+
+So: four questions, four shapes of row. And every row carries the same spine: what it's about, when it happened, where it came from, who's allowed to see it. Two of those fields do more work than they look like they should. Visibility is stamped when the row is written, inherited from wherever the data was born, so a thread from a private channel stays private without anyone remembering to make it so.[^c6-3] And the link back to the source is required.
 
 ### Acting and asking
 
@@ -426,13 +483,13 @@ Events are for acting. The index is for asking. A decent picture is a factory fl
 
 <Diagram
   src="junto-factory-library.png"
-  label="Fig. 8"
+  label="Fig. 12"
   caption="Events are for acting, the index is for asking. Work orders fire actions. The filing room answers questions."
 />
 
 A play is a small workflow a rep builds and runs: watch for something, fetch something, produce something. A typed row is a database row whose kind is declared up front, a signal row or an activity row, so code can rely on its fields. Plays act on typed rows, and that path is deterministic end to end. A detector reads usage and emits signals. A play consumes the signals and does its work, and no model decides any of it. Acting needs types, because a play that fires on a signal can't fire on a vague blob of relevance. The rows are the API.[^c6-1]
 
-Questions work differently. A question here is a rep asking Junto something in plain language in Slack: "what did Northwind say about pricing?" Every row, whatever its shape, projects into one flat index, so a single search can rank a quote from a call against a Slack thread against a signal. It works like a library catalog: the books stay shelved by type, but one catalog lets a single search sweep across all of them. The flattening happens only at the asking boundary. The stores stay typed underneath, and the evidence is filtered by who's asking before any model sees a word of it.
+Questions work differently. A question here is a rep asking Junto something in plain language in Slack: "what did Northwind say about pricing?" Every row, whatever its shape, projects into one flat index, so a single search can rank a quote from a call against a Slack thread against a signal.[^c6-4] It works like a library catalog: the books stay shelved by type, but one catalog lets a single search sweep across all of them. The index stays current so a search is fast. What gets assembled only at the asking boundary is the evidence itself. The stores stay typed underneath, and the evidence is filtered by who's asking before any model sees a word of it.
 
 ### The corpus came first
 
@@ -440,7 +497,13 @@ One of the four shapes has a longer story than the others, and it's kinda the on
 
 My 2025 transcript tagging strategy was bad in a way that took a few dozen calls to see, unfortunately. I'd paste a transcript, ask for the pains, and get back a list that was plausible and quietly useless, because about half of it was my own side of the call. Reps voice pain on the buyer's behalf constantly. I had built a machine that read my own pitch back to me, with a citation. I learned from the 2025 mistakes. Step zero of the revised plan became simple speaker hygiene: label every speaker buyer or seller, and throw the seller's speech away before tagging a word of it. With the revised plan I tagged every new-business call from 2026, about 400 of them.
 
-{/* [D2 · a call becomes tagged moments] */}
+
+<Diagram
+  src="junto-d2-tagging.png"
+  label="Fig. 13"
+  caption="The 2026 tagging pipeline, with me taken out of the middle. The model judges, the script enforces, and anything under 0.7 goes to a person."
+/>
+
 
 Every record gets tagged twice. A closed tag comes from a locked vocabulary, and a script enforces it. The model can't free-type a tag. An open label is free text, in the buyer's own words. The closed tag makes the corpus countable. The open label keeps it honest, because sooner or later a customer says something true that the vocabulary has no word for, and the open label is where that truth survives until the vocabulary catches up. When a theme in the open labels recurred across five distinct companies, it earned a real tag, and every affected historical record was moved onto it so the past stayed consistent with the present.
 
@@ -454,9 +517,15 @@ The Junto version is the same method with me removed from the middle and left at
 
 ### The clock
 
-{/* [D1 · where the data comes from, and how often] */}
 
-How often should a source be read? The wrong answer is one schedule for everything, and the right answer is sorta boring: read each source at the rate it actually changes.
+<Diagram
+  src="junto-d1-cadence.png"
+  label="Fig. 14"
+  caption="Every source is read at the rate it actually changes. Five cadences feeding four typed stores, and current state never written down at all."
+/>
+
+
+How often should a source be read? The wrong answer is one schedule for everything, and the right answer is sorta boring: let how fast a source changes set how often you read it, which is different than trying to keep up with it.[^c6-5]
 
 Calls land hourly, so a morning call is queryable by lunch. That's the cadence I'd argue hardest for, because it's what makes call data feel alive rather than archival. CRM history diffs daily. Field churn is constant and mostly meaningless, and the changes that matter resolve on a day boundary. Product usage lands daily too, because the detectors compare day over day.
 
@@ -469,6 +538,23 @@ Each connector declares its cadence in its own manifest, and none of those rates
 Something I held the line on: current state is never stored. Things like "what stage is the deal in?" and "what is on the calendar today?" are queried live, at the moment of asking, every time. Storing state, for stuff like this, is how a system becomes confidently wrong, and confidently wrong is the failure that kills trust fastest, because the answer looks exactly like a right one. That one was learned first-hand.
 
 So state stays federated, and knowledge gets materialized. The memory holds what happened and what was learned. What is true right now, it goes and asks for.
+
+
+<Diagram
+  src="junto-d8-three-rows.png"
+  label="Fig. 15"
+  caption="Three of the seven cases, carried end to end. One event in, one typed row, one flattened copy, and one line the model is allowed to cite."
+/>
+
+
+
+<Diagram
+  src="junto-widget-normalize-event.html"
+  label="Fig. 16"
+  caption="Name something that happens at your company. If a connector watches it, you get the row it becomes. If nothing does, you get told so."
+  height={900}
+/>
+
 
 ### The name
 
@@ -487,6 +573,12 @@ Where I diverge from them is as follows: their product answers questions, so eve
 [^c6-1]: One divergence is better named than hidden: there's no event bus. Plays and distillers pull rows newer than a watermark instead of subscribing to a stream. At today's volumes a bus is machinery without a customer, and every write already passes through one validated funnel, so the seam is clean if that day comes. But a queue at the edges isn't an event-driven architecture, and I'd rather say so than imply otherwise.
 
 [^c6-2]: Two honesty notes on the automated version. The hand-tagged corpus was new-business calls only, so the post-sale lane is specified and seeded, not proven against a year of real conversations. And the demo corpus is fictional end to end: the categories are structurally real, and every quote in it's invented.
+
+[^c6-3]: Buttcher and Clarke (USENIX FAST 2005) showed that a shared index over many people's content has to enforce permissions inside query processing, because filtering after retrieval leaks. Junto does both, stamping at write and filtering at ask. The stamp is the weaker half and it's worth saying why: if a channel later goes public, or someone loses access to a source, a stamp written months ago is quietly wrong now. Bailey and colleagues wrote that tradeoff up in 2006 and I haven't solved it.
+
+[^c6-4]: UniK-QA (Meta AI, 2022) is the catalog measured: flatten text, tables, lists and knowledge-base triples into one index, search it with a single retriever, and beat the specialized per-source systems by as much as eleven points. Their setting is open questions over Wikipedia and mine is a permissioned corpus of calls and threads, so it's the shape I'm taking and not the number. Doing the flattening late instead of early is the column-store instinct (Abadi et al., ICDE 2007), and the precise version of my claim is that the index is a derived projection while the typed stores stay canonical.
+
+[^c6-5]: Cho and Garcia-Molina (ACM TODS 2003) is the foundational result here, and it says something more awkward than "match the rate." Under a fixed budget, reading in proportion to change isn't optimal, and the fastest-changing sources should be read deliberately less often than their churn suggests. Azar and colleagues (PNAS 2018) gave it a shape, with optimal frequency rising sublinearly with change rate. The Slack rule above is the clearest case of this: threads change constantly and I wait two quiet hours anyway, because a thread isn't a knowledge unit until it stops moving.
 
 
 ## Credit is a feature
@@ -532,7 +624,7 @@ Ramp settled any doubt I had about this direction. In their tooling demo with De
 
 <Diagram
   src="junto-ramp-flywheel.png"
-  label="Fig. 9"
+  label="Fig. 17"
   caption="Ramp's flywheel, as Keyan Sarrafzadeh described it in their tooling demo with Deepline. Their loop, my redraw."
 />
 
@@ -656,7 +748,7 @@ One thing I didn't expect: the truer claim was the harder one to keep. When the 
 
 When a play finishes, Junto posts a diagram into the thread. It shows the run's journey: what was asked, what data was touched, what came back. A rep can glance at it and know what the machine just did on their behalf. That was the goal, anyway.
 
-The lazy way, and the way I did it at first, is to ask the model to draw it. The model was there for the whole run. Why not have it sketch what happened? Because a model redrawing its own work will happily draw what should have happened. It draws the plan, not the run, and the two look identical right up until they matter.
+The lazy way, and the way I did it at first, is to ask the model to draw it. The model was there for the whole run. Why not have it sketch what happened? Because a model redrawing its own work will happily draw what should have happened. It draws the plan, not the run, and the two look identical right up until they matter.[^c10-4]
 
 
 {/* TK: [NEEDS FACT: a specific early example where the model drew what should have happened instead of what did] */}
@@ -705,6 +797,8 @@ So render failures are loud now, the same rule chapter 4 landed on for everythin
 [^c10-3]: In my opinion, this is a gap in functionality, because our CRM doesn't always reflect the most recent records. Currently we list a confidence score for how confident we're that a contact is still at the company, calculated from the last outreach GTM or marketing sent them. The airtight way to be 100% confident they're still there would be running HarvestAPI to scrape their LinkedIn Sales Navigator, which I'm currently weighing whether to implement.
 
 [^c10-2]: The count in the caption matters. A filter that hides things without saying how many it hid is just a lie with good manners.
+
+[^c10-4]: Turpin et al. (NeurIPS 2023) named the mechanism: models produce plausible step-by-step explanations that never mention what actually drove the answer. Anthropic measured a newer version in 2025 and found frontier models mention the hint they actually used in under 20% of the cases where they used it. Both study reasoning traces rather than an agent redrawing its own tool run, so this is evidence for the failure mode and not for my instance of it.
 
 
 ## Files are the memory

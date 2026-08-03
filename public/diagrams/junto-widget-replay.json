@@ -1,0 +1,1346 @@
+{
+ "recorded_at": "2026-08-03",
+ "note": "Recorded from the real demo service (quote gate active). Replayed honestly when the live endpoint is unreachable.",
+ "message": {
+  "agreement": {
+   "prompt": "@junto what has CorePay said about pricing on past calls?",
+   "events": [
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "identity",
+      "state": "start",
+      "summary": "Ryan, in #sdr-team. That channel maps to the sdr lane, so he sees his own 18 accounts."
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "identity",
+      "state": "end",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "route",
+      "state": "start",
+      "summary": "The front door decides what kind of ask this is. The stages below are that decision happening."
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "gate",
+      "passed": false,
+      "via": "shortcut",
+      "reason": "no deterministic shortcut matched — going to the classifier",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "classify",
+      "exit": "ANSWER",
+      "confidence": 0.92,
+      "candidates": [],
+      "catalog_size": 24,
+      "ms": 1778
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R1",
+      "name": "\"tell me X\" is never HELP or DISCOVER",
+      "fired": false,
+      "detail": "no imperative data-request verb"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R2",
+      "name": "a question about your data never DISCOVERs",
+      "fired": false,
+      "detail": "not a data question exiting DISCOVER"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R3",
+      "name": "a rejected DISCOVER bars DISCOVER next turn",
+      "fired": false,
+      "detail": "no rejected DISCOVER on the previous turn"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R4",
+      "name": "below the 0.55 confidence floor",
+      "fired": false,
+      "detail": "confidence 0.92 clears the 0.55 floor"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R5",
+      "name": "referent already resolved, never CLARIFY",
+      "fired": false,
+      "detail": "exit is ANSWER, nothing to override"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "exit",
+      "exit": "ANSWER",
+      "via": "llm",
+      "confidence": 0.92
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "route",
+      "state": "end",
+      "ms": 1780,
+      "summary": "Exit ANSWER at 0.92 via llm. All five rules agreed with the pick."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "skill:sales-call-prep",
+      "ms": 13528
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "context",
+      "state": "start",
+      "summary": "Instructions assembled and version-pinned before the model is involved."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "context.assemble",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "context",
+      "state": "end",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "fetch",
+      "state": "start",
+      "summary": "Data fetched through visibility-scoped adapters. The model never queries anything itself."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "data.fetch:sales-call-prep",
+      "ms": 1
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "fetch",
+      "state": "end",
+      "ms": 1
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "generate",
+      "state": "start",
+      "summary": "One model call drafts the answer from the fetched rows."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "llm:claude-sonnet-4-6",
+      "ms": 13527
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "generate",
+      "state": "end",
+      "ms": 13527
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "lint",
+      "state": "start",
+      "summary": "The constitution linter checked the draft and found nothing to fix."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "format",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "lint",
+      "state": "end"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "post",
+      "state": "start",
+      "summary": "Junto posts the reply back to the thread."
+     }
+    },
+    {
+     "event": "answer",
+     "data": {
+      "markdown": "_Prepping for the call. Pulling signals, contacts, and Gong._\n\nOne pricing-related quote is on file from CorePay, pulled from the Gong call titled CorePay - Pricing Review (2026-06-22).\n\nChris Jones, Head of Total Rewards and current champion, said: \"We modeled headcount growth and we blow through the per-seat threshold by Q2, so the step-down pricing matters a lot.\" (Gong, gong_calls row quote-296bc64e-2ca3-534a-a95c-bfb7ddb883d1-0, 2026-06-22)\n\nThe QBR two days later (CorePay - QBR, 2026-06-24) covered compensation pain points and current tooling; no pricing quotes are surfaced from that call in the data.\n\nThose are the only two CorePay Gong calls in the data. No other pricing quotes are on file.",
+      "citations": [
+       {
+        "id": "gong-296bc64e-2ca3-534a-a95c-bfb7ddb883d1-0",
+        "source": "gong_calls",
+        "snippet": "CorePay - QBR — with ea3bb73e-09ba-56f1-97ce-29b42ab998a8, 00f8cd39-0289-5b90-8e9c-2676d6e2cda8, 008650ad-365c-526a-95e9-09c5c412982a",
+        "date": "2026-06-24T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "296bc64e-2ca3-534a-a95c-bfb7ddb883d1",
+        "confidence": 0.9,
+        "adapter": "GongAdapter",
+        "fetched_at": "2026-08-03T16:28:24.481Z"
+       },
+       {
+        "id": "quote-296bc64e-2ca3-534a-a95c-bfb7ddb883d1-0",
+        "source": "gong_calls",
+        "snippet": "CorePay - Pricing Review — Chris Jones",
+        "date": "2026-06-22T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "296bc64e-2ca3-534a-a95c-bfb7ddb883d1",
+        "confidence": 0.9,
+        "adapter": "GongAdapter",
+        "fetched_at": "2026-08-03T16:28:24.481Z",
+        "ref": "cd663726-a793-5009-a675-c343159de2c7",
+        "quote": "We modeled headcount growth and we blow through the per-seat threshold by Q2, so the step-down pricing matters a lot."
+       }
+      ]
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "post",
+      "state": "end"
+     }
+    },
+    {
+     "event": "artifact",
+     "data": {
+      "kind": "org_chart",
+      "svg": "<svg id=\"mermaid-1785774508302\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" class=\"flowchart\" style=\"max-width: 2180.34375px;\" viewBox=\"0 0 2180.34375 496\" role=\"graphics-document document\" aria-roledescription=\"flowchart-v2\"><style>#mermaid-1785774508302{font-family:\"trebuchet ms\",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785774508302 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785774508302 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785774508302 .error-icon{fill:hsl(220.5882352941, 100%, 98.3333333333%);}#mermaid-1785774508302 .error-text{fill:rgb(8.5000000002, 5.7500000001, 0);stroke:rgb(8.5000000002, 5.7500000001, 0);}#mermaid-1785774508302 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785774508302 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785774508302 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785774508302 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785774508302 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785774508302 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785774508302 .marker{fill:#0b0b0b;stroke:#0b0b0b;}#mermaid-1785774508302 .marker.cross{stroke:#0b0b0b;}#mermaid-1785774508302 svg{font-family:\"trebuchet ms\",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785774508302 p{margin:0;}#mermaid-1785774508302 .label{font-family:\"trebuchet ms\",verdana,arial,sans-serif;color:#333;}#mermaid-1785774508302 .cluster-label text{fill:rgb(8.5000000002, 5.7500000001, 0);}#mermaid-1785774508302 .cluster-label span{color:rgb(8.5000000002, 5.7500000001, 0);}#mermaid-1785774508302 .cluster-label span p{background-color:transparent;}#mermaid-1785774508302 .label text,#mermaid-1785774508302 span{fill:#333;color:#333;}#mermaid-1785774508302 .node rect,#mermaid-1785774508302 .node circle,#mermaid-1785774508302 .node ellipse,#mermaid-1785774508302 .node polygon,#mermaid-1785774508302 .node path{fill:#fff4dd;stroke:hsl(40.5882352941, 60%, 83.3333333333%);stroke-width:1px;}#mermaid-1785774508302 .rough-node .label text,#mermaid-1785774508302 .node .label text,#mermaid-1785774508302 .image-shape .label,#mermaid-1785774508302 .icon-shape .label{text-anchor:middle;}#mermaid-1785774508302 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785774508302 .rough-node .label,#mermaid-1785774508302 .node .label,#mermaid-1785774508302 .image-shape .label,#mermaid-1785774508302 .icon-shape .label{text-align:center;}#mermaid-1785774508302 .node.clickable{cursor:pointer;}#mermaid-1785774508302 .root .anchor path{fill:#0b0b0b!important;stroke-width:0;stroke:#0b0b0b;}#mermaid-1785774508302 .arrowheadPath{fill:#0b0b0b;}#mermaid-1785774508302 .edgePath .path{stroke:#0b0b0b;stroke-width:1px;}#mermaid-1785774508302 .flowchart-link{stroke:#0b0b0b;fill:none;}#mermaid-1785774508302 .edgeLabel{background-color:hsl(-79.4117647059, 100%, 93.3333333333%);text-align:center;}#mermaid-1785774508302 .edgeLabel p{background-color:hsl(-79.4117647059, 100%, 93.3333333333%);}#mermaid-1785774508302 .edgeLabel rect{opacity:0.5;background-color:hsl(-79.4117647059, 100%, 93.3333333333%);fill:hsl(-79.4117647059, 100%, 93.3333333333%);}#mermaid-1785774508302 .labelBkg{background-color:rgba(243.9999999999, 220.9999999998, 255, 0.5);}#mermaid-1785774508302 .cluster rect{fill:hsl(220.5882352941, 100%, 98.3333333333%);stroke:hsl(220.5882352941, 60%, 88.3333333333%);stroke-width:1px;}#mermaid-1785774508302 .cluster text{fill:rgb(8.5000000002, 5.7500000001, 0);}#mermaid-1785774508302 .cluster span{color:rgb(8.5000000002, 5.7500000001, 0);}#mermaid-1785774508302 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:\"trebuchet ms\",verdana,arial,sans-serif;font-size:12px;background:hsl(220.5882352941, 100%, 98.3333333333%);border:1px solid hsl(220.5882352941, 60%, 88.3333333333%);border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785774508302 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#mermaid-1785774508302 rect.text{fill:none;stroke-width:0;}#mermaid-1785774508302 .icon-shape,#mermaid-1785774508302 .image-shape{background-color:hsl(-79.4117647059, 100%, 93.3333333333%);text-align:center;}#mermaid-1785774508302 .icon-shape p,#mermaid-1785774508302 .image-shape p{background-color:hsl(-79.4117647059, 100%, 93.3333333333%);padding:2px;}#mermaid-1785774508302 .icon-shape .label rect,#mermaid-1785774508302 .image-shape .label rect{opacity:0.5;background-color:hsl(-79.4117647059, 100%, 93.3333333333%);fill:hsl(-79.4117647059, 100%, 93.3333333333%);}#mermaid-1785774508302 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785774508302 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785774508302 .node .neo-node{stroke:hsl(40.5882352941, 60%, 83.3333333333%);}#mermaid-1785774508302 [data-look=\"neo\"].node rect,#mermaid-1785774508302 [data-look=\"neo\"].cluster rect,#mermaid-1785774508302 [data-look=\"neo\"].node polygon{stroke:url(#mermaid-1785774508302-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785774508302 [data-look=\"neo\"].swimlane.cluster rect{filter:none;}#mermaid-1785774508302 [data-look=\"neo\"].node path{stroke:url(#mermaid-1785774508302-gradient);stroke-width:1px;}#mermaid-1785774508302 [data-look=\"neo\"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785774508302 [data-look=\"neo\"].node .neo-line path{stroke:hsl(40.5882352941, 60%, 83.3333333333%);filter:none;}#mermaid-1785774508302 [data-look=\"neo\"].node circle{stroke:url(#mermaid-1785774508302-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785774508302 [data-look=\"neo\"].node circle .state-start{fill:#000000;}#mermaid-1785774508302 [data-look=\"neo\"].icon-shape .icon{fill:url(#mermaid-1785774508302-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785774508302 [data-look=\"neo\"].icon-shape .icon-neo path{stroke:url(#mermaid-1785774508302-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785774508302 :root{--mermaid-font-family:\"trebuchet ms\",verdana,arial,sans-serif;}#mermaid-1785774508302 .engaged&gt;*{fill:rgb(251, 228, 213)!important;stroke:rgb(232, 131, 58)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .engaged span{fill:rgb(251, 228, 213)!important;stroke:rgb(232, 131, 58)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .engaged tspan{fill:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .champion&gt;*{fill:rgb(216, 245, 227)!important;stroke:rgb(51, 196, 130)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .champion span{fill:rgb(216, 245, 227)!important;stroke:rgb(51, 196, 130)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .champion tspan{fill:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .new_role&gt;*{fill:rgb(231, 230, 255)!important;stroke:rgb(109, 106, 248)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .new_role span{fill:rgb(231, 230, 255)!important;stroke:rgb(109, 106, 248)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .new_role tspan{fill:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .none&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(182, 182, 191)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .none span{fill:rgb(255, 255, 255)!important;stroke:rgb(182, 182, 191)!important;color:rgb(29, 28, 29)!important;}#mermaid-1785774508302 .none tspan{fill:rgb(29, 28, 29)!important;}</style><g><marker id=\"mermaid-1785774508302_flowchart-v2-pointEnd\" class=\"marker flowchart-v2\" viewBox=\"0 0 10 10\" refX=\"5\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"8\" markerHeight=\"8\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowMarkerPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"></path></marker><marker id=\"mermaid-1785774508302_flowchart-v2-pointStart\" class=\"marker flowchart-v2\" viewBox=\"0 0 10 10\" refX=\"4.5\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"8\" markerHeight=\"8\" orient=\"auto\"><path d=\"M 0 5 L 10 10 L 10 0 z\" class=\"arrowMarkerPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"></path></marker><marker id=\"mermaid-1785774508302_flowchart-v2-pointEnd-margin\" class=\"marker flowchart-v2\" viewBox=\"0 0 11.5 14\" refX=\"11.5\" refY=\"7\" markerUnits=\"userSpaceOnUse\" markerWidth=\"10.5\" markerHeight=\"14\" orient=\"auto\"><path d=\"M 0 0 L 11.5 7 L 0 14 z\" class=\"arrowMarkerPath\" style=\"stroke-width: 0; stroke-dasharray: 1, 0;\"></path></marker><marker id=\"mermaid-1785774508302_flowchart-v2-pointStart-margin\" class=\"marker flowchart-v2\" viewBox=\"0 0 11.5 14\" refX=\"1\" refY=\"7\" markerUnits=\"userSpaceOnUse\" markerWidth=\"11.5\" markerHeight=\"14\" orient=\"auto\"><polygon points=\"0,7 11.5,14 11.5,0\" class=\"arrowMarkerPath\" style=\"stroke-width: 0; stroke-dasharray: 1, 0;\"></polygon></marker><marker id=\"mermaid-1785774508302_flowchart-v2-circleEnd\" class=\"marker flowchart-v2\" viewBox=\"0 0 10 10\" refX=\"11\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"11\" markerHeight=\"11\" orient=\"auto\"><circle cx=\"5\" cy=\"5\" r=\"5\" class=\"arrowMarkerPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"></circle></marker><marker id=\"mermaid-1785774508302_flowchart-v2-circleStart\" class=\"marker flowchart-v2\" viewBox=\"0 0 10 10\" refX=\"-1\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"11\" markerHeight=\"11\" orient=\"auto\"><circle cx=\"5\" cy=\"5\" r=\"5\" class=\"arrowMarkerPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"></circle></marker><marker id=\"mermaid-1785774508302_flowchart-v2-circleEnd-margin\" class=\"marker flowchart-v2\" viewBox=\"0 0 10 10\" refY=\"5\" refX=\"12.25\" markerUnits=\"userSpaceOnUse\" markerWidth=\"14\" markerHeight=\"14\" orient=\"auto\"><circle cx=\"5\" cy=\"5\" r=\"5\" class=\"arrowMarkerPath\" style=\"stroke-width: 0; stroke-dasharray: 1, 0;\"></circle></marker><marker id=\"mermaid-1785774508302_flowchart-v2-circleStart-margin\" class=\"marker flowchart-v2\" viewBox=\"0 0 10 10\" refX=\"-2\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"14\" markerHeight=\"14\" orient=\"auto\"><circle cx=\"5\" cy=\"5\" r=\"5\" class=\"arrowMarkerPath\" style=\"stroke-width: 0; stroke-dasharray: 1, 0;\"></circle></marker><marker id=\"mermaid-1785774508302_flowchart-v2-crossEnd\" class=\"marker cross flowchart-v2\" viewBox=\"0 0 11 11\" refX=\"12\" refY=\"5.2\" markerUnits=\"userSpaceOnUse\" markerWidth=\"11\" markerHeight=\"11\" orient=\"auto\"><path d=\"M 1,1 l 9,9 M 10,1 l -9,9\" class=\"arrowMarkerPath\" style=\"stroke-width: 2; stroke-dasharray: 1, 0;\"></path></marker><marker id=\"mermaid-1785774508302_flowchart-v2-crossStart\" class=\"marker cross flowchart-v2\" viewBox=\"0 0 11 11\" refX=\"-1\" refY=\"5.2\" markerUnits=\"userSpaceOnUse\" markerWidth=\"11\" markerHeight=\"11\" orient=\"auto\"><path d=\"M 1,1 l 9,9 M 10,1 l -9,9\" class=\"arrowMarkerPath\" style=\"stroke-width: 2; stroke-dasharray: 1, 0;\"></path></marker><marker id=\"mermaid-1785774508302_flowchart-v2-crossEnd-margin\" class=\"marker cross flowchart-v2\" viewBox=\"0 0 15 15\" refX=\"17.7\" refY=\"7.5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"12\" markerHeight=\"12\" orient=\"auto\"><path d=\"M 1,1 L 14,14 M 1,14 L 14,1\" class=\"arrowMarkerPath\" style=\"stroke-width: 2.5;\"></path></marker><marker id=\"mermaid-1785774508302_flowchart-v2-crossStart-margin\" class=\"marker cross flowchart-v2\" viewBox=\"0 0 15 15\" refX=\"-3.5\" refY=\"7.5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"12\" markerHeight=\"12\" orient=\"auto\"><path d=\"M 1,1 L 14,14 M 1,14 L 14,1\" class=\"arrowMarkerPath\" style=\"stroke-width: 2.5; stroke-dasharray: 1, 0;\"></path></marker><g class=\"root\"><g class=\"clusters\"><g class=\"cluster \" id=\"mermaid-1785774508302-People_Ops\" data-look=\"classic\"><rect style=\"\" x=\"8\" y=\"288\" width=\"1223.703125\" height=\"200\"></rect><g class=\"cluster-label \" transform=\"translate(580.4296875, 288)\"><foreignObject width=\"78.84375\" height=\"24\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5;\"><span class=\"nodeLabel \"><p>People Ops</p></span></div></foreignObject></g></g><g class=\"cluster \" id=\"mermaid-1785774508302-Compensation_and_Total_Rewards_crown_jewel\" data-look=\"classic\"><rect style=\"\" x=\"1251.703125\" y=\"288\" width=\"920.640625\" height=\"200\"></rect><g class=\"cluster-label \" transform=\"translate(1542.2734375, 288)\"><foreignObject width=\"339.5\" height=\"24\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5;\"><span class=\"nodeLabel \"><p>Compensation and Total Rewards - crown jewel</p></span></div></foreignObject></g></g></g><g class=\"edgePaths\"><path d=\"M1117.328,86L1109.436,90.167C1101.544,94.333,1085.76,102.667,1077.868,110.333C1069.977,118,1069.977,125,1069.977,128.5L1069.977,132\" id=\"mermaid-1785774508302-L_org-corepay-ceo_org-corepay-c-fabb2f15_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-ceo_org-corepay-c-fabb2f15_0\" data-points=\"W3sieCI6MTExNy4zMjc2MzY3MTg3NSwieSI6ODZ9LHsieCI6MTA2OS45NzY1NjI1LCJ5IjoxMTF9LHsieCI6MTA2OS45NzY1NjI1LCJ5IjoxMzZ9XQ==\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M1265.063,86L1272.955,90.167C1280.847,94.333,1296.63,102.667,1304.522,110.333C1312.414,118,1312.414,125,1312.414,128.5L1312.414,132\" id=\"mermaid-1785774508302-L_org-corepay-ceo_org-corepay-fin-head_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-ceo_org-corepay-fin-head_0\" data-points=\"W3sieCI6MTI2NS4wNjI5ODgyODEyNSwieSI6ODZ9LHsieCI6MTMxMi40MTQwNjI1LCJ5IjoxMTF9LHsieCI6MTMxMi40MTQwNjI1LCJ5IjoxMzZ9XQ==\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M1188.305,212.937L1226.371,221.281C1264.438,229.624,1340.57,246.312,1378.637,258.823C1416.703,271.333,1416.703,279.667,1416.703,287.333C1416.703,295,1416.703,302,1416.703,305.5L1416.703,309\" id=\"mermaid-1785774508302-L_org-corepay-c-fabb2f15_org-corepay-c-ea3bb73e_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-ea3bb73e_0\" data-points=\"W3sieCI6MTE4OC4zMDQ2ODc1LCJ5IjoyMTIuOTM2Njg0NjE3MjkxMTh9LHsieCI6MTQxNi43MDMxMjUsInkiOjI2M30seyJ4IjoxNDE2LjcwMzEyNSwieSI6Mjg4fSx7IngiOjE0MTYuNzAzMTI1LCJ5IjozMTN9XQ==\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M1188.305,201.007L1275.591,211.339C1362.878,221.671,1537.451,242.336,1624.737,256.834C1712.023,271.333,1712.023,279.667,1712.023,291.333C1712.023,303,1712.023,318,1712.023,325.5L1712.023,333\" id=\"mermaid-1785774508302-L_org-corepay-c-fabb2f15_org-corepay-c-008650ad_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-008650ad_0\" data-points=\"W3sieCI6MTE4OC4zMDQ2ODc1LCJ5IjoyMDEuMDA2NjY4MTI2ODQwNDJ9LHsieCI6MTcxMi4wMjM0Mzc1LCJ5IjoyNjN9LHsieCI6MTcxMi4wMjM0Mzc1LCJ5IjoyODh9LHsieCI6MTcxMi4wMjM0Mzc1LCJ5IjozMzd9XQ==\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M1188.305,196.594L1324.811,207.662C1461.318,218.729,1734.331,240.865,1870.837,256.099C2007.344,271.333,2007.344,279.667,2007.344,289.333C2007.344,299,2007.344,310,2007.344,315.5L2007.344,321\" id=\"mermaid-1785774508302-L_org-corepay-c-fabb2f15_org-corepay-open-comp_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-open-comp_0\" data-points=\"W3sieCI6MTE4OC4zMDQ2ODc1LCJ5IjoxOTYuNTkzODI1NzkxOTg3Mn0seyJ4IjoyMDA3LjM0Mzc1LCJ5IjoyNjN9LHsieCI6MjAwNy4zNDM3NSwieSI6Mjg4fSx7IngiOjIwMDcuMzQzNzUsInkiOjMyNX1d\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M951.648,197.006L821.576,208.005C691.503,219.004,431.357,241.002,301.284,256.168C171.211,271.333,171.211,279.667,171.211,291.333C171.211,303,171.211,318,171.211,325.5L171.211,333\" id=\"mermaid-1785774508302-L_org-corepay-c-fabb2f15_org-corepay-c-e5d52e2e_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-e5d52e2e_0\" data-points=\"W3sieCI6OTUxLjY0ODQzNzUsInkiOjE5Ny4wMDU4NzYxMTQ4MTAyM30seyJ4IjoxNzEuMjEwOTM3NSwieSI6MjYzfSx7IngiOjE3MS4yMTA5Mzc1LCJ5IjoyODh9LHsieCI6MTcxLjIxMDkzNzUsInkiOjMzN31d\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M951.648,201.919L870.908,212.099C790.167,222.28,628.685,242.64,547.944,256.987C467.203,271.333,467.203,279.667,467.203,293.333C467.203,307,467.203,326,467.203,335.5L467.203,345\" id=\"mermaid-1785774508302-L_org-corepay-c-fabb2f15_org-corepay-c-1242bb24_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-1242bb24_0\" data-points=\"W3sieCI6OTUxLjY0ODQzNzUsInkiOjIwMS45MTkyNjY0MTE3Njg1Mn0seyJ4Ijo0NjcuMjAzMTI1LCJ5IjoyNjN9LHsieCI6NDY3LjIwMzEyNSwieSI6Mjg4fSx7IngiOjQ2Ny4yMDMxMjUsInkiOjM0OX1d\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M951.648,216.402L920.393,224.168C889.138,231.935,826.628,247.467,795.372,259.4C764.117,271.333,764.117,279.667,764.117,291.333C764.117,303,764.117,318,764.117,325.5L764.117,333\" id=\"mermaid-1785774508302-L_org-corepay-c-fabb2f15_org-corepay-c-00f8cd39_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-00f8cd39_0\" data-points=\"W3sieCI6OTUxLjY0ODQzNzUsInkiOjIxNi40MDIxOTY2Nzk0MzgwNX0seyJ4Ijo3NjQuMTE3MTg3NSwieSI6MjYzfSx7IngiOjc2NC4xMTcxODc1LCJ5IjoyODh9LHsieCI6NzY0LjExNzE4NzUsInkiOjMzN31d\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path><path d=\"M1069.977,238L1069.977,242.167C1069.977,246.333,1069.977,254.667,1069.977,263C1069.977,271.333,1069.977,279.667,1069.977,291.333C1069.977,303,1069.977,318,1069.977,325.5L1069.977,333\" id=\"mermaid-1785774508302-L_org-corepay-c-fabb2f15_org-corepay-c-aac51a77_0\" class=\" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link\" style=\";\" data-edge=\"true\" data-et=\"edge\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-aac51a77_0\" data-points=\"W3sieCI6MTA2OS45NzY1NjI1LCJ5IjoyMzh9LHsieCI6MTA2OS45NzY1NjI1LCJ5IjoyNjN9LHsieCI6MTA2OS45NzY1NjI1LCJ5IjoyODh9LHsieCI6MTA2OS45NzY1NjI1LCJ5IjozMzd9XQ==\" data-look=\"classic\" marker-end=\"url(#mermaid-1785774508302_flowchart-v2-pointEnd)\"></path></g><g class=\"edgeLabels\"><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-ceo_org-corepay-c-fabb2f15_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-ceo_org-corepay-fin-head_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-ea3bb73e_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-008650ad_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-open-comp_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-e5d52e2e_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-1242bb24_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-00f8cd39_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g><g class=\"edgeLabel\"><g class=\"label\" data-id=\"L_org-corepay-c-fabb2f15_org-corepay-c-aac51a77_0\" transform=\"translate(0, 0)\"><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"labelBkg\" style=\"display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\"><span class=\"edgeLabel \"></span></div></foreignObject></g></g></g><g class=\"nodes\"><g class=\"node default none \" id=\"mermaid-1785774508302-flowchart-org-corepay-ceo-0\" data-look=\"classic\" transform=\"translate(1191.1953125, 47)\"><rect class=\"basic label-container\" style=\"fill:#ffffff !important;stroke:#b6b6bf !important\" x=\"-113.3203125\" y=\"-39\" width=\"226.640625\" height=\"78\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-83.3203125, -24)\"><rect></rect><foreignObject width=\"166.640625\" height=\"48\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>Margaret Chen<br>Chief Executive Officer</p></span></div></foreignObject></g></g><g class=\"node default engaged \" id=\"mermaid-1785774508302-flowchart-org-corepay-c-fabb2f15-1\" data-look=\"classic\" transform=\"translate(1069.9765625, 187)\"><rect class=\"basic label-container\" style=\"fill:#fbe4d5 !important;stroke:#e8833a !important\" x=\"-118.328125\" y=\"-51\" width=\"236.65625\" height=\"102\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-88.328125, -36)\"><rect></rect><foreignObject width=\"176.65625\" height=\"72\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>ENGAGED - Robert Smith<br>CHRO<br>call Jun 17</p></span></div></foreignObject></g></g><g class=\"node default none \" id=\"mermaid-1785774508302-flowchart-org-corepay-fin-head-2\" data-look=\"classic\" transform=\"translate(1312.4140625, 187)\"><rect class=\"basic label-container\" style=\"fill:#ffffff !important;stroke:#b6b6bf !important\" x=\"-74.109375\" y=\"-51\" width=\"148.21875\" height=\"102\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-44.109375, -36)\"><rect></rect><foreignObject width=\"88.21875\" height=\"72\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>Priya Raman<br>VP Finance<br>verify</p></span></div></foreignObject></g></g><g class=\"node default champion \" id=\"mermaid-1785774508302-flowchart-org-corepay-c-ea3bb73e-3\" data-look=\"classic\" transform=\"translate(1416.703125, 388)\"><rect class=\"basic label-container\" style=\"fill:#d8f5e3 !important;stroke:#33c482 !important\" x=\"-130\" y=\"-75\" width=\"260\" height=\"150\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-100, -60)\"><rect></rect><foreignObject width=\"200\" height=\"120\"><div style=\"color: rgb(29, 28, 29) !important; display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>CHAMPION - Chris Jones<br>Head of Total Rewards<br>recent hire per enrichment, call Jun 24, call Jun 22, call Jun 17</p></span></div></foreignObject></g></g><g class=\"node default engaged \" id=\"mermaid-1785774508302-flowchart-org-corepay-c-008650ad-4\" data-look=\"classic\" transform=\"translate(1712.0234375, 388)\"><rect class=\"basic label-container\" style=\"fill:#fbe4d5 !important;stroke:#e8833a !important\" x=\"-115.3203125\" y=\"-51\" width=\"230.640625\" height=\"102\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-85.3203125, -36)\"><rect></rect><foreignObject width=\"170.640625\" height=\"72\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>ENGAGED - Daniel Davis<br>Head of Total Rewards<br>call Jun 24</p></span></div></foreignObject></g></g><g class=\"node default new_role \" id=\"mermaid-1785774508302-flowchart-org-corepay-open-comp-5\" data-look=\"classic\" transform=\"translate(2007.34375, 388)\"><rect class=\"basic label-container\" style=\"fill:#e7e6ff !important;stroke:#6d6af8 !important\" x=\"-130\" y=\"-63\" width=\"260\" height=\"126\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-100, -48)\"><rect></rect><foreignObject width=\"200\" height=\"96\"><div style=\"color: rgb(29, 28, 29) !important; display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>OPEN ROLE - Open role<br>Director of Compensation (open)<br>open role</p></span></div></foreignObject></g></g><g class=\"node default engaged \" id=\"mermaid-1785774508302-flowchart-org-corepay-c-e5d52e2e-6\" data-look=\"classic\" transform=\"translate(171.2109375, 388)\"><rect class=\"basic label-container\" style=\"fill:#fbe4d5 !important;stroke:#e8833a !important\" x=\"-128.2109375\" y=\"-51\" width=\"256.421875\" height=\"102\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-98.2109375, -36)\"><rect></rect><foreignObject width=\"196.421875\" height=\"72\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>ENGAGED - Stephanie Clark<br>People Operations Manager<br>call Jun 22</p></span></div></foreignObject></g></g><g class=\"node default engaged \" id=\"mermaid-1785774508302-flowchart-org-corepay-c-1242bb24-7\" data-look=\"classic\" transform=\"translate(467.203125, 388)\"><rect class=\"basic label-container\" style=\"fill:#fbe4d5 !important;stroke:#e8833a !important\" x=\"-117.78125\" y=\"-39\" width=\"235.5625\" height=\"78\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-87.78125, -24)\"><rect></rect><foreignObject width=\"175.5625\" height=\"48\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>ENGAGED - Daniel White<br>Senior HR Generalist</p></span></div></foreignObject></g></g><g class=\"node default engaged \" id=\"mermaid-1785774508302-flowchart-org-corepay-c-00f8cd39-8\" data-look=\"classic\" transform=\"translate(764.1171875, 388)\"><rect class=\"basic label-container\" style=\"fill:#fbe4d5 !important;stroke:#e8833a !important\" x=\"-129.1328125\" y=\"-51\" width=\"258.265625\" height=\"102\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-99.1328125, -36)\"><rect></rect><foreignObject width=\"198.265625\" height=\"72\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>ENGAGED - Nicole Anderson<br>Senior HR Generalist<br>call Jun 24, call Jun 17</p></span></div></foreignObject></g></g><g class=\"node default engaged \" id=\"mermaid-1785774508302-flowchart-org-corepay-c-aac51a77-9\" data-look=\"classic\" transform=\"translate(1069.9765625, 388)\"><rect class=\"basic label-container\" style=\"fill:#fbe4d5 !important;stroke:#e8833a !important\" x=\"-126.7265625\" y=\"-51\" width=\"253.453125\" height=\"102\"></rect><g class=\"label\" style=\"color:#1d1c1d !important\" transform=\"translate(-96.7265625, -36)\"><rect></rect><foreignObject width=\"193.453125\" height=\"72\"><div style=\"color: rgb(29, 28, 29) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;\" xmlns=\"http://www.w3.org/1999/xhtml\"><span style=\"color:#1d1c1d !important\" class=\"nodeLabel \"><p>ENGAGED - Nicole Williams<br>Senior HR Generalist<br>call Jun 22, verify</p></span></div></foreignObject></g></g></g></g></g><defs><filter id=\"mermaid-1785774508302-drop-shadow\" height=\"130%\" width=\"130%\"><feDropShadow dx=\"4\" dy=\"4\" stdDeviation=\"0\" flood-opacity=\"0.06\" flood-color=\"#000000\"></feDropShadow></filter></defs><defs><filter id=\"mermaid-1785774508302-drop-shadow-small\" height=\"150%\" width=\"150%\"><feDropShadow dx=\"2\" dy=\"2\" stdDeviation=\"0\" flood-opacity=\"0.06\" flood-color=\"#000000\"></feDropShadow></filter></defs><linearGradient id=\"mermaid-1785774508302-gradient\" gradientUnits=\"objectBoundingBox\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"hsl(40.5882352941, 60%, 83.3333333333%)\" stop-opacity=\"1\"></stop><stop offset=\"100%\" stop-color=\"hsl(-79.4117647059, 60%, 83.3333333333%)\" stop-opacity=\"1\"></stop></linearGradient></svg>"
+     }
+    },
+    {
+     "event": "receipts",
+     "data": {
+      "exit": "ANSWER",
+      "confidence": 0.92,
+      "via": "llm",
+      "rules": [
+       {
+        "stage": "post_rule",
+        "rule": "R1",
+        "name": "\"tell me X\" is never HELP or DISCOVER",
+        "fired": false,
+        "detail": "no imperative data-request verb"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R2",
+        "name": "a question about your data never DISCOVERs",
+        "fired": false,
+        "detail": "not a data question exiting DISCOVER"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R3",
+        "name": "a rejected DISCOVER bars DISCOVER next turn",
+        "fired": false,
+        "detail": "no rejected DISCOVER on the previous turn"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R4",
+        "name": "below the 0.55 confidence floor",
+        "fired": false,
+        "detail": "confidence 0.92 clears the 0.55 floor"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R5",
+        "name": "referent already resolved, never CLARIFY",
+        "fired": false,
+        "detail": "exit is ANSWER, nothing to override"
+       }
+      ],
+      "duration_ms": 20387,
+      "cost_usd": 0.06474,
+      "sources": [
+       "GongAdapter"
+      ],
+      "run_id": "4bd5b4b8-20d5-4eab-b42d-38205e367d59",
+      "executor": "direct",
+      "play": "sales-call-prep"
+     }
+    },
+    {
+     "event": "done",
+     "data": {
+      "ok": true
+     }
+    }
+   ]
+  },
+  "override": {
+   "prompt": "which of my accounts launched something new?",
+   "events": [
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "identity",
+      "state": "start",
+      "summary": "Ryan, in #sdr-team. That channel maps to the sdr lane, so he sees his own 18 accounts."
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "identity",
+      "state": "end",
+      "ms": 1
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "route",
+      "state": "start",
+      "summary": "The front door decides what kind of ask this is. The stages below are that decision happening."
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "gate",
+      "passed": false,
+      "via": "shortcut",
+      "reason": "no deterministic shortcut matched — going to the classifier",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "classify",
+      "exit": "DISCOVER",
+      "confidence": 0.75,
+      "candidates": [],
+      "catalog_size": 24,
+      "ms": 1527
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R1",
+      "name": "\"tell me X\" is never HELP or DISCOVER",
+      "fired": false,
+      "detail": "no imperative data-request verb"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R2",
+      "name": "a question about your data never DISCOVERs",
+      "fired": true,
+      "from": "DISCOVER",
+      "to": "ANSWER",
+      "detail": "question shape + DISCOVER → ANSWER (confidence clears the floor)"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R3",
+      "name": "a rejected DISCOVER bars DISCOVER next turn",
+      "fired": false,
+      "detail": "no rejected DISCOVER on the previous turn"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R4",
+      "name": "below the 0.55 confidence floor",
+      "fired": false,
+      "detail": "confidence 0.75 clears the 0.55 floor"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "post_rule",
+      "rule": "R5",
+      "name": "referent already resolved, never CLARIFY",
+      "fired": false,
+      "detail": "exit is ANSWER, nothing to override"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "exit",
+      "exit": "ANSWER",
+      "via": "post-rule",
+      "confidence": 0.75
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "route",
+      "state": "end",
+      "ms": 1530,
+      "summary": "Exit ANSWER at 0.75. R2 (a question about your data never DISCOVERs) overrode the model's pick. The model never gets the last word."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "skill:new-hire-play",
+      "ms": 4655
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "context",
+      "state": "start",
+      "summary": "Instructions assembled and version-pinned before the model is involved."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "context.assemble",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "context",
+      "state": "end",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "fetch",
+      "state": "start",
+      "summary": "Data fetched through visibility-scoped adapters. The model never queries anything itself."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "data.fetch:new-hire-play",
+      "ms": 3
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "fetch",
+      "state": "end",
+      "ms": 3
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "generate",
+      "state": "start",
+      "summary": "One model call drafts the answer from the fetched rows."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "llm:claude-sonnet-4-6",
+      "ms": 4652
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "generate",
+      "state": "end",
+      "ms": 4652
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "lint",
+      "state": "start",
+      "summary": "The constitution linter checked the draft and found nothing to fix."
+     }
+    },
+    {
+     "event": "step",
+     "data": {
+      "label": "format",
+      "ms": 0
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "lint",
+      "state": "end"
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "post",
+      "state": "start",
+      "summary": "Junto posts the reply back to the thread."
+     }
+    },
+    {
+     "event": "answer",
+     "data": {
+      "markdown": "_Checking for new comp leaders._\n\nThe question here is about new launches, not new comp-leader hires. The data seeded for this session covers comp-leader-hire signals only. There are no product launch, feature release, or company announcement signals in the data for your accounts.\n\nIf you can point me to a source (a press release, a product page, a news mention), I can pull what's there. Otherwise I don't have the evidence to answer this one accurately.",
+      "citations": [
+       {
+        "id": "sig-comp_leader_hire-79c97383-6e95-591b-b9d8-c92e410710c0-0",
+        "source": "signals",
+        "snippet": "FuseWorks posted a new opening for Director of Rewards, signaling active comp-team buildout.",
+        "date": "2026-08-01T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "79c97383-6e95-591b-b9d8-c92e410710c0",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/7c502eb0"
+       },
+       {
+        "id": "sig-comp_leader_hire-72b2eca7-4672-5655-9a8e-5886d1ebe725-1",
+        "source": "signals",
+        "snippet": "GridCo posted a new opening for Director of Rewards, signaling active comp-team buildout.",
+        "date": "2026-07-31T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "72b2eca7-4672-5655-9a8e-5886d1ebe725",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/ce070fae"
+       },
+       {
+        "id": "sig-comp_leader_hire-63d888bf-67ad-5a42-bff0-42b767fb6ee3-2",
+        "source": "signals",
+        "snippet": "GridPeople posted a new opening for Compensation Manager, signaling active comp-team buildout.",
+        "date": "2026-07-31T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "63d888bf-67ad-5a42-bff0-42b767fb6ee3",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/e85644bd"
+       },
+       {
+        "id": "sig-comp_leader_hire-1797d399-0356-5254-b797-e33502bc6f56-3",
+        "source": "signals",
+        "snippet": "OrbitHub posted a new opening for CHRO, signaling active comp-team buildout.",
+        "date": "2026-07-30T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "1797d399-0356-5254-b797-e33502bc6f56",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/1062e127"
+       },
+       {
+        "id": "sig-comp_leader_hire-1bbfbb6e-dd83-51dd-a88b-80969611258e-4",
+        "source": "signals",
+        "snippet": "CipherWorks posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-07-30T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "1bbfbb6e-dd83-51dd-a88b-80969611258e",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/78415124"
+       },
+       {
+        "id": "sig-comp_leader_hire-a70dc4fc-05b8-5511-ba2b-f6e28f267785-5",
+        "source": "signals",
+        "snippet": "SlateComp posted a new opening for Compensation Manager, signaling active comp-team buildout.",
+        "date": "2026-07-26T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "a70dc4fc-05b8-5511-ba2b-f6e28f267785",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/5ea8b931"
+       },
+       {
+        "id": "sig-comp_leader_hire-296bc64e-2ca3-534a-a95c-bfb7ddb883d1-6",
+        "source": "signals",
+        "snippet": "CorePay posted a new opening for Director of Rewards, signaling active comp-team buildout.",
+        "date": "2026-07-24T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "296bc64e-2ca3-534a-a95c-bfb7ddb883d1",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/49b2ddff"
+       },
+       {
+        "id": "sig-comp_leader_hire-c6ecbbb6-7bfd-514a-a7d6-619af4960103-7",
+        "source": "signals",
+        "snippet": "BoltSuite posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-07-19T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "c6ecbbb6-7bfd-514a-a7d6-619af4960103",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/2c9b8d85"
+       },
+       {
+        "id": "sig-comp_leader_hire-382ce654-e8de-5404-94d3-dc635ec4787e-8",
+        "source": "signals",
+        "snippet": "AtlasTalent posted a new opening for Director of Rewards, signaling active comp-team buildout.",
+        "date": "2026-07-13T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "382ce654-e8de-5404-94d3-dc635ec4787e",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/0e43bf26"
+       },
+       {
+        "id": "sig-comp_leader_hire-73b22b42-513e-54fd-950e-e0886e8c6445-9",
+        "source": "signals",
+        "snippet": "SummitHR posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-07-05T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "73b22b42-513e-54fd-950e-e0886e8c6445",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/4f95dbea"
+       },
+       {
+        "id": "sig-comp_leader_hire-296bc64e-2ca3-534a-a95c-bfb7ddb883d1-10",
+        "source": "signals",
+        "snippet": "CorePay posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-07-04T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "296bc64e-2ca3-534a-a95c-bfb7ddb883d1",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/3fb10b41"
+       },
+       {
+        "id": "sig-comp_leader_hire-fa8ff9b0-6bf2-59d4-b5dd-b56f9cffec76-11",
+        "source": "signals",
+        "snippet": "FuseSuite posted a new opening for CHRO, signaling active comp-team buildout.",
+        "date": "2026-07-01T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "fa8ff9b0-6bf2-59d4-b5dd-b56f9cffec76",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/3723ae89"
+       },
+       {
+        "id": "sig-comp_leader_hire-296bc64e-2ca3-534a-a95c-bfb7ddb883d1-12",
+        "source": "signals",
+        "snippet": "CorePay posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-06-30T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "296bc64e-2ca3-534a-a95c-bfb7ddb883d1",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/29c03ea7"
+       },
+       {
+        "id": "sig-comp_leader_hire-3ac8ecfa-b7c1-5663-8d5d-27ac9cac8012-13",
+        "source": "signals",
+        "snippet": "NovaComp posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-06-29T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "3ac8ecfa-b7c1-5663-8d5d-27ac9cac8012",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/ebabdb42"
+       },
+       {
+        "id": "sig-comp_leader_hire-fcd1e265-3b96-59cd-ba21-da0d43d6b67d-14",
+        "source": "signals",
+        "snippet": "VeloBench posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-06-27T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "fcd1e265-3b96-59cd-ba21-da0d43d6b67d",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/89640c26"
+       },
+       {
+        "id": "sig-comp_leader_hire-d804d393-5681-515c-8145-1ce6fc787a7b-15",
+        "source": "signals",
+        "snippet": "WaveRewards posted a new opening for Head of Total Rewards, signaling active comp-team buildout.",
+        "date": "2026-06-24T12:00:00.000Z",
+        "subject_type": "account",
+        "subject_id": "d804d393-5681-515c-8145-1ce6fc787a7b",
+        "confidence": 1,
+        "adapter": "SignalsStore",
+        "fetched_at": "2026-08-03T16:28:35.751Z",
+        "ref": "https://linkedin.com/jobs/view/9a0e9be3"
+       },
+       {
+        "id": "acc-1797d399-0356-5254-b797-e33502bc6f56",
+        "source": "accounts",
+        "snippet": "OrbitHub · industry: finance · 1649 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "1797d399-0356-5254-b797-e33502bc6f56",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       },
+       {
+        "id": "acc-1bbfbb6e-dd83-51dd-a88b-80969611258e",
+        "source": "accounts",
+        "snippet": "CipherWorks · industry: healthcare · 3235 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "1bbfbb6e-dd83-51dd-a88b-80969611258e",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       },
+       {
+        "id": "acc-296bc64e-2ca3-534a-a95c-bfb7ddb883d1",
+        "source": "accounts",
+        "snippet": "CorePay · industry: finance · 1531 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "296bc64e-2ca3-534a-a95c-bfb7ddb883d1",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       },
+       {
+        "id": "acc-33925460-26ba-56ee-af06-d378c2b0c753",
+        "source": "accounts",
+        "snippet": "SparkBench · industry: finance · 3157 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "33925460-26ba-56ee-af06-d378c2b0c753",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       },
+       {
+        "id": "acc-382ce654-e8de-5404-94d3-dc635ec4787e",
+        "source": "accounts",
+        "snippet": "AtlasTalent · industry: healthcare · 2879 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "382ce654-e8de-5404-94d3-dc635ec4787e",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       },
+       {
+        "id": "acc-3ac8ecfa-b7c1-5663-8d5d-27ac9cac8012",
+        "source": "accounts",
+        "snippet": "NovaComp · industry: manufacturing · 2025 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "3ac8ecfa-b7c1-5663-8d5d-27ac9cac8012",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       },
+       {
+        "id": "acc-56dbf8aa-4ebe-5c7b-8b5d-2febd3382b63",
+        "source": "accounts",
+        "snippet": "ArcWorks · industry: healthcare · 2810 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "56dbf8aa-4ebe-5c7b-8b5d-2febd3382b63",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       },
+       {
+        "id": "acc-5e28cd34-84d7-5777-8293-14f8895e28fa",
+        "source": "accounts",
+        "snippet": "PeakForce · industry: healthcare · 2015 employees",
+        "date": "2026-08-03",
+        "subject_type": "account",
+        "subject_id": "5e28cd34-84d7-5777-8293-14f8895e28fa",
+        "confidence": 1,
+        "adapter": "SFDCAccountsAdapter",
+        "fetched_at": "2026-08-03T16:28:35.751Z"
+       }
+      ]
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "post",
+      "state": "end"
+     }
+    },
+    {
+     "event": "receipts",
+     "data": {
+      "exit": "ANSWER",
+      "confidence": 0.75,
+      "via": "post-rule",
+      "rules": [
+       {
+        "stage": "post_rule",
+        "rule": "R1",
+        "name": "\"tell me X\" is never HELP or DISCOVER",
+        "fired": false,
+        "detail": "no imperative data-request verb"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R2",
+        "name": "a question about your data never DISCOVERs",
+        "fired": true,
+        "from": "DISCOVER",
+        "to": "ANSWER",
+        "detail": "question shape + DISCOVER → ANSWER (confidence clears the floor)"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R3",
+        "name": "a rejected DISCOVER bars DISCOVER next turn",
+        "fired": false,
+        "detail": "no rejected DISCOVER on the previous turn"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R4",
+        "name": "below the 0.55 confidence floor",
+        "fired": false,
+        "detail": "confidence 0.75 clears the 0.55 floor"
+       },
+       {
+        "stage": "post_rule",
+        "rule": "R5",
+        "name": "referent already resolved, never CLARIFY",
+        "fired": false,
+        "detail": "exit is ANSWER, nothing to override"
+       }
+      ],
+      "duration_ms": 8316,
+      "cost_usd": 0.06091,
+      "sources": [
+       "SignalsStore",
+       "SFDCAccountsAdapter"
+      ],
+      "run_id": "b3919ab4-1e25-4dbb-bbe9-9c7a47c9c7e5",
+      "executor": "direct",
+      "play": "new-hire-play"
+     }
+    },
+    {
+     "event": "done",
+     "data": {
+      "ok": true
+     }
+    }
+   ]
+  },
+  "silent": {
+   "prompt": "@dana can you take the deck review pass today?",
+   "events": [
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "identity",
+      "state": "start",
+      "summary": "Ryan, in #sdr-team. That channel maps to the sdr lane, so he sees his own 18 accounts."
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "phase",
+      "phase": "identity",
+      "state": "end",
+      "ms": 1
+     }
+    },
+    {
+     "event": "stage",
+     "data": {
+      "stage": "gate",
+      "passed": false,
+      "via": "shortcut",
+      "reason": "addressed to @dana, not Junto. Not spoken to, so not speaking.",
+      "ms": 0
+     }
+    },
+    {
+     "event": "done",
+     "data": {
+      "ok": true,
+      "silent": true
+     }
+    }
+   ]
+  }
+ },
+ "normalize": {
+  "a CHRO says on a call that they can't see half their comp data": {
+   "covered": true,
+   "source": {
+    "id": "gong",
+    "label": "Gong",
+    "cadence": "hourly",
+    "what": "new call transcripts, routed by lane"
+   },
+   "stores": [
+    {
+     "kind": "call_insight",
+     "question": "someone said something meaningful",
+     "fields": {
+      "record_type": "pain",
+      "closed_tag": "data_coverage",
+      "open_label": "half our comp data is invisible",
+      "evidence_quote": "We're making band decisions on maybe half our people. The rest we're guessing.",
+      "speaker_role": "exec (CHRO)",
+      "severity": 3,
+      "confidence": 0.88,
+      "account_id": "acct_4471",
+      "call_date": "2026-06-14"
+     }
+    },
+    {
+     "kind": "knowledge_artifact",
+     "question": "a conversation concluded something",
+     "fields": {
+      "kind": "gong_call",
+      "subject_ids": [
+       "acct_4471"
+      ],
+      "text": "CorePay QBR: data coverage pain and rollout scope discussed.",
+      "source_ref": "gong://call/8812"
+     }
+    }
+   ],
+   "retrieval_row": {
+    "kind": "call_insight",
+    "subject_ids": [
+     "acct_4471"
+    ],
+    "text": "pain · data coverage · CHRO · \"We're making band decisions on maybe half our people. The rest we're guessing.\"",
+    "date": "2026-06-14",
+    "source_ref": "gong://call/8812#t=1420",
+    "visibility": "owner:U0B489723Q9"
+   },
+   "evidence_row": {
+    "source": "Gong · CorePay QBR",
+    "snippet": "\"We're making band decisions on maybe half our people.\"",
+    "date": "2026-06-14",
+    "subject_id": "acct_4471",
+    "confidence": 0.88,
+    "ref": "gong://call/8812#t=1420"
+   },
+   "note": "A model decided what the quote meant, so confidence is 0.88 and the row says so. Contrast with a stage change, where nothing is interpreted."
+  },
+  "an opportunity moves from Discovery to Negotiation": {
+   "covered": true,
+   "source": {
+    "id": "salesforce-history",
+    "label": "Salesforce · history",
+    "cadence": "nightly",
+    "what": "watermark diff of timeline events"
+   },
+   "stores": [
+    {
+     "kind": "activity",
+     "question": "something happened at all",
+     "fields": {
+      "account_id": "acct_4471",
+      "actor_id": "U0B489723Q9",
+      "type": "stage_change",
+      "ts": "2026-07-28T16:04Z",
+      "direction": "none",
+      "detail": "Discovery → Negotiation, CorePay Enterprise",
+      "outcome": null
+     }
+    },
+    {
+     "kind": "signal",
+     "question": "something happened that deserves attention",
+     "fields": {
+      "signal_type": "positive_reply",
+      "evidence": {
+       "activity_id": "act_88f2",
+       "matched": "happy to chat"
+      },
+      "source": "reply_sentiment_detector"
+     }
+    }
+   ],
+   "retrieval_row": {
+    "kind": "activity",
+    "text": "stage change · CorePay Enterprise moved from Discovery to Negotiation",
+    "date": "2026-07-28",
+    "source_ref": "sfdc://opp/0064x00001/history"
+   },
+   "evidence_row": {
+    "source": "Salesforce · opportunity history",
+    "snippet": "Discovery → Negotiation",
+    "date": "2026-07-28",
+    "confidence": 1
+   },
+   "note": "Nothing was interpreted, so confidence is 1.0."
+  },
+  "a prospect's reply to a cold email lands on the CRM timeline": {
+   "covered": true,
+   "source": {
+    "id": "salesforce-history",
+    "label": "Salesforce · history",
+    "cadence": "nightly",
+    "what": "watermark diff of timeline events"
+   },
+   "stores": [
+    {
+     "kind": "activity",
+     "question": "something happened at all",
+     "fields": {
+      "account_id": "acct_4471",
+      "actor_id": "U0B489723Q9",
+      "type": "stage_change",
+      "ts": "2026-07-28T16:04Z",
+      "direction": "none",
+      "detail": "Discovery → Negotiation, CorePay Enterprise",
+      "outcome": null
+     }
+    },
+    {
+     "kind": "signal",
+     "question": "something happened that deserves attention",
+     "fields": {
+      "signal_type": "positive_reply",
+      "evidence": {
+       "activity_id": "act_88f2",
+       "matched": "happy to chat"
+      },
+      "source": "reply_sentiment_detector"
+     }
+    }
+   ],
+   "retrieval_row": {
+    "kind": "activity",
+    "text": "stage change · CorePay Enterprise moved from Discovery to Negotiation",
+    "date": "2026-07-28",
+    "source_ref": "sfdc://opp/0064x00001/history"
+   },
+   "evidence_row": {
+    "source": "Salesforce · opportunity history",
+    "snippet": "Discovery → Negotiation",
+    "date": "2026-07-28",
+    "confidence": 1
+   },
+   "note": "Nothing was interpreted, so confidence is 1.0."
+  },
+  "two reps work out in Slack that a prospect is on a competitor": {
+   "covered": true,
+   "source": {
+    "id": "slack-threads",
+    "label": "Slack threads",
+    "cadence": "realtime",
+    "what": "whole threads, not messages, distilled only once the thread stops moving (120 min quiet)"
+   },
+   "stores": [
+    {
+     "kind": "knowledge_artifact",
+     "question": "a conversation concluded something",
+     "fields": {
+      "kind": "slack_thread",
+      "subject_ids": [
+       "acct_acme"
+      ],
+      "text": "Acme is believed to be on a competitor. Secondhand: a mutual contact who works at neither company heard it from someone inside Acme. Not confirmed by Acme or by any system.",
+      "source_ref": "slack://C04SDR/p17285…",
+      "participants": [
+       "Hayden",
+       "Tre"
+      ],
+      "visibility": "private:C04SDR"
+     }
+    }
+   ],
+   "retrieval_row": {
+    "kind": "slack_thread",
+    "text": "Acme competitor usage, secondhand via a mutual contact. Unconfirmed.",
+    "date": "2026-07-30",
+    "source_ref": "slack://C04SDR/p17285…",
+    "visibility": "private:C04SDR"
+   },
+   "evidence_row": {
+    "source": "#sdr-team thread, Hayden and Tre",
+    "snippet": "Acme believed to be on a competitor. Secondhand, unconfirmed.",
+    "date": "2026-07-30",
+    "confidence": 0.35,
+    "ref": "slack permalink"
+   },
+   "note": "The row no adapter could ever fetch, and the weakest evidence in the set. The row says so itself: confidence 0.35, secondhand, unconfirmed, with a permalink so anyone can read the actual thread."
+  },
+  "a job posting names three vendor tools and pay ranges": {
+   "covered": true,
+   "source": {
+    "id": "ats-boards",
+    "label": "ATS boards",
+    "cadence": "daily",
+    "what": "Greenhouse · Lever · Ashby, full JD and pay ranges"
+   },
+   "stores": [
+    {
+     "kind": "signal",
+     "question": "something happened that deserves attention",
+     "fields": {
+      "subject_type": "account",
+      "subject_id": "acct_acme",
+      "signal_type": "comp_leader_hire",
+      "evidence": {
+       "url": "https://boards.greenhouse.io/acme/jobs/…",
+       "title": "VP People",
+       "tools": [
+        "Workday",
+        "Rippling",
+        "Carta"
+       ],
+       "pay_range": "$220-260k"
+      },
+      "detected_at": "2026-07-18",
+      "freshness": "daily-batch",
+      "source": "ats_boards · greenhouse"
+     }
+    }
+   ],
+   "retrieval_row": {
+    "kind": "signal",
+    "text": "comp leader hire · VP People at Acme · requires Workday, Rippling, Carta · $220-260k",
+    "date": "2026-07-18",
+    "source_ref": "https://boards.greenhouse.io/acme/jobs/…"
+   },
+   "evidence_row": {
+    "source": "Greenhouse · Acme · VP People",
+    "snippet": "Requires Workday, Rippling and Carta experience",
+    "date": "2026-07-18",
+    "confidence": 1
+   },
+   "note": "Nothing was interpreted, so confidence is 1.0. The vendor names go into the searchable text: that is what makes 'who is hiring for a competitor's tool' answerable at all."
+  },
+  "someone runs ten searches in one afternoon": {
+   "covered": true,
+   "source": {
+    "id": "product-telemetry",
+    "label": "Product telemetry",
+    "cadence": "daily",
+    "what": "usage aggregates, org-level deltas"
+   },
+   "stores": [
+    {
+     "kind": "raw",
+     "question": "kept uncurated and queryable; never projected into the index",
+     "fields": {
+      "user": "ellie.chun",
+      "action": "search",
+      "ts": "2026-07-29T15:12:00Z",
+      "query_len": 14
+     }
+    },
+    {
+     "kind": "signal",
+     "question": "something happened that deserves attention",
+     "fields": {
+      "signal_type": "usage_spike",
+      "subject_type": "contact",
+      "evidence": {
+       "searches": 10,
+       "window": "1 afternoon",
+       "trailing_avg": 1.8,
+       "threshold": 5
+      },
+      "freshness": "daily-batch",
+      "source": "usage_shift detector"
+     }
+    }
+   ],
+   "retrieval_row": {
+    "kind": "signal",
+    "subject_ids": [
+     "cont_ellie",
+     "acct_4471"
+    ],
+    "text": "usage spike · Ellie Chun ran 10 searches in one afternoon against a trailing average of 1.8",
+    "date": "2026-07-29",
+    "source_ref": "usage_shift detector"
+   },
+   "evidence_row": {
+    "source": "product usage · usage_shift detector",
+    "snippet": "10 searches in an afternoon vs a 1.8 average",
+    "date": "2026-07-29",
+    "confidence": 0.9
+   },
+   "note": "The raw events are never projected. The threshold is the qualify step: deterministic, tunable, no model. Only rows that clear it compete for attention in the index."
+  },
+  "a prospect keeps coming back to the pricing page": {
+   "covered": true,
+   "source": {
+    "id": "site-demo-revisit",
+    "label": "Site / demo revisit",
+    "cadence": "realtime",
+    "what": "a prior visitor returns to the site or demo, the exception to the batch rule"
+   },
+   "stores": [
+    {
+     "kind": "signal",
+     "question": "something happened that deserves attention",
+     "fields": {
+      "subject_type": "account",
+      "signal_type": "site_demo_revisit",
+      "evidence": {
+       "url": "https://gtm-os.internal/analytics/sessions/a32d82c9-f9a",
+       "summary": "PeakForce revisited the /integrations page, 3rd visit this week, high intent signal."
+      },
+      "detected_at": "2026-07-12T12:00:00.000Z",
+      "freshness": "realtime",
+      "source": "mock_site_analytics"
+     }
+    }
+   ],
+   "retrieval_row": {
+    "kind": "signal",
+    "text": "site revisit · PeakForce revisited the /integrations page, 3rd visit this week, high intent signal.",
+    "date": "2026-07-12",
+    "source_ref": "https://gtm-os.internal/analytics/sessions/a32d82c9-f9a"
+   },
+   "evidence_row": {
+    "source": "site analytics",
+    "snippet": "PeakForce revisited the /integrations page, 3rd visit this week, high intent signal.",
+    "date": "2026-07-12",
+    "confidence": 1
+   },
+   "note": "The exception to the batch rule: a revisit is worth knowing the day it happens, so this source writes in realtime. Nothing was interpreted, so confidence is 1.0."
+  },
+  "the team updates the ICP definition in a pull request": {
+   "covered": true,
+   "source": {
+    "id": "canonical-docs",
+    "label": "Canonical docs",
+    "cadence": "on merge",
+    "what": "ICP · personas · positioning · playbooks · competitor radar"
+   },
+   "stores": [],
+   "retrieval_row": {
+    "kind": "doc",
+    "text": "ICP definition: target segments, firmographics, disqualifiers.",
+    "date": "2026-07-13",
+    "source_ref": "data/canonical/icp.md"
+   },
+   "note": "Read-only truth, evolved by PR. It reaches the model as versioned instructions in the context phase, not as an evidence row, so there is no evidence row to show."
+  },
+  "a rep hears a rumour at a conference": {
+   "covered": false,
+   "why": "Nothing in the nine tracked sources would catch this. Junto only knows what a connector delivers as an event: Salesforce state and history, Gong calls, Slack threads, product telemetry, site revisits, hiring boards, and the canonical docs. No connector watches a hallway. For this to become a row, a connector would have to exist that captures it as an event with a source_ref a reader can follow."
+  }
+ }
+}

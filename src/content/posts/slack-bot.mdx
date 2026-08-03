@@ -14,7 +14,7 @@ I built a Slack bot called Junto for our GTM team. The bigger story, a shared da
 
 A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot with one name, and that was a decision, not a default.
 
-The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust. It's a graveyard of dead internal tools rebuilt inside Slack, except now it pings you. Many bots is a coffee table with ten remote controls on it.
+The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust.[^3] It's a graveyard of dead internal tools rebuilt inside Slack, except now it pings you. Many bots is a coffee table with ten remote controls on it.
 
 One outside data point made me confident Slack was the right home at all. In LangChain's session with Deepline, Vishnu Suresh, an engineer there, described building their internal GTM agent as a data pipeline first, and it only took off, in his words, once it became a two-way Slack chatbot. The capability was the same before and after. The location changed everything.
 
@@ -119,3 +119,5 @@ And four rules, if you only keep four. One bot. Routing is constrained choice, n
 [^1]: In the code they're ANSWER, RUN, COMPOSE, REMIX, SCHEDULE, DISCOVER, CLARIFY, HELP, SOURCE_MISS and CHAT. Naming them as an enum rather than as behaviors was worth more than it sounds, because you can't add an eleventh exit by accident.
 
 [^2]: The gate bug in the loud-beats-silent story accounts for two of the nine pinned transcripts on its own: one rule saying a clarify can't fire when the thread has already resolved to a single subject, and one saying the turn that answers the bot's own clarify can never draw another clarify.
+
+[^3]: Sclar et al. (ICLR 2024) found a single model's accuracy swinging by as much as 76 points on formatting alone, a different separator or a different casing. If differences that meaningless move results that far, differences on purpose certainly will. The effect shrinks on newer models without going away, and the paper says nothing about the other half of that sentence, which is three bots reading three different sets of sources.

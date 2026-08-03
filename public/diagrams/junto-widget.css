@@ -1,0 +1,62 @@
+/* junto-widget.css — one set of design tokens for both essay widgets.
+   The colour language and hand-drawn register come from the approved
+   mockups (junto-widget-seven-steps / normalize-event). */
+:root{--paper:#faf7f2;--ink:#2b2724;--mute:#8a8078;--faint:#ded5ca;
+ --orange:#c65d3f;--orange-fill:#fbeee8;--purple:#7a5aa8;--purple-fill:#f3eefa;
+ --green:#3d8b60;--green-fill:#e9f3ed;--grey-fill:#f1efec;--red:#c0392b;--red-fill:#fbeae8;
+ --hand:'Shantell Sans',cursive;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 14px 40px;background:#1a1a1a;font-family:var(--hand);
+ display:flex;flex-direction:column;align-items:center;gap:10px}
+.plate{background:var(--paper);border-radius:11px;padding:22px 24px 20px;width:min(900px,100%);color:var(--ink)}
+.pos{font-size:11.5px;color:var(--mute);margin:0 0 10px;line-height:1.45}
+.pos b{color:var(--ink)}
+
+.badge{display:none;font-size:11px;border:1.6px solid;border-radius:999px;padding:2px 11px;margin:0 0 10px}
+.badge.on{display:inline-block}
+.badge.live{color:var(--green);border-color:#8fc3a8;background:var(--green-fill)}
+.badge.replay{color:var(--orange);border-color:#e0a68e;background:var(--orange-fill)}
+
+.ask{border:2.4px solid var(--ink);background:#fff;border-radius:10px 13px 11px 10px/13px 10px 12px 11px;
+ padding:11px 13px;transform:rotate(-.25deg)}
+.ask .who{font-size:10.5px;color:var(--mute);margin-bottom:4px}
+.ask input{width:100%;border:0;outline:0;font-family:inherit;font-size:15px;color:var(--ink);background:transparent}
+.ask input::placeholder{color:#bdb5ac}
+.askrow{display:flex;gap:8px;margin-top:9px;align-items:center;flex-wrap:wrap}
+button.go{font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;border:2px solid var(--ink);
+ background:var(--ink);color:#fff;border-radius:8px 9px 8px 10px;padding:4px 15px}
+button.go:disabled{opacity:.35;cursor:default}
+.eg{font-family:inherit;font-size:11px;cursor:pointer;border:1.6px dashed #b6bcc2;color:#5f666d;
+ background:transparent;border-radius:8px;padding:3px 9px;text-align:left}
+.eg:hover{border-color:var(--ink);color:var(--ink)}
+.egs{margin-top:12px}
+.egs .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:5px}
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+
+.rail{display:flex;flex-direction:column;align-items:center}
+.dot{width:26px;height:26px;border-radius:50%;border:2.2px solid var(--ink);background:#fff;
+ display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.line{flex:1;width:2px;background:var(--faint);margin:3px 0;min-height:12px}
+.card{border:2.2px solid var(--ink);background:#fff;border-radius:9px 12px 10px 9px/12px 9px 11px 10px;
+ padding:9px 12px;margin-bottom:11px}
+.card .t{font-weight:700;font-size:14px}
+.card .sub{font-size:10px;color:var(--mute);font-family:var(--mono);margin-top:1px}
+.card .r{font-size:12.5px;margin-top:6px;line-height:1.45}
+.card .r b{color:var(--green)}
+.card .r .warn{color:var(--red)}
+.ms{font-family:var(--mono);font-size:9.5px;color:#a09890;margin-left:6px}
+
+.typing{display:inline-flex;gap:3px;vertical-align:middle}
+.typing i{width:4px;height:4px;border-radius:50%;background:var(--orange);animation:b .9s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+.foot{margin-top:14px;font-size:11.5px;color:var(--mute);border-top:1.5px dashed var(--faint);padding-top:9px}
+.err{border:2.2px dashed var(--red);background:var(--red-fill);border-radius:9px;padding:11px 13px;
+ font-size:12.5px;color:#8a3d33;margin-top:14px}
+
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10.5px;margin-top:7px}
+td{padding:1.5px 0;vertical-align:top}
+td.k{color:var(--mute);white-space:nowrap;padding-right:10px;width:1%}
+td.v{color:var(--ink);word-break:break-word}
+.q{color:var(--purple);font-style:italic}

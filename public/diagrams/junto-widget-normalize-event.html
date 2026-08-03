@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Name something that happens at your company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="junto-widget.css">
+<style>
+h2{font-size:20px;margin:0 0 3px}
+.dek{font-size:12.5px;color:var(--mute);margin:0 0 14px}
+.out{margin-top:20px;display:none}
+.out.on{display:block}
+.lane{display:grid;grid-template-columns:30px 1fr;gap:11px}
+.lane .dot{width:24px;height:24px;font-size:11px}
+.lane:last-of-type .line{display:none}
+.card{opacity:0;transform:translateY(6px);transition:.3s;padding:10px 12px}
+.card.show{opacity:1;transform:none}
+.card .h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.card .h .t{font-weight:700;font-size:13.5px}
+.card .h .cad{margin-left:auto;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+ border:1.5px solid var(--faint);border-radius:999px;padding:1px 8px;color:var(--mute);white-space:nowrap}
+.card .h .cad.rt{color:var(--orange);border-color:#e0a68e;background:var(--orange-fill)}
+.card .d{font-size:11.5px;color:var(--mute);margin-top:3px;line-height:1.4}
+.card.store{border-color:var(--orange);background:#fffdfa}
+.card.retr{border-color:var(--green);background:var(--green-fill)}
+.card.ev{border-color:var(--ink);background:var(--grey-fill)}
+.storeblock+.storeblock{margin-top:8px;padding-top:7px;border-top:1.5px dashed var(--faint)}
+.flag{margin-top:7px;padding:6px 9px;border-radius:6px;font-size:11px;background:var(--green-fill);color:#3a6b52}
+.flag b{color:var(--green);font-size:9.5px;letter-spacing:.04em}
+.miss{border:2.2px dashed var(--red);background:#fdf2f0;border-radius:9px;padding:12px 14px;
+ font-size:12.5px;color:#8a3d33;line-height:1.5}
+.miss b{color:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <h2>Name something that happens at your company</h2>
+  <p class="dek">Everything a business does has to become the same shape before anything can search across it.
+  Type an event and the real pipeline classifies it against the nine sources it actually watches. Nothing here
+  is a keyword table: a small model picks a source from a closed list or admits that none fits, and every field
+  you see is rendered from the system's own manifest.</p>
+
+  <span class="badge" id="badge"></span>
+
+  <div class="ask">
+    <input id="q" placeholder="something that happens at your company" autocomplete="off">
+    <div class="row" style="margin-top:10px"><button class="go" id="go">normalize it</button></div>
+  </div>
+
+  <div class="egs">
+    <div class="lbl">or try one of these</div>
+    <div class="row" id="chips"></div>
+  </div>
+
+  <div class="out" id="out"></div>
+</div>
+
+<script type="module">
+import { demoBase, isMobileViewport, mintSession, postNormalize, escapeHtml, tidySystemCopy } from "./junto-widget-lib.js";
+
+const $ = (i) => document.getElementById(i);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let MODE = "live";
+let REPLAY = null;
+let sid = null;
+let busy = false;
+
+const rows = (obj) => `<table>${Object.entries(obj).map(([k, v]) =>
+  `<tr><td class="k">${escapeHtml(k)}</td><td class="v">${escapeHtml(typeof v === "string" ? v : JSON.stringify(v))}</td></tr>`).join("")}</table>`;
+
+async function render(resp) {
+  const out = $("out");
+  out.className = "out on"; out.innerHTML = "";
+  if (resp.covered === false) {
+    out.innerHTML = `<div class="miss"><b>Nothing sees it.</b> ${escapeHtml(tidySystemCopy(resp.why ?? ""))}</div>`;
+    return;
+  }
+  const cards = [];
+  cards.push({ n: 1, cls: "", h: `<span class="t">Where it is seen</span>
+      <span class="cad ${resp.source.cadence === "realtime" || resp.source.cadence === "at ask time" ? "rt" : ""}">${escapeHtml(resp.source.cadence)}</span>`,
+    body: `<div class="d"><b>${escapeHtml(resp.source.label)}</b> · ${escapeHtml(tidySystemCopy(resp.source.what))}</div>` });
+  const storeBlocks = (resp.stores ?? []).map((s) => `<div class="storeblock">
+      <div class="t" style="font-size:12.5px">${escapeHtml(s.kind)}</div>
+      <div class="d q">"${escapeHtml(s.question)}"</div>${rows(s.fields)}</div>`).join("");
+  cards.push({ n: 2, cls: "store",
+    h: `<span class="t">The typed row${(resp.stores ?? []).length > 1 ? "s" : ""} the store keeps</span>`,
+    body: storeBlocks || `<div class="d">No typed store. ${escapeHtml(tidySystemCopy(resp.note ?? ""))}</div>` });
+  if (resp.retrieval_row) {
+    cards.push({ n: 3, cls: "retr", h: `<span class="t">RetrievalRow · flattened so it can be ranked</span>`,
+      body: rows(resp.retrieval_row) });
+  }
+  if (resp.evidence_row) {
+    cards.push({ n: 4, cls: "ev", h: `<span class="t">EvidenceRow · what the model may finally read</span>`,
+      body: rows(resp.evidence_row) });
+  }
+  for (const c of cards) {
+    const el = document.createElement("div");
+    el.className = "lane";
+    el.innerHTML = `<div class="rail"><div class="dot">${c.n}</div><div class="line"></div></div>
+      <div class="card ${c.cls}"><div class="h">${c.h}</div>${c.body}</div>`;
+    out.appendChild(el);
+    await sleep(70);
+    el.querySelector(".card").classList.add("show");
+    await sleep(300);
+  }
+  if (resp.note) {
+    const f = document.createElement("div");
+    f.className = "flag";
+    f.innerHTML = `<b>THE NOTE THAT RIDES THE ROW</b> · ${escapeHtml(tidySystemCopy(resp.note))}`;
+    out.appendChild(f);
+  }
+}
+
+async function loadReplayFile() {
+  if (REPLAY) return REPLAY;
+  const r = await fetch("junto-widget-replay.json");
+  REPLAY = await r.json();
+  return REPLAY;
+}
+
+async function go(text) {
+  if (busy || !text.trim()) return;
+  busy = true; $("go").disabled = true;
+  try {
+    if (MODE === "live") {
+      const base = demoBase();
+      if (!sid) sid = await mintSession(base);
+      const resp = await postNormalize(base, sid, text);
+      await render(resp);
+    } else {
+      const t = await loadReplayFile();
+      const rec = t.normalize?.[text];
+      if (rec) await render(rec);
+      else {
+        $("out").className = "out on";
+        $("out").innerHTML = `<div class="miss"><b>The live classifier is unreachable</b>, and matching your
+          words to a source honestly takes the real one. A keyword lookup here would only pretend to.
+          Pick one of the recorded examples above, or come back when the endpoint is up.</div>`;
+      }
+    }
+  } catch (err) {
+    // Live failed: flip to recordings, honestly badged, and retry as replay.
+    if (MODE === "live") {
+      MODE = "replay"; sid = null;
+      const t = await loadReplayFile().catch(() => null);
+      setBadge("replay", `The live endpoint is unreachable. Recorded examples from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
+      busy = false; $("go").disabled = false;
+      return go(text);
+    }
+    $("out").className = "out on";
+    $("out").innerHTML = `<div class="miss"><b>Nothing could be reached or replayed.</b> ${escapeHtml(String(err?.message ?? err))}</div>`;
+  } finally {
+    busy = false; $("go").disabled = false;
+  }
+}
+
+function setBadge(kind, text) {
+  const b = $("badge");
+  b.className = `badge on ${kind}`;
+  b.textContent = text;
+}
+
+async function boot() {
+  const t = await loadReplayFile().catch(() => null);
+  for (const label of Object.keys(t?.normalize ?? {})) {
+    const b = document.createElement("button");
+    b.className = "eg";
+    b.textContent = label;
+    b.onclick = () => { $("q").value = label; go(label); };
+    $("chips").appendChild(b);
+  }
+  if (isMobileViewport()) {
+    MODE = "replay";
+    setBadge("replay", `On a phone this plays recorded examples from ${t?.recorded_at ?? "an earlier run"}. Live classification runs on desktop.`);
+    return;
+  }
+  try {
+    const r = await fetch(`${demoBase()}/healthz`);
+    const h = await r.json();
+    if (h.killed) throw new Error("killed");
+    setBadge("live", "live · a real classifier picks from a closed list, or admits none fits");
+  } catch {
+    MODE = "replay";
+    setBadge("replay", `The live endpoint is unreachable right now. Recorded examples from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
+  }
+}
+
+$("go").onclick = () => go($("q").value);
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") go($("q").value); });
+boot();
+</script>
+</body>
+</html>

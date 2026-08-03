@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What happens when you @junto: seven steps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="junto-widget.css">
+<style>
+.steps{margin-top:18px;display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:34px 1fr;gap:12px;opacity:0;transform:translateY(7px);
+ transition:opacity .34s ease,transform .34s ease}
+.step.show{opacity:1;transform:none}
+.step.done .dot{background:var(--green-fill);border-color:var(--green);color:var(--green)}
+.step.busy .dot{background:var(--orange-fill);border-color:var(--orange);color:var(--orange)}
+.step:last-child .line{display:none}
+.more{margin-top:7px;border-top:1.5px dashed var(--faint);padding-top:6px}
+.more summary{cursor:pointer;list-style:none;font-size:11px;color:var(--mute);display:flex;gap:6px;align-items:center}
+.more summary::-webkit-details-marker{display:none}
+.more summary:hover{color:var(--ink)}
+.more .chev{font-size:8px;transition:transform .2s}
+.more[open] .chev{transform:rotate(90deg)}
+.rules{margin-top:7px;display:flex;flex-direction:column;gap:3px}
+.rule{display:flex;gap:8px;font-size:11px;align-items:baseline;padding:2px 7px;border-radius:5px;background:#f7f5f2}
+.rule .id{font-family:var(--mono);color:var(--mute);min-width:20px}
+.rule .nm{flex:1;color:#5a5550}
+.rule .v{font-family:var(--mono);font-size:10px;color:var(--green)}
+.rule.fired{background:var(--red-fill)}
+.rule.fired .v{color:var(--red);font-weight:600}
+.cands{margin-top:5px;display:flex;gap:5px;flex-wrap:wrap}
+.cand{font-family:var(--mono);font-size:9.5px;border:1.4px solid var(--faint);border-radius:999px;padding:1px 8px;color:#5a5550}
+.evline{margin-top:4px;font-family:var(--mono);font-size:10.5px;color:#5a5550;line-height:1.6}
+.evline .src{color:var(--purple)}
+.answer{margin-top:7px;border-top:1.5px dashed var(--faint);padding-top:7px;font-size:12.5px;line-height:1.5}
+.answer p{margin:0 0 7px}
+.cites{margin-top:8px;background:var(--grey-fill);border-radius:7px;padding:7px 10px}
+.cites-h{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.cites ul{margin:5px 0 0;padding-left:16px;font-size:11px;line-height:1.5}
+.cites li{margin-bottom:6px}
+.csrc{color:var(--purple);font-family:var(--mono);font-size:10px}
+.csnip{color:#5a5550}
+.cquote{color:var(--ink);font-style:italic;margin-top:2px}
+.cref{font-family:var(--mono);font-size:9px;color:#a09890}
+.silent{border:2.2px dashed var(--mute);background:var(--grey-fill);border-radius:9px;padding:11px 13px;
+ font-size:12.5px;color:#5a5550;margin-top:11px;line-height:1.5}
+.silent b{color:var(--ink)}
+#pending{margin:2px 0 8px 46px;display:none}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <p class="pos"><b>You are a rep on this team</b>, typing in <b>#sdr-team</b>. The demo seat belongs to Ryan,
+  and its 18 accounts are the book you are asking about. Nothing below is scripted: the cards settle as the
+  real system's events arrive.</p>
+
+  <span class="badge" id="badge"></span>
+
+  <div class="ask">
+    <div class="who">you · #sdr-team</div>
+    <input id="q" placeholder="@junto ask it anything" autocomplete="off">
+    <div class="askrow">
+      <button class="go" id="go">send</button>
+      <span style="font-size:10px;color:var(--mute)">or poke where it is interesting:</span>
+    </div>
+    <div class="askrow" id="chips"></div>
+  </div>
+
+  <div class="steps" id="steps"></div>
+  <div id="pending"><span class="typing"><i></i><i></i><i></i></span>
+    <span style="font-size:10.5px;color:var(--mute)"> the run is executing, receipts arrive when it lands</span></div>
+  <div id="tail"></div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<script type="module">
+import {
+  demoBase, isMobileViewport, mintSession, streamMessage, playRecorded,
+  renderAnswerHtml, renderCitationsHtml, escapeHtml, tidySystemCopy,
+} from "./junto-widget-lib.js";
+
+const PHASES = {
+  identity: { n: 1, t: "Determine who asked, and from where", sub: "identity · channel → lane" },
+  route:    { n: 2, t: "Decide: run a play, build one, remix one, or just find information", sub: "front door · 10 exits · 5 rules" },
+  context:  { n: 3, t: "Read the rules and the facts", sub: "constitution at one seam + canonical docs" },
+  fetch:    { n: 4, t: "Find the data", sub: "fetchers → typed stores → evidence rows" },
+  generate: { n: 5, t: "Write the answer", sub: "one model pass, evidence rows only" },
+  lint:     { n: 6, t: "Check the answer", sub: "deterministic linter, no model" },
+  post:     { n: 7, t: "Post it", sub: "thread reply + provenance line" },
+};
+
+const CHIPS = [
+  { label: "pull real quotes from the calls", key: "agreement" },
+  { label: "watch a rule overrule the model", key: "override" },
+  { label: "address someone else", key: "silent" },
+];
+
+const $ = (i) => document.getElementById(i);
+let MODE = "live";            // "live" | "replay"
+let REPLAY = null;            // bundled trace file
+let busy = false;
+
+// --- per-run render state -------------------------------------------------------
+let cards = {};               // phase -> {el, body}
+let route = null;             // accumulated routing stages
+let sawAnswer = false;
+
+function reset() {
+  $("steps").innerHTML = ""; $("tail").innerHTML = ""; $("foot").textContent = "";
+  $("pending").style.display = "none";
+  cards = {}; route = null; sawAnswer = false;
+}
+
+function addCard(phase) {
+  const meta = PHASES[phase];
+  if (!meta || cards[phase]) return cards[phase];
+  const el = document.createElement("div");
+  el.className = "step busy";
+  el.innerHTML = `<div class="rail"><div class="dot">${meta.n}</div><div class="line"></div></div>
+    <div class="card"><div class="t">${meta.t}</div><div class="sub">${meta.sub}</div>
+    <div class="r"><span class="typing"><i></i><i></i><i></i></span></div></div>`;
+  $("steps").appendChild(el);
+  requestAnimationFrame(() => el.classList.add("show"));
+  $("pending").style.display = "none";
+  cards[phase] = { el, body: el.querySelector(".r") };
+  return cards[phase];
+}
+
+function settle(phase, summary, ms) {
+  const c = cards[phase];
+  if (!c) return;
+  const spinner = c.body.querySelector(".typing");
+  if (spinner) spinner.remove();
+  if (summary) {
+    const line = document.createElement("div");
+    line.innerHTML = escapeHtml(tidySystemCopy(summary)) + (ms !== undefined ? `<span class="ms">${ms} ms</span>` : "");
+    c.body.prepend(line);
+  }
+  c.el.classList.remove("busy"); c.el.classList.add("done");
+}
+
+// --- the route card: real stages, agreement designed first ---------------------
+function renderRoute() {
+  const r = route; if (!r || !cards.route) return;
+  const parts = [];
+  if (r.exit) {
+    if (r.fired) {
+      parts.push(`The model proposed <s>${escapeHtml(r.fired.from ?? "?")}</s>. ` +
+        `<span class="warn">${escapeHtml(r.fired.rule)} overruled it</span>, and the run exits <b>${escapeHtml(r.exit.exit)}</b>.`);
+    } else if (r.classify) {
+      parts.push(`The model proposed <b>${escapeHtml(r.exit.exit)}</b> at ${Number(r.classify.confidence).toFixed(2)}, ` +
+        `and all five rules let it stand. Agreement is the usual outcome, and it is the system working.`);
+    } else if (r.gate) {
+      parts.push(`A deterministic shortcut decided: <b>${escapeHtml(r.exit.exit)}</b>. No model ran.`);
+    }
+  }
+  if (r.classify) {
+    const cands = (r.classify.candidates ?? []).length > 0
+      ? `<div class="cands">${r.classify.candidates.map((c) => `<span class="cand">${escapeHtml(c)}</span>`).join("")}</div>`
+      : `<div class="cands"><span class="cand">no candidate plays for this exit: nothing to narrow</span></div>`;
+    parts.push(`<div class="evline">catalog of ${escapeHtml(String(r.classify.catalog_size))} plays went in · ` +
+      `one call came back: ${escapeHtml(r.classify.exit)} at ${Number(r.classify.confidence).toFixed(2)}</div>` + cands);
+  }
+  if (r.rules.length > 0) {
+    const rows = r.rules.map((p) => `<div class="rule ${p.fired ? "fired" : ""}">
+      <span class="id">${escapeHtml(p.rule)}</span><span class="nm">${escapeHtml(p.name)}</span>
+      <span class="v">${p.fired ? `✗ rerouted → ${escapeHtml(p.to ?? "")}` : "passed"}</span></div>`).join("");
+    parts.push(`<div class="more"><details${r.fired ? " open" : ""}>
+      <summary><span class="chev">▶</span> the five rules that check the model</summary>
+      <div class="rules">${rows}</div></details></div>`);
+  }
+  cards.route.body.innerHTML = parts.join("") || `<span class="typing"><i></i><i></i><i></i></span>`;
+}
+
+function renderSilent(gate) {
+  settle("identity", undefined, undefined);
+  const el = document.createElement("div");
+  el.className = "silent";
+  el.innerHTML = `<b>Junto stayed silent.</b> ${escapeHtml(tidySystemCopy(gate?.reason ?? "The message was not addressed to it."))}
+    <br>Nothing was posted, and phases 2 through 7 never ran. In a shared channel that silence is the
+    system's most important habit, not a failure.`;
+  $("tail").appendChild(el);
+  $("foot").textContent = "A run that ends in silence spends zero tokens.";
+}
+
+function onEvent({ event, data }) {
+  if (event === "stage" && data.stage === "phase") {
+    if (data.state === "start") { addCard(data.phase); if (data.summary) { /* summary arrives on start for some phases */ cards[data.phase].pendingSummary = data.summary; } }
+    else {
+      settle(data.phase, data.summary ?? cards[data.phase]?.pendingSummary, data.ms);
+      if (data.phase === "route" && MODE === "live" && !sawAnswer) $("pending").style.display = "block";
+    }
+    return;
+  }
+  if (event === "stage") {
+    if (!route) route = { rules: [], fired: null, classify: null, gate: null, exit: null };
+    if (data.stage === "gate") route.gate = data;
+    else if (data.stage === "classify") route.classify = data;
+    else if (data.stage === "post_rule") { route.rules.push(data); if (data.fired) route.fired = data; }
+    else if (data.stage === "exit") route.exit = data;
+    // A silent run emits its gate with NO route phase. The route card only
+    // exists once the phase opened (or a classify/rule stage proves the
+    // router actually ran, which covers older recordings without phases).
+    if (data.stage !== "gate" && !cards.route) addCard("route");
+    if (cards.route) renderRoute();
+    return;
+  }
+  if (event === "step") {
+    const open = ["fetch", "generate", "lint", "context"].map((p) => cards[p])
+      .filter((c) => c && c.el.classList.contains("busy")).pop();
+    if (open) {
+      const d = document.createElement("div");
+      d.className = "evline";
+      d.innerHTML = `<span class="src">${escapeHtml(data.label ?? "")}</span> · ${escapeHtml(String(data.ms ?? 0))} ms`;
+      open.body.appendChild(d);
+    }
+    return;
+  }
+  if (event === "answer") {
+    sawAnswer = true;
+    $("pending").style.display = "none";
+    const target = cards.post?.body ?? (() => { const d = document.createElement("div"); d.className = "card"; $("tail").appendChild(d); return d; })();
+    const wrap = document.createElement("div");
+    wrap.className = "answer";
+    wrap.innerHTML = renderAnswerHtml(data.markdown, data.citations) + renderCitationsHtml(data.citations);
+    target.appendChild(wrap);
+    return;
+  }
+  if (event === "receipts") {
+    const cost = typeof data.cost_usd === "number" ? ` · $${data.cost_usd.toFixed(4)}` : "";
+    const srcs = (data.sources ?? []).length ? ` · sources: ${data.sources.join(", ")}` : "";
+    $("foot").textContent = `Receipts: exit ${data.exit} at ${Number(data.confidence).toFixed(2)} via ${data.via} · ${data.duration_ms} ms${cost}${srcs}. Every step above came from the run's own events.`;
+    return;
+  }
+  if (event === "done") {
+    $("pending").style.display = "none";
+    if (data.silent === true) renderSilent(route?.gate);
+    busy = false; $("go").disabled = false;
+    return;
+  }
+  if (event === "error") {
+    $("pending").style.display = "none";
+    const el = document.createElement("div");
+    el.className = "err";
+    el.textContent = `The run failed: ${tidySystemCopy(data.message ?? data.code ?? "unknown error")}. That is the honest state of it.`;
+    $("tail").appendChild(el);
+    busy = false; $("go").disabled = false;
+    return;
+  }
+  if (event === "replay") {
+    setBadge("replay", `The live service declined the run (${tidySystemCopy(data.reason ?? "paused")}). What follows is a recording, replayed honestly.`);
+    return;
+  }
+}
+
+// --- modes ----------------------------------------------------------------------
+function setBadge(kind, text) {
+  const b = $("badge");
+  b.className = `badge on ${kind}`;
+  b.textContent = text;
+}
+
+async function loadReplayFile() {
+  if (REPLAY) return REPLAY;
+  const r = await fetch("junto-widget-replay.json");
+  REPLAY = await r.json();
+  return REPLAY;
+}
+
+async function runLive(text) {
+  const base = demoBase();
+  const sid = await mintSession(base);
+  await streamMessage(base, sid, text, onEvent);
+}
+
+async function runReplay(text) {
+  const t = await loadReplayFile();
+  const rec = Object.values(t.message).find((m) => m.prompt === text);
+  if (!rec) {
+    const el = document.createElement("div");
+    el.className = "err";
+    el.textContent = "The live service is unreachable, and a recording only exists for the suggested prompts. Free text needs the real system. Pick a recorded run, or come back when the endpoint is up.";
+    $("tail").appendChild(el);
+    busy = false; $("go").disabled = false;
+    return;
+  }
+  await playRecorded(rec.events, onEvent);
+  busy = false; $("go").disabled = false;
+}
+
+async function run(text) {
+  if (busy || !text.trim()) return;
+  busy = true; $("go").disabled = true;
+  reset();
+  try {
+    if (MODE === "live") await runLive(text);
+    else await runReplay(text);
+  } catch (err) {
+    // The live path failed mid-flight or up front: fall to the recording,
+    // honestly badged. Never fake a live result.
+    if (MODE === "live") {
+      MODE = "replay";
+      const t = await loadReplayFile().catch(() => null);
+      setBadge("replay", `The live endpoint is unreachable. Recordings from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
+      reset();
+      await runReplay(text);
+    } else {
+      const el = document.createElement("div");
+      el.className = "err";
+      el.textContent = `Nothing could be reached or replayed: ${String(err?.message ?? err)}`;
+      $("tail").appendChild(el);
+    }
+  } finally {
+    if (MODE === "live") { busy = false; $("go").disabled = false; }
+  }
+}
+
+// --- boot -----------------------------------------------------------------------
+async function boot() {
+  const t = await loadReplayFile().catch(() => null);
+  for (const c of CHIPS) {
+    const b = document.createElement("button");
+    b.className = "eg";
+    b.textContent = c.label;
+    const prompt = t?.message?.[c.key]?.prompt ?? "";
+    b.onclick = () => { $("q").value = prompt; run(prompt); };
+    $("chips").appendChild(b);
+  }
+  if (isMobileViewport()) {
+    MODE = "replay";
+    setBadge("replay", `On a phone this plays recordings from ${t?.recorded_at ?? "an earlier run"}. The live stream runs on desktop.`);
+    return;
+  }
+  try {
+    const r = await fetch(`${demoBase()}/healthz`);
+    const h = await r.json();
+    if (h.killed) throw new Error("killed");
+    setBadge("live", "live · every card below settles on a real event");
+  } catch {
+    MODE = "replay";
+    setBadge("replay", `The live endpoint is unreachable right now. Recordings from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
+  }
+}
+
+$("go").onclick = () => run($("q").value);
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") run($("q").value); });
+boot();
+</script>
+</body>
+</html>
