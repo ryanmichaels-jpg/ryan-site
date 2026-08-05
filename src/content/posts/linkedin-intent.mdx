@@ -28,9 +28,17 @@ So is a comment on one of those posts worth anything? Plenty of them are not. Pe
 
 And the format is spreading, because it works for the people posting. So the volume of the signal goes up every month.
 
+
+<Diagram
+  src="junto-d11-linkedin-pipeline.png"
+  label="Fig. 1"
+  caption="The whole run on one page. One gate before the scrape and one after the tagging, and the only model in it is the one judging ICP fit. Everything past the CSV is matching and routing."
+/>
+
+
 ## The pipeline
 
-1. Apify scrapes recent posts from competitor company pages, ranks them by engagement, and pulls every reactor and commenter from the top posts.
+1. HarvestAPI scrapes recent posts from competitor company pages, ranks them by engagement, and pulls every reactor and commenter from the top posts.
 2. Claude classifies each engager on title relevance, company size, and decision-maker level.
 3. Anyone who engaged with more than one competitor post gets flagged and prioritized.
 4. It watches for new posters. When a creator starts pulling engagement from our ICP, they go on a watchlist automatically.
