@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Junto, live, in a Slack window</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="junto-widget.css">
+<style>
+/* Slack's LAYOUT in the essay's hand-drawn register, never a pixel copy. */
+.plate{padding:0;overflow:hidden;width:min(940px,100%)}
+.frame{display:grid;grid-template-columns:168px 1fr;min-height:560px}
+.side{border-right:2.2px solid var(--ink);background:#f4efe7;padding:10px 0 12px;display:flex;flex-direction:column}
+.ws{font-weight:700;font-size:14px;padding:2px 13px 8px;border-bottom:1.5px dashed var(--faint)}
+.sect{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);padding:10px 13px 3px}
+.chan{font-size:12.5px;padding:3px 13px;color:var(--ink);cursor:default}
+.chan.active{background:var(--purple);color:#fff;border-radius:0 999px 999px 0;margin-right:10px;font-weight:600}
+.channote{font-size:9.8px;color:var(--mute);padding:8px 13px 0;line-height:1.45;margin-top:auto}
+.pane{display:flex;flex-direction:column;min-width:0}
+.chanhead{padding:8px 14px;border-bottom:1.5px dashed var(--faint);display:flex;align-items:baseline;gap:10px}
+.chanhead b{font-size:14px}
+.pos2{font-size:10px;color:var(--mute)}
+#msgs{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:12px;max-height:520px}
+
+.thread{border:1.6px dashed var(--faint);border-radius:9px;padding:8px 10px}
+.thread.seeded{background:#fffdf8}
+.seednote{font-size:9.5px;color:var(--mute);margin-bottom:6px}
+.msg{display:grid;grid-template-columns:30px 1fr;gap:9px;margin-bottom:7px}
+.av{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+ font-weight:700;font-size:11px;color:#fff;flex-shrink:0}
+.av.you{background:var(--green)} .av.ryan{background:var(--orange)} .av.bot{background:var(--purple)}
+.mh{display:flex;gap:7px;align-items:baseline}
+.mh .nm{font-weight:700;font-size:12.5px}
+.mh .app{font-size:8.5px;border:1.3px solid var(--faint);border-radius:3px;padding:0 4px;color:var(--mute);
+ letter-spacing:.03em}
+.mh .ts{font-size:9.5px;color:var(--mute);font-family:var(--mono)}
+.mb{font-size:12.5px;line-height:1.5;margin-top:2px;overflow-wrap:anywhere}
+.mb p{margin:0 0 7px}
+.replies{margin-left:14px;border-left:2px solid var(--faint);padding-left:12px}
+.replybox{margin-left:26px;margin-top:4px}
+.replybox input{width:100%;border:1.6px dashed #b6bcc2;border-radius:7px;background:#fff;
+ font-family:inherit;font-size:11.5px;padding:4px 9px;outline:none;color:var(--ink)}
+.replybox input:focus{border-color:var(--ink)}
+.sysline{font-size:11px;color:#8a3d33;font-style:italic;margin:4px 0 7px}
+
+.cites{margin-top:7px;background:var(--grey-fill);border-radius:7px;padding:7px 10px}
+.cites-h{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.cites ul{margin:5px 0 0;padding-left:16px;font-size:10.5px;line-height:1.5}
+.cites li{margin-bottom:5px}
+.csrc{color:var(--purple);font-family:var(--mono);font-size:9.5px}
+.csnip{color:#5a5550}
+.cquote{color:var(--ink);font-style:italic;margin-top:2px}
+.cref{font-family:var(--mono);font-size:8.5px;color:#a09890}
+.artifact{margin:6px 0 8px;border:1.6px solid var(--faint);border-radius:8px;overflow:hidden;background:#fff}
+.artifact img,.artifact svg{display:block;width:100%;height:auto}
+.artifact .cap{font-size:9.5px;color:var(--mute);padding:4px 8px;border-top:1.5px dashed var(--faint)}
+details.rcpt{margin-top:4px}
+details.rcpt summary{cursor:pointer;list-style:none;font-size:9.5px;color:var(--mute);font-family:var(--mono)}
+details.rcpt summary::-webkit-details-marker{display:none}
+details.rcpt summary:hover{color:var(--ink)}
+details.rcpt .body{font-family:var(--mono);font-size:9.5px;color:#5a5550;margin-top:3px;line-height:1.7}
+
+.compose{border-top:2.2px solid var(--ink);padding:9px 14px 12px;background:#fff}
+.compose .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px}
+.compose .box{display:flex;gap:8px}
+.compose input{flex:1;border:2.2px solid var(--ink);border-radius:9px 11px 9px 10px;background:#fff;
+ font-family:inherit;font-size:13.5px;padding:7px 11px;outline:none;color:var(--ink)}
+.compose input::placeholder{color:#bdb5ac}
+.badgebar{padding:7px 14px 0}
+.typing{margin:2px 0 6px}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <div class="badgebar"><span class="badge" id="badge"></span></div>
+  <div class="frame">
+    <aside class="side">
+      <div class="ws">Junto · demo</div>
+      <div class="sect">Channels</div>
+      <div class="chan active"># sdr-team</div>
+      <div class="channote">One channel, on purpose. A channel maps to a lane and the lane decides what a
+        seat can see. This demo runs one pinned seat in the sdr lane, so a second channel would change
+        nothing you could notice, and this essay does not do set dressing.</div>
+    </aside>
+    <main class="pane">
+      <div class="chanhead"><b># sdr-team</b>
+        <span class="pos2">You are a rep on this team. The seat is Ryan's; its 18 accounts are yours to ask about.</span>
+      </div>
+      <div id="msgs"></div>
+      <div class="compose">
+        <div class="chips" id="chips"></div>
+        <div class="box">
+          <input id="q" placeholder="Message #sdr-team. Ask anything, or run a play" autocomplete="off">
+          <button class="go" id="go">send</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script type="module">
+import {
+  demoBase, isMobileViewport, mintSession, streamMessage, playRecorded,
+  renderAnswerHtml, renderCitationsHtml, escapeHtml, tidySystemCopy,
+} from "./junto-widget-lib.js";
+
+const $ = (i) => document.getElementById(i);
+let MODE = "live";
+let REPLAY = null;
+let sid = null;
+let busy = false;
+let threadN = 0;
+
+const CHIPS = [
+  { label: "quotes from real calls", key: "agreement" },
+  { label: "run a play", key: "runplay" },
+  { label: "an org chart", key: "pov" },
+  { label: "something we have no source for", key: "sourcemiss" },
+  { label: "address someone else", key: "silent" },
+];
+
+const now = () => new Date().toTimeString().slice(0, 5);
+
+function msgEl(who, bodyHtml, ts) {
+  const cls = who === "Junto" ? "bot" : who === "Ryan" ? "ryan" : "you";
+  const initial = who === "Junto" ? "J" : who === "Ryan" ? "R" : "you";
+  const el = document.createElement("div");
+  el.className = "msg";
+  el.innerHTML = `<div class="av ${cls}">${initial}</div><div>
+    <div class="mh"><span class="nm">${escapeHtml(who)}</span>${who === "Junto" ? '<span class="app">APP</span>' : ""}
+      <span class="ts">${escapeHtml(ts ?? now())}</span></div>
+    <div class="mb">${bodyHtml}</div></div>`;
+  return el;
+}
+
+function newThread({ seeded } = {}) {
+  const key = `t${++threadN}`;
+  const el = document.createElement("div");
+  el.className = "thread" + (seeded ? " seeded" : "");
+  el.dataset.key = key;
+  el.innerHTML = `${seeded ? "" : ""}<div class="root"></div><div class="replies"></div>
+    <div class="replybox"><input placeholder="Reply in thread…" autocomplete="off"></div>`;
+  const input = el.querySelector(".replybox input");
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter" && input.value.trim()) { const v = input.value; input.value = ""; send(v, key, el); } });
+  $("msgs").appendChild(el);
+  el.scrollIntoView({ block: "end" });
+  return { key, el };
+}
+
+function typingOn(threadEl) {
+  const t = document.createElement("div");
+  t.className = "typing"; t.dataset.typing = "1";
+  t.innerHTML = "<i></i><i></i><i></i>";
+  threadEl.querySelector(".replies").appendChild(t);
+}
+function typingOff(threadEl) {
+  threadEl.querySelectorAll("[data-typing]").forEach((n) => n.remove());
+}
+
+function sysline(threadEl, text) {
+  const d = document.createElement("div");
+  d.className = "sysline";
+  d.textContent = text;
+  threadEl.querySelector(".replies").appendChild(d);
+}
+
+// --- event → thread rendering ---------------------------------------------------
+function makeHandler(threadEl) {
+  let lastReplyBody = null;
+  return ({ event, data }) => {
+    const replies = threadEl.querySelector(".replies");
+    if (event === "answer") {
+      typingOff(threadEl);
+      const html = renderAnswerHtml(data.markdown, data.citations) + renderCitationsHtml(data.citations);
+      const m = msgEl("Junto", html);
+      replies.appendChild(m);
+      lastReplyBody = m.querySelector(".mb");
+      threadEl.scrollIntoView({ block: "end" });
+      return;
+    }
+    if (event === "artifact") {
+      const box = document.createElement("div");
+      box.className = "artifact";
+      if (data.kind === "org_chart" && data.svg) {
+        box.innerHTML = `${data.svg}<div class="cap">org chart, drawn from the fetched rows. No model in this path.</div>`;
+      } else if (data.kind === "run_journey" && data.png_base64) {
+        box.innerHTML = `<img alt="run journey diagram" src="data:image/png;base64,${data.png_base64}">
+          <div class="cap">${escapeHtml(tidySystemCopy(data.caption ?? "the run's own journey, drawn from its trace"))}</div>`;
+      } else if (data.kind === "run_journey" && data.caption) {
+        box.innerHTML = `<div class="cap">${escapeHtml(tidySystemCopy(data.caption))}</div>`;
+      } else { return; }
+      (lastReplyBody ?? replies).appendChild(box);
+      threadEl.scrollIntoView({ block: "end" });
+      return;
+    }
+    if (event === "receipts") {
+      const target = lastReplyBody ?? replies;
+      const cost = typeof data.cost_usd === "number" ? `cost $${data.cost_usd.toFixed(4)}` : "";
+      const lines = [
+        `exit ${data.exit} at ${Number(data.confidence).toFixed(2)} via ${data.via}`,
+        `${data.duration_ms} ms · ${cost}`,
+        (data.sources ?? []).length ? `sources: ${data.sources.join(", ")}` : "",
+        data.run_id ? `run ${data.run_id}${data.executor ? ` · ${data.executor}` : ""}` : "",
+      ].filter(Boolean);
+      const d = document.createElement("details");
+      d.className = "rcpt";
+      d.innerHTML = `<summary>▸ receipts</summary><div class="body">${lines.map((l) => escapeHtml(l)).join("<br>")}</div>`;
+      target.appendChild(d);
+      return;
+    }
+    if (event === "done") {
+      typingOff(threadEl);
+      // A silent run ends here with NOTHING in the thread. The message just
+      // sits, which is the demonstration.
+      busy = false; $("go").disabled = false;
+      return;
+    }
+    if (event === "error") {
+      typingOff(threadEl);
+      sysline(threadEl, tidySystemCopy(`${data.message ?? data.code ?? "the run failed"}`));
+      busy = false; $("go").disabled = false;
+      return;
+    }
+    if (event === "replay") {
+      setBadge("replay", `The live service declined the run (${tidySystemCopy(data.reason ?? "paused")}). What follows is a recording, replayed honestly.`);
+      return;
+    }
+    // stage/step events are widget A's material; this surface is the product.
+  };
+}
+
+// --- sending --------------------------------------------------------------------
+async function send(text, threadKey, threadEl) {
+  if (busy || !text.trim()) return;
+  busy = true; $("go").disabled = true;
+  let el = threadEl;
+  if (!el) { const t = newThread({}); el = t.el; threadKey = t.key; }
+  el.querySelector(threadEl ? ".replies" : ".root").appendChild(msgEl("you", `<p>${escapeHtml(text)}</p>`));
+  typingOn(el);
+  el.scrollIntoView({ block: "end" });
+  const handler = makeHandler(el);
+  try {
+    if (MODE === "live") {
+      const base = demoBase();
+      if (!sid) sid = await mintSession(base);
+      await streamMessage(base, sid, text, handler, threadKey);
+    } else {
+      const t = await loadReplayFile();
+      const rec = Object.values(t.message).find((m) => m.prompt === text);
+      if (!rec) {
+        typingOff(el);
+        sysline(el, "The live service is unreachable, and recordings only exist for the suggested prompts. Free text needs the real engine; this surface will not fake it.");
+        busy = false; $("go").disabled = false;
+        return;
+      }
+      await playRecorded(rec.events, handler);
+      busy = false; $("go").disabled = false;
+    }
+  } catch (err) {
+    typingOff(el);
+    if (MODE === "live") {
+      MODE = "replay"; sid = null;
+      const t = await loadReplayFile().catch(() => null);
+      setBadge("replay", `The live endpoint is unreachable. Recordings from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
+      sysline(el, "The live endpoint went unreachable mid-run. Suggested prompts replay recordings; free text needs the real engine.");
+    } else {
+      sysline(el, `Nothing could be reached or replayed: ${String(err?.message ?? err)}`);
+    }
+    busy = false; $("go").disabled = false;
+  }
+}
+
+// --- boot -----------------------------------------------------------------------
+function setBadge(kind, text) {
+  const b = $("badge");
+  b.className = `badge on ${kind}`;
+  b.textContent = text;
+}
+
+async function loadReplayFile() {
+  if (REPLAY) return REPLAY;
+  const r = await fetch("junto-widget-replay.json");
+  REPLAY = await r.json();
+  return REPLAY;
+}
+
+function seedHistory(t) {
+  // Real fixture content: the recorded pricing thread, rendered statically.
+  // No run fires on load (issue #9 §9).
+  const rec = t?.message?.agreement;
+  if (!rec) return;
+  const { el } = newThread({ seeded: true });
+  el.insertAdjacentHTML("afterbegin", `<div class="seednote">earlier in this channel · recorded ${escapeHtml(t.recorded_at)}</div>`);
+  el.querySelector(".root").appendChild(msgEl("Ryan", `<p>${escapeHtml(rec.prompt.replace(/^@junto\s*/i, "@junto "))}</p>`, t.recorded_at));
+  const handler = makeHandler(el);
+  for (const e of rec.events) {
+    if (["answer", "artifact", "receipts"].includes(e.event)) handler(e);
+  }
+}
+
+async function boot() {
+  const t = await loadReplayFile().catch(() => null);
+  seedHistory(t);
+  for (const c of CHIPS) {
+    const b = document.createElement("button");
+    b.className = "eg";
+    b.textContent = c.label;
+    const prompt = t?.message?.[c.key]?.prompt ?? "";
+    b.onclick = () => { if (prompt) { $("q").value = ""; send(prompt, undefined, undefined); } };
+    $("chips").appendChild(b);
+  }
+  if (isMobileViewport()) {
+    MODE = "replay";
+    setBadge("replay", `On a phone this plays recordings from ${t?.recorded_at ?? "an earlier run"}. The live product runs on desktop.`);
+    return;
+  }
+  try {
+    const r = await fetch(`${demoBase()}/healthz`);
+    const h = await r.json();
+    if (h.killed) throw new Error("killed");
+    setBadge("live", "live · this is the working product, spending real money on your questions");
+  } catch {
+    MODE = "replay";
+    setBadge("replay", `The live endpoint is unreachable right now. Recordings from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
+  }
+}
+
+$("go").onclick = () => { const v = $("q").value; $("q").value = ""; send(v, undefined, undefined); };
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") { const v = $("q").value; $("q").value = ""; send(v, undefined, undefined); } });
+boot();
+</script>
+</body>
+</html>

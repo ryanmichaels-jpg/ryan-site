@@ -35,12 +35,14 @@ export async function mintSession(base) {
 }
 
 /** POST /demo/message and deliver each SSE event to onEvent as it arrives.
- *  fetch + reader because EventSource cannot POST. */
-export async function streamMessage(base, sessionId, text, onEvent) {
+ *  fetch + reader because EventSource cannot POST. `thread` (optional) is
+ *  the client thread key the Slack surface uses so referents and pending
+ *  clarifies resolve per thread. */
+export async function streamMessage(base, sessionId, text, onEvent, thread) {
   const r = await fetch(`${base}/message`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ session_id: sessionId, text, mode: "full" }),
+    body: JSON.stringify({ session_id: sessionId, text, mode: "full", ...(thread ? { thread } : {}) }),
   });
   if (!r.ok || !r.body) throw new Error(`message failed: ${r.status}`);
   const reader = r.body.getReader();

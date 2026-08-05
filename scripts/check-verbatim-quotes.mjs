@@ -34,12 +34,27 @@ function checkMessageTrace(label, events) {
   const answer = events.find((e) => e.event === "answer")?.data;
   if (!answer) { console.log(`  (${label}: no answer event, nothing rendered in quotes)`); return; }
   const citations = answer.citations ?? [];
-  const html = renderAnswerHtml(answer.markdown, citations) + renderCitationsHtml(citations);
-  const spans = extractQuotations(html);
-  // The ONLY legitimate source of on-screen quotation marks is a citation's
-  // verbatim quote field.
-  assertVerbatim(label, spans, citations.map((c) => c.quote).filter((q) => typeof q === "string"));
-  console.log(`  ${label}: ${spans.length} on-screen quotation(s), ${citations.filter((c) => c.quote).length} citation quote(s)`);
+  // Two populations, two rules, so a prose span can never pass by matching
+  // an id or a ref somewhere in the payload.
+  //
+  // 1. Model PROSE: every quotation must be verbatim in a citation's quote
+  //    field, nothing else. stripUnverbatimQuoteMarks enforces this at
+  //    render; this proves it held.
+  const proseSpans = extractQuotations(renderAnswerHtml(answer.markdown, citations));
+  const quoteFields = citations.map((c) => c.quote).filter((q) => typeof q === "string");
+  assertVerbatim(`${label} (prose)`, proseSpans, quoteFields);
+  // 2. The CITATIONS PANEL: each rendered citation may only show quote
+  //    marks its OWN fields carry: its verbatim quote field, or quote marks
+  //    the source snippet itself contains (a seed post that says
+  //    "pay equity" is quoted BY the source; stripping those marks would
+  //    alter the payload).
+  let panelSpanCount = 0;
+  citations.forEach((c, i) => {
+    const spans = extractQuotations(renderCitationsHtml([c]));
+    panelSpanCount += spans.length;
+    assertVerbatim(`${label} (citation ${i})`, spans, [c.snippet, c.quote].filter((s) => typeof s === "string"));
+  });
+  console.log(`  ${label}: ${proseSpans.length} prose + ${panelSpanCount} citation-panel quotation(s), ${quoteFields.length} citation quote(s)`);
 }
 
 // --- widget B: everything rendered IS the response; quotations must trace ------
