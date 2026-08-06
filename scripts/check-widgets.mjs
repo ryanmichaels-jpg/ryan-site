@@ -61,7 +61,7 @@ if (mode === "live") {
   // territory), so retry with a fresh page until the ANSWER path runs.
   let agree;
   for (let i = 0; i < 3; i++) {
-    agree = await runPrompt(page, "@junto what has CorePay said about pricing on past calls?");
+    agree = await runPrompt(page, "@junto what has CoreFlow said about pricing on past calls?");
     if (agree.done === 7) break;
     console.log(`  (attempt ${i + 1}: ${agree.done} cards — front door took a non-run exit, retrying)`);
     await page.goto(A, { waitUntil: "networkidle0" });

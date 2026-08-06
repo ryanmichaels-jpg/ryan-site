@@ -74,7 +74,7 @@ if (mode === "live") {
   // 1 + 10. free text -> run -> citations with source/date/ref; receipts.
   let st;
   for (let i = 0; i < 3; i++) {
-    await compose(page, "what has CorePay said about pricing on past calls?");
+    await compose(page, "what has CoreFlow said about pricing on past calls?");
     st = await lastThreadState(page);
     if (st.cites > 0) break;
   }
@@ -83,7 +83,7 @@ if (mode === "live") {
   ok(/exit \w+ at \d/.test(st.rcpt) && /ms/.test(st.rcpt) && /\$\d/.test(st.rcpt), `check 10: receipts show exit, confidence, duration, cost`);
 
   // 2 + 5. play runs end to end; org chart + run journey render in thread.
-  await compose(page, "run the account pov on CorePay");
+  await compose(page, "run the account pov on CoreFlow");
   st = await lastThreadState(page);
   ok(st.artifacts.includes("svg"), `check 2: org chart rendered in thread (artifacts: ${st.artifacts.join(",")})`);
   ok(st.artifacts.includes("png"), `run journey diagram rendered in thread`);
@@ -93,7 +93,7 @@ if (mode === "live") {
   await replyInLastThread(page, "what about their pricing?");
   st = await lastThreadState(page);
   ok(st.juntoReplies >= 2, "check 3: the follow-up got its own reply in the thread");
-  ok(/CorePay/i.test(st.lastReply), `check 3: "their" resolved to CorePay from the thread (reply mentions CorePay)`);
+  ok(/CoreFlow/i.test(st.lastReply), `check 3: "their" resolved to CoreFlow from the thread (reply mentions CoreFlow)`);
 
   // 6. CLARIFY round trip.
   let clarified = false;
@@ -103,18 +103,21 @@ if (mode === "live") {
     if (/CLARIFY/.test(st.rcpt) || /\?\s*$/.test(st.lastReply.trim())) { clarified = true; break; }
   }
   ok(clarified, "check 6: vague ask gets a clarifying question");
-  await replyInLastThread(page, "I meant CorePay");
+  await replyInLastThread(page, "I meant CoreFlow");
   st = await lastThreadState(page);
   ok(st.juntoReplies >= 2, "check 6: the reader's thread answer resolves the clarify round trip");
 
   // 7. SOURCE_MISS, HELP, DISCOVER all reachable, all read as answers.
-  await compose(page, "what's CorePay's NPS score?");
+  // The NPS ask needs the "survey" phrasing: post-scrub, "what's X's NPS
+  // score?" classifies ANSWER, not SOURCE_MISS (same drift the recorded
+  // sourcemiss trace works around).
+  await compose(page, "show me the NPS survey results for CoreFlow");
   st = await lastThreadState(page);
   ok(st.juntoReplies >= 1 && /source/i.test(st.lastReply), `check 7: SOURCE_MISS reads as an answer: "${st.lastReply.slice(0, 70)}"`);
   await compose(page, "how does this thing work?");
   st = await lastThreadState(page);
   ok(st.juntoReplies >= 1 && st.lastReply.length > 30, "check 7: HELP reads as an answer");
-  await compose(page, "I need to keep an eye on accounts hiring comp leaders, which play fits?");
+  await compose(page, "I need to keep an eye on accounts hiring lifecycle leaders, which play fits?");
   st = await lastThreadState(page);
   ok(st.juntoReplies >= 1 && st.lastReply.length > 30, "check 7: DISCOVER reads as an answer");
 

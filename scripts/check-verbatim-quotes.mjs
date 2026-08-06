@@ -46,8 +46,8 @@ function checkMessageTrace(label, events) {
   // 2. The CITATIONS PANEL: each rendered citation may only show quote
   //    marks its OWN fields carry: its verbatim quote field, or quote marks
   //    the source snippet itself contains (a seed post that says
-  //    "pay equity" is quoted BY the source; stripping those marks would
-  //    alter the payload).
+  //    "sender reputation" is quoted BY the source; stripping those marks
+  //    would alter the payload).
   let panelSpanCount = 0;
   citations.forEach((c, i) => {
     const spans = extractQuotations(renderCitationsHtml([c]));
@@ -86,7 +86,7 @@ if (process.argv.includes("--live")) {
   const sid = (await mint.json()).session_id;
   const r = await fetch("http://localhost:3200/demo/message", {
     method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ session_id: sid, text: "what has CorePay said about pricing on past calls?", mode: "full" }),
+    body: JSON.stringify({ session_id: sid, text: "what has CoreFlow said about pricing on past calls?", mode: "full" }),
   });
   const raw = await r.text();
   const events = [];

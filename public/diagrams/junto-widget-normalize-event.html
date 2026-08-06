@@ -113,6 +113,13 @@ async function render(resp) {
     f.innerHTML = `<b>THE NOTE THAT RIDES THE ROW</b> · ${escapeHtml(tidySystemCopy(resp.note))}`;
     out.appendChild(f);
   }
+  if (resp.cached) {
+    const at = resp.generated_at ? `${new Date(resp.generated_at).toISOString().slice(11, 16)} UTC today` : "earlier today";
+    const f = document.createElement("div");
+    f.className = "flag";
+    f.innerHTML = `<b>SERVED FROM CACHE</b> · classified by a live run at ${escapeHtml(at)}; repeated example chips don't re-spend the demo budget.`;
+    out.appendChild(f);
+  }
 }
 
 async function loadReplayFile() {
