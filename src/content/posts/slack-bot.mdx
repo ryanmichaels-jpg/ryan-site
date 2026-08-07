@@ -1,5 +1,5 @@
 ---
-title: What I learned building a Slack bot people actually use
+title: What I learned creating a Slack bot
 dek: The unglamorous mechanics that decide whether a bot in a shared channel survives contact with real users, and the rules I only learned by getting them wrong.
 date: 2026-07-30
 draft: true
@@ -8,15 +8,15 @@ tags: ['build journal', 'slack']
 
 import Diagram from '../../components/Diagram.astro';
 
-I built a Slack bot called Junto for our GTM team. The bigger story, a shared data layer that reps build on top of, is its own essay. This one is just the bot lessons: the unglamorous mechanics that decide whether a bot in a shared channel survives contact with real users, and the rules I only learned by getting them wrong. If you're about to put a bot in front of your team, this is the essay I wish someone had handed me.
+I built a Slack bot called Junto for our GTM team. The bigger story, a shared data layer that reps build on top of, is its own essay: [Building a shared memory for GTM](/junto/). This one is just the bot lessons: the unglamorous mechanics that decide whether a bot in a shared channel survives contact with real users, and the rules I only learned by getting them wrong. If you're about to put a bot in front of your team, this is the essay I wish someone had handed me.
 
 ## One bot, not many
 
 A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot with one name, and that was a decision, not a default.
 
-The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust.[^3] It's a graveyard of dead internal tools rebuilt inside Slack, except now it pings you. Many bots is a coffee table with ten remote controls on it.
+The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust.[^3] It's a graveyard of dead internal tools rebuilt inside Slack, except now it pings you.
 
-One outside data point made me confident Slack was the right home at all. In LangChain's session with Deepline, Vishnu Suresh, an engineer there, described building their internal GTM agent as a data pipeline first, and it only took off, in his words, once it became a two-way Slack chatbot. The capability was the same before and after. The location changed everything.
+One outside data point made me confident Slack was the right home at all. In [LangChain's session with Deepline](https://www.youtube.com/watch?v=zx_PGg-cRgE), Vishnu Suresh, an engineer there, described building their internal GTM agent as a data pipeline first, and it only took off, in his words, once it became a two-way Slack chatbot. The capability was the same before and after, and the location changed everything.
 
 ## The plumbing
 
@@ -26,13 +26,13 @@ Before any of the interesting parts there are three boring ones, and between the
 2. Put idempotency on the message id, so the same event delivered twice still only runs once.
 3. Give every external call a timeout and a dead-letter, so nothing can hang forever in silence.
 
-None of that demos well. All of it's why the demos worked.
+None of that demos well, and all of it is why the demos worked.
 
 ## The router grew up
 
-Version one matched keywords (i.e. "@junto prep me for my call with Acme" would match "prep" to call prep), and anything it didn't understand fell through to a default skill. A router that guesses is a router spending trust on every miss. An error costs the user one interaction, whereas a confident wrong answer probably costs you the next ten, because now they have to check everything you tell them. And that balance only ever moves one way.
+Version one matched keywords (i.e. "@junto prep me for my call with Acme" would match "prep" to call prep), and anything it didn't understand fell through to a default skill. That meant guessing. An error costs the user one interaction, whereas a confident wrong answer probably costs you the next ten, because now they have to check everything you tell them. And that balance only ever moves one way.
 
-I later found the same rule written down by people building in a different world entirely. acpx, a client for the Agent Client Protocol that lets orchestrators talk to coding agents, states it as a design principle: routing is constrained choice, never open-ended generation, because an LLM allowed to route freely will eventually route confidently and wrongly. My keyword router had proven their sentence before I ever read it.
+I later found the same rule written down by people building in a different world entirely. [acpx](https://github.com/openclaw/acpx), a client for the Agent Client Protocol that lets orchestrators talk to coding agents, states it as a design principle: routing is constrained choice, never open-ended generation, because an LLM allowed to route freely will eventually route confidently and wrongly. My keyword router had proven their sentence before I ever read it.
 
 ## Ten exits
 
@@ -45,7 +45,7 @@ The fix was to stop guessing. One classifier at the front, and ten explicit exit
   caption="One classifier at the front, ten explicit exits. A default path does not exist."
 />
 
-The exits are described to the classifier in plain language, and the descriptions do real work. In Ramp's tooling demo with Deepline, whose internal MCP serves hundreds of reps, they put it on a slide: tool descriptions are the interface. The agent picks from the description, not the code, so a precise description is the difference between a tool that gets called correctly and one that gets misused or ignored.
+The exits are described to the classifier in plain language, and the descriptions do real work. In [Ramp's tooling demo with Deepline](https://www.youtube.com/watch?v=LfrzaAr69d4), whose internal MCP serves hundreds of reps, they put it on a slide: tool descriptions are the interface. The agent picks from the description, not the code, so a precise description is the difference between a tool that gets called correctly and one that gets misused or ignored.
 
 ## Mechanical beats model
 
@@ -63,9 +63,9 @@ The gate used to stay quiet whenever it wasn't sure. That sounds like good manne
 
 `decision: silent, rule: gate`
 
-A silent failure is an invisible failure, and invisible is sometimes even worse than loud. In a demo it's death.
+A silent failure is an invisible failure, sometimes even worse than a loud one, and in a demo it's death.
 
-So the gate flipped. In any thread the bot is part of, it responds. Staying silent now requires positive evidence that a message was addressed to a human, and uncertainty means answer. That moved the failure mode from invisible to visible, which I think is the correct direction. acpx has this one on its list too: fail loud, never degrade silently. A system that fails quietly gets to keep failing.
+So the gate flipped. In any thread the bot is part of, it responds. Staying silent now requires positive evidence that a message was addressed to a human, and uncertainty means answer. That moved the failure mode from invisible to visible, which I think is the correct direction. acpx has this one on its list too: fail loud, never degrade silently.
 
 ## The constitution
 
@@ -90,7 +90,7 @@ It's frozen and versioned: v1, with a date. One seam buys three things:
 
 One rule mattered more than all the others. When a rep asks who to reach out to, never suggest an account that already has an open opportunity. Get that wrong once and a rep emails into a live deal, which is the fastest way I know to make the whole tool untrusted.
 
-The rule lives in the fetcher, the code that pulls candidate accounts before the model ever runs. Accounts with an open opportunity are filtered out of the query itself, so the model never sees them. It can't be talked out of data it never saw. You can argue with a prompt all day but you can't argue with a filter.
+The rule lives in the fetcher, the code that pulls candidate accounts before the model ever runs. Accounts with an open opportunity are filtered out of the query itself, so the model never sees them. You can argue with a prompt all day but you can't argue with a filter.
 
 That became my sorting test for every rule since. Anything that absolutely must hold goes below the model, where there's nothing to persuade. Anything that should usually hold can stay up in the prompt with the other requests.
 
@@ -120,4 +120,4 @@ And four rules, if you only keep four. One bot. Routing is constrained choice, n
 
 [^2]: The gate bug in the loud-beats-silent story accounts for two of the nine pinned transcripts on its own: one rule saying a clarify can't fire when the thread has already resolved to a single subject, and one saying the turn that answers the bot's own clarify can never draw another clarify.
 
-[^3]: Sclar et al. (ICLR 2024) found a single model's accuracy swinging by as much as 76 points on formatting alone, a different separator or a different casing. If differences that meaningless move results that far, differences on purpose certainly will. The effect shrinks on newer models without going away, and the paper says nothing about the other half of that sentence, which is three bots reading three different sets of sources.
+[^3]: [Sclar et al.](https://arxiv.org/abs/2310.11324) (ICLR 2024) found a single model's accuracy swinging by as much as 76 points on formatting alone, a different separator or a different casing. If differences that meaningless move results that far, differences on purpose certainly will. The effect shrinks on newer models without going away, and the paper says nothing about the other half of that sentence, which is three bots reading three different sets of sources.

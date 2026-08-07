@@ -8,23 +8,21 @@ tags: ['build journal', 'gtm engineering']
 
 import Diagram from '../../components/Diagram.astro';
 
-Someone who comments on a competitor's post is thinking about the problem you solve, at the moment they comment. That is about as clean a buying signal as an SDR gets. It is also sitting in public, where anyone can read it.
+Someone who comments on a competitor's post is thinking about the problem you solve, at the moment they comment. That's about as clean a buying signal as an SDR gets. It's also sitting in public, where anyone can read it.
 
 ## What we pay for
 
-My org pays for an intent platform. One of the things it does is tell us when people engage with our competitors' LinkedIn posts. The signals are good. The problem is when they show up.
+One of the things that our paid intent platform tells us is when people engage with our competitors' LinkedIn posts. The signals are good. The problem is when they show up: by the time one reached me it was weeks old, and sometimes months.
 
-By the time one reached me it was weeks old, and sometimes months.
+That sounds like a small complaint. It isn't. This signal decays faster than anything else I work. Someone who commented Tuesday morning is warm Tuesday morning. The same person a week later is a name on a list. Nothing about them has changed. The moment has.
 
-That sounds like a small complaint. It isn't, because this particular signal decays faster than anything else I work. Someone who commented Tuesday morning is warm Tuesday morning. The same person a week later is a name on a list. Nothing about them has changed. The moment has.
-
-A signal with a short half-life, delivered late, is not a weaker version of the same signal. It is a different and much worse one, and it costs the same.
+A signal with a short half-life, delivered late, isn't a weaker version of the same signal. It's a different and much worse one, and it costs the same.
 
 ## Comment GUIDE
 
-Half the posts on my feed now end the same way. Comment GUIDE and I'll send it to you. I mock these posts. I have mocked them out loud, more than once.
+Half the posts on my feed now end the same way. Comment GUIDE and I'll send it to you. I mock these posts. I've mocked them out loud, more than once.
 
-So is a comment on one of those posts worth anything? Plenty of them are not. People type GUIDE because they want the PDF, which is why the filtering below matters more than the scraping does. But that misses what the comment is. Someone in your ICP is publicly saying they have this problem, on a specific day, in front of everyone they work with. Reps pay real money for lists of people who might have a problem. This is a list of people announcing one.
+So is a comment on one of those posts worth anything? Plenty of them aren't. People type GUIDE because they want the PDF, which is why the filtering below matters more than the scraping does. But that misses what the comment is. Someone in your ICP is publicly saying they have this problem, on a specific day, in front of everyone they work with. Reps pay real money for lists of people who might have a problem. This is a list of people announcing one.
 
 And the format is spreading, because it works for the people posting. So the volume of the signal goes up every month.
 
@@ -38,7 +36,7 @@ And the format is spreading, because it works for the people posting. So the vol
 
 ## The pipeline
 
-1. HarvestAPI scrapes recent posts from competitor company pages, ranks them by engagement, and pulls every reactor and commenter from the top posts.
+1. [HarvestAPI](https://harvestapi.io/) scrapes recent posts from competitor company pages, ranks them by engagement, and pulls every reactor and commenter from the top posts.
 2. Claude classifies each engager on title relevance, company size, and decision-maker level.
 3. Anyone who engaged with more than one competitor post gets flagged and prioritized.
 4. It watches for new posters. When a creator starts pulling engagement from our ICP, they go on a watchlist automatically.
@@ -50,32 +48,30 @@ None of that is clever. The scraping is a paid service, the classifying is a pro
 
 The first version returned everyone. Every reactor, every commenter, no filter beyond having touched the post.
 
-What comes back when you do that is mostly not prospects. A competitor's post is cheered by the competitor's own employees, which in hindsight is the most predictable thing in the world. Their people like their company's posts, the way anyone would. So the top of my list was full of people who work at the company I am selling against, mixed in with whoever else happened to be scrolling. More than half of that first pass was noise.
+What comes back when you do that is mostly not prospects. A competitor's post is cheered by the competitor's own employees, which in hindsight is the most predictable thing in the world. Their people like their company's posts, the way anyone would. So the top of my list was full of people who work at the company I'm selling against, mixed in with whoever else happened to be scrolling. More than half of that first pass was noise.
 
 So what do you keep? The filters got stricter, and they became the three in step two: does this person's title relate to what we sell, is the company a size we can sell to, and are they senior enough to do anything about it.
 
-The lesson generalizes past LinkedIn. A scraper's default is to return everything it can reach, and everything it can reach is never the thing you wanted. The work is not the collecting. It is deciding what to throw away, and you cannot decide that until you have seen what comes back.
+The lesson generalizes past LinkedIn. A scraper's default is to return everything it can reach, and everything it can reach is never the thing you wanted. The work isn't the collecting. It's deciding what to throw away, and you can't decide that until you've seen what comes back.
 
 ## One like is scrolling. Three is not.
 
 The multi-touch rule is the part I would keep if I had to throw the rest away.
 
-One reaction might be a thumb moving down a feed. Three separate posts from three different competitors is a person with a problem, and no single interaction tells you that. It costs nothing to compute, because you already have every engager from every post in one place. It is the closest thing to a repeat website visit that you can see from outside a company.
+One reaction might be a thumb moving down a feed. Three separate posts from three different competitors is a person with a problem, and no single interaction tells you that. It costs nothing to compute, because you already have every engager from every post in one place. It's the closest thing to a repeat website visit that you can see from outside a company.
 
 ## The sources grow themselves
 
-The watchlist is the other piece worth copying. A creator who is not on my list starts pulling engagement from our ICP, and they get added without me doing anything.
+The watchlist is the other piece worth copying. A creator who isn't on my list starts pulling engagement from our ICP, and they get added without me doing anything.
 
-That matters because I am the person who would otherwise maintain the list, and a list one rep maintains by hand has a known expiration date. This one gets wider while I am asleep.
+That matters because I'm the person who would otherwise maintain the list, and a list one rep maintains by hand has a known expiration date. This one gets wider while I'm asleep.
 
 ## What it came to
 
 298 engagers scraped and classified so far. 7 qualified opportunities. $1.28m in qualified pipeline in the first month.
 
-That works out to about 1 in 40 raw engagers becoming an S2 or S3 opportunity. I have not gotten a hit rate like that from any other signal I have worked.
+That works out to about 1 in 40 raw engagers becoming an S2 or S3 opportunity. I haven't gotten a hit rate like that from any other signal I've worked.
 
 The whole thing is a scraper, a prompt, and a spreadsheet, and it beat a product we pay for on the only axis that turned out to matter, which was how fast a name reached me. I built it as a rep, not as an ops person. It was more fun than making cold calls.
 
-The repo is at github.com/ryanmichaels-jpg/intent-tracker.[^1]
-
-[^1]: A star is appreciated, and I am happy to answer questions about the stack or the classification prompts.
+The repo is at [github.com/ryanmichaels-jpg/intent-tracker](https://github.com/ryanmichaels-jpg/intent-tracker).
