@@ -38,21 +38,16 @@ h2{font-size:20px;margin:0 0 3px}
 <body>
 
 <div class="plate">
-  <h2>Name something that happens at your company</h2>
+  <h2>Pick something that happens at a company</h2>
   <p class="dek">Everything a business does has to become the same shape before anything can search across it.
-  Type an event and the real pipeline classifies it against the nine sources it actually watches. Nothing here
+  Pick an event and the real pipeline classifies it against the nine sources it actually watches. Nothing here
   is a keyword table: a small model picks a source from a closed list or admits that none fits, and every field
   you see is rendered from the system's own manifest.</p>
 
   <span class="badge" id="badge"></span>
 
-  <div class="ask">
-    <input id="q" placeholder="something that happens at your company" autocomplete="off">
-    <div class="row" style="margin-top:10px"><button class="go" id="go">normalize it</button></div>
-  </div>
-
   <div class="egs">
-    <div class="lbl">or try one of these</div>
+    <div class="lbl">pick an event</div>
     <div class="row" id="chips"></div>
   </div>
 
@@ -68,6 +63,7 @@ let MODE = "live";
 let REPLAY = null;
 let sid = null;
 let busy = false;
+const setBusy = (d) => { busy = d; for (const b of document.querySelectorAll(".eg")) b.disabled = d; };
 
 const rows = (obj) => `<table>${Object.entries(obj).map(([k, v]) =>
   `<tr><td class="k">${escapeHtml(k)}</td><td class="v">${escapeHtml(typeof v === "string" ? v : JSON.stringify(v))}</td></tr>`).join("")}</table>`;
@@ -131,7 +127,7 @@ async function loadReplayFile() {
 
 async function go(text) {
   if (busy || !text.trim()) return;
-  busy = true; $("go").disabled = true;
+  setBusy(true);
   try {
     if (MODE === "live") {
       const base = demoBase();
@@ -144,9 +140,8 @@ async function go(text) {
       if (rec) await render(rec);
       else {
         $("out").className = "out on";
-        $("out").innerHTML = `<div class="miss"><b>The live classifier is unreachable</b>, and matching your
-          words to a source honestly takes the real one. A keyword lookup here would only pretend to.
-          Pick one of the recorded examples above, or come back when the endpoint is up.</div>`;
+        $("out").innerHTML = `<div class="miss"><b>The live classifier is unreachable</b> and no recording
+          exists for this event. Pick one of the examples above, or come back when the endpoint is up.</div>`;
       }
     }
   } catch (err) {
@@ -155,13 +150,13 @@ async function go(text) {
       MODE = "replay"; sid = null;
       const t = await loadReplayFile().catch(() => null);
       setBadge("replay", `The live endpoint is unreachable. Recorded examples from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
-      busy = false; $("go").disabled = false;
+      setBusy(false);
       return go(text);
     }
     $("out").className = "out on";
     $("out").innerHTML = `<div class="miss"><b>Nothing could be reached or replayed.</b> ${escapeHtml(String(err?.message ?? err))}</div>`;
   } finally {
-    busy = false; $("go").disabled = false;
+    setBusy(false);
   }
 }
 
@@ -177,7 +172,7 @@ async function boot() {
     const b = document.createElement("button");
     b.className = "eg";
     b.textContent = label;
-    b.onclick = () => { $("q").value = label; go(label); };
+    b.onclick = () => go(label);
     $("chips").appendChild(b);
   }
   if (isMobileViewport()) {
@@ -196,8 +191,6 @@ async function boot() {
   }
 }
 
-$("go").onclick = () => go($("q").value);
-$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") go($("q").value); });
 boot();
 </script>
 </body>

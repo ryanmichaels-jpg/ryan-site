@@ -91,11 +91,8 @@ details.rcpt .body{font-family:var(--mono);font-size:9.5px;color:#5a5550;margin-
       </div>
       <div id="msgs"></div>
       <div class="compose">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:6px">pick a message and it sends to #sdr-team</div>
         <div class="chips" id="chips"></div>
-        <div class="box">
-          <input id="q" placeholder="Message #sdr-team. Ask anything, or run a play" autocomplete="off">
-          <button class="go" id="go">send</button>
-        </div>
       </div>
     </main>
   </div>
@@ -112,6 +109,7 @@ let MODE = "live";
 let REPLAY = null;
 let sid = null;
 let busy = false;
+const setBusy = (d) => { busy = d; for (const b of document.querySelectorAll(".eg")) b.disabled = d; };
 let threadN = 0;
 
 const CHIPS = [
@@ -141,10 +139,7 @@ function newThread({ seeded } = {}) {
   const el = document.createElement("div");
   el.className = "thread" + (seeded ? " seeded" : "");
   el.dataset.key = key;
-  el.innerHTML = `${seeded ? "" : ""}<div class="root"></div><div class="replies"></div>
-    <div class="replybox"><input placeholder="Reply in thread…" autocomplete="off"></div>`;
-  const input = el.querySelector(".replybox input");
-  input.addEventListener("keydown", (e) => { if (e.key === "Enter" && input.value.trim()) { const v = input.value; input.value = ""; send(v, key, el); } });
+  el.innerHTML = `<div class="root"></div><div class="replies"></div>`;
   $("msgs").appendChild(el);
   el.scrollIntoView({ block: "end" });
   return { key, el };
@@ -221,13 +216,13 @@ function makeHandler(threadEl) {
       typingOff(threadEl);
       // A silent run ends here with NOTHING in the thread. The message just
       // sits, which is the demonstration.
-      busy = false; $("go").disabled = false;
+      setBusy(false);
       return;
     }
     if (event === "error") {
       typingOff(threadEl);
       sysline(threadEl, tidySystemCopy(`${data.message ?? data.code ?? "the run failed"}`));
-      busy = false; $("go").disabled = false;
+      setBusy(false);
       return;
     }
     if (event === "replay") {
@@ -241,7 +236,7 @@ function makeHandler(threadEl) {
 // --- sending --------------------------------------------------------------------
 async function send(text, threadKey, threadEl) {
   if (busy || !text.trim()) return;
-  busy = true; $("go").disabled = true;
+  setBusy(true);
   let el = threadEl;
   if (!el) { const t = newThread({}); el = t.el; threadKey = t.key; }
   el.querySelector(threadEl ? ".replies" : ".root").appendChild(msgEl("you", `<p>${escapeHtml(text)}</p>`));
@@ -259,11 +254,11 @@ async function send(text, threadKey, threadEl) {
       if (!rec) {
         typingOff(el);
         sysline(el, "The live service is unreachable, and recordings only exist for the suggested prompts. Free text needs the real engine; this surface will not fake it.");
-        busy = false; $("go").disabled = false;
+        setBusy(false);
         return;
       }
       await playRecorded(rec.events, handler);
-      busy = false; $("go").disabled = false;
+      setBusy(false);
     }
   } catch (err) {
     typingOff(el);
@@ -275,7 +270,7 @@ async function send(text, threadKey, threadEl) {
     } else {
       sysline(el, `Nothing could be reached or replayed: ${String(err?.message ?? err)}`);
     }
-    busy = false; $("go").disabled = false;
+    setBusy(false);
   }
 }
 
@@ -315,7 +310,8 @@ async function boot() {
     b.className = "eg";
     b.textContent = c.label;
     const prompt = t?.message?.[c.key]?.prompt ?? "";
-    b.onclick = () => { if (prompt) { $("q").value = ""; send(prompt, undefined, undefined); } };
+    b.title = prompt;
+    b.onclick = () => { if (prompt) send(prompt, undefined, undefined); };
     $("chips").appendChild(b);
   }
   if (isMobileViewport()) {
@@ -327,15 +323,13 @@ async function boot() {
     const r = await fetch(`${demoBase()}/healthz`);
     const h = await r.json();
     if (h.killed) throw new Error("killed");
-    setBadge("live", "live · this is the working product, spending real money on your questions");
+    setBadge("live", "live · this is the working product, and every message goes to the real service");
   } catch {
     MODE = "replay";
     setBadge("replay", `The live endpoint is unreachable right now. Recordings from ${t?.recorded_at ?? "an earlier run"}, replayed honestly.`);
   }
 }
 
-$("go").onclick = () => { const v = $("q").value; $("q").value = ""; send(v, undefined, undefined); };
-$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") { const v = $("q").value; $("q").value = ""; send(v, undefined, undefined); } });
 boot();
 </script>
 </body>

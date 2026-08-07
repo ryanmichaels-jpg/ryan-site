@@ -52,19 +52,15 @@
 <body>
 
 <div class="plate">
-  <p class="pos"><b>You are a rep on this team</b>, typing in <b>#sdr-team</b>. The demo seat belongs to Ryan,
-  and its 18 accounts are the book you are asking about. Nothing below is scripted: the cards settle as the
-  real system's events arrive.</p>
+  <p class="pos"><b>You are a rep on this team</b>, in <b>#sdr-team</b>. The demo seat belongs to Ryan,
+  and its 18 accounts are the book you are asking about. Pick a message and it is sent for real: the cards
+  settle as the real system's events arrive.</p>
 
   <span class="badge" id="badge"></span>
 
   <div class="ask">
     <div class="who">you · #sdr-team</div>
-    <input id="q" placeholder="@junto ask it anything" autocomplete="off">
-    <div class="askrow">
-      <button class="go" id="go">send</button>
-      <span style="font-size:10px;color:var(--mute)">or poke where it is interesting:</span>
-    </div>
+    <div id="q" style="font-size:15px;min-height:21px;color:#bdb5ac">pick a message below and it sends</div>
     <div class="askrow" id="chips"></div>
   </div>
 
@@ -101,6 +97,7 @@ const $ = (i) => document.getElementById(i);
 let MODE = "live";            // "live" | "replay"
 let REPLAY = null;            // bundled trace file
 let busy = false;
+const setBusy = (d) => { busy = d; for (const b of document.querySelectorAll(".eg")) b.disabled = d; };
 
 // --- per-run render state -------------------------------------------------------
 let cards = {};               // phase -> {el, body}
@@ -240,7 +237,7 @@ function onEvent({ event, data }) {
   if (event === "done") {
     $("pending").style.display = "none";
     if (data.silent === true) renderSilent(route?.gate);
-    busy = false; $("go").disabled = false;
+    setBusy(false);
     return;
   }
   if (event === "error") {
@@ -249,7 +246,7 @@ function onEvent({ event, data }) {
     el.className = "err";
     el.textContent = `The run failed: ${tidySystemCopy(data.message ?? data.code ?? "unknown error")}. That is the honest state of it.`;
     $("tail").appendChild(el);
-    busy = false; $("go").disabled = false;
+    setBusy(false);
     return;
   }
   if (event === "replay") {
@@ -284,18 +281,18 @@ async function runReplay(text) {
   if (!rec) {
     const el = document.createElement("div");
     el.className = "err";
-    el.textContent = "The live service is unreachable, and a recording only exists for the suggested prompts. Free text needs the real system. Pick a recorded run, or come back when the endpoint is up.";
+    el.textContent = "No recording exists for this run. Pick one of the messages above, or come back when the live endpoint is up.";
     $("tail").appendChild(el);
-    busy = false; $("go").disabled = false;
+    setBusy(false);
     return;
   }
   await playRecorded(rec.events, onEvent);
-  busy = false; $("go").disabled = false;
+  setBusy(false);
 }
 
 async function run(text) {
   if (busy || !text.trim()) return;
-  busy = true; $("go").disabled = true;
+  setBusy(true);
   reset();
   try {
     if (MODE === "live") await runLive(text);
@@ -316,7 +313,7 @@ async function run(text) {
       $("tail").appendChild(el);
     }
   } finally {
-    if (MODE === "live") { busy = false; $("go").disabled = false; }
+    if (MODE === "live") { setBusy(false); }
   }
 }
 
@@ -328,7 +325,8 @@ async function boot() {
     b.className = "eg";
     b.textContent = c.label;
     const prompt = t?.message?.[c.key]?.prompt ?? "";
-    b.onclick = () => { $("q").value = prompt; run(prompt); };
+    b.title = prompt;
+    b.onclick = () => { $("q").textContent = prompt; $("q").style.color = "var(--ink)"; run(prompt); };
     $("chips").appendChild(b);
   }
   if (isMobileViewport()) {
@@ -347,8 +345,6 @@ async function boot() {
   }
 }
 
-$("go").onclick = () => run($("q").value);
-$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") run($("q").value); });
 boot();
 </script>
 </body>
