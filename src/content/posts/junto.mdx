@@ -9,15 +9,12 @@ tags: ['build journal', 'gtm engineering']
 import Diagram from '../../components/Diagram.astro';
 import Lede from '../../components/Lede.astro';
 
-## Nothing broke
-
-
 <Diagram
   src="junto-intro.gif"
-  label="Fig. 1"
-  caption="One recorded session with Junto, cut together. A question comes back with dated quotes, the run posts its own receipt, the org chart draws itself from the rows, and a sentence remixes a play into a new workflow on the engine. Every frame is a real run."
 />
 
+
+## Nothing broke
 
 <Lede>
 Every AI project our GTM team built ended up dying. I counted eight over the last year, some of them mine, some built by teammates, even some that the company bought from vendors.
@@ -53,9 +50,9 @@ Which makes it a different question. Not what did these projects lack, but what 
 
 
 <Diagram
-  src="junto-d6-systems.png"
+  src="junto-death-loop.png"
   label="Fig. 2"
-  caption="Eight projects, and every part of all eight of them worked. The frame is from Albert Rutherford: blame the parts, replace all of them, and get the same behavior back."
+  caption="Every dead project, one loop. Each turn makes the next one quieter, and the balancing loop that would have forced a decision never fired once."
 />
 
 ### 4 relationships
@@ -190,7 +187,7 @@ I didn't draw that shape unaided. Right as this started, Cerebras [published how
 <Diagram
   src="junto-bredvick-thread.png"
   label="Fig. 5"
-  caption="Drew Bredvick restating the Cerebras build as six steps, to 123K views. Step three is the compression the shared memory section runs on: normalize your business into a set of events."
+  width={400}
 />
 
 I named it Junto, after the club Ben Franklin started for mutual improvement.[^c2-2] What its members did was pool what each of them knew, which was a fair description of what I wanted from a GTM team. One line for what Junto is: a shared, compounding knowledge layer.
@@ -289,78 +286,33 @@ A bot, for this purpose, is one name in Slack you can talk to: an account that w
 
 The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust.[^c4-4] It's the graveyard from the opening section rebuilt inside Slack, except now it pings you.
 
-### The plumbing
-
-Before any of the interesting parts there are three boring ones, and between them they decide whether a Slack bot survives contact with real users:
-
-1. Acknowledge within three seconds, then do the real work asynchronously.
-2. Put idempotency on the message id, so the same event delivered twice still only runs once.
-3. Give every external call a timeout and a dead-letter, so nothing can hang forever in silence.
-
-None of that demos well, and all of it is why the demos worked.
-
-There turned out to be enough of this to fill an essay of its own, so it got one. The rest of what I learned about making a bot survive real users is in [What I learned creating a Slack bot](/slack-bot/). This post stays on Junto, and the bot lessons live there.
-
-
-<Diagram
-  src="junto-mention-flow.png"
-  label="Fig. 8"
-  caption="What happens between the mention and the reply. One place does the thinking. Everything around it is bookkeeping."
-/>
-
-### The router grew up
-
-Version one matched keywords (i.e. "@junto prep me for my call with Acme" would match "prep" to call prep), and anything it didn't understand fell through to a default skill. That meant guessing. An error costs the user one interaction, whereas a confident wrong answer probably costs you the next ten, because now they have to check everything you tell them. And that balance only ever moves one way.
-
 ### Ten exits
 
-The fix was to stop guessing. One classifier at the front, and ten explicit exits: answer a question, run a play, compose a new one, remix one that already exists, schedule something, discover what is there, ask for clarification, offer help, admit that no source covers this, or just chat.[^c4-1] Nothing runs that wasn't explicitly selected, and there's no default and no fall-through. That last part is what turned "I don't have a source that covers that" from a failure into an answer.
+Every message to Junto passes through one classifier at the front, with ten explicit exits: answer a question, run a play, compose a new one, remix one that already exists, schedule something, discover what is there, ask for clarification, offer help, admit that no source covers this, or just chat.[^c4-1] Nothing runs that wasn't explicitly selected, and there's no default and no fall-through. That last part is what turned "I don't have a source that covers that" from a failure into an answer.
 
 
 <Diagram
   src="junto-ten-exits.png"
-  label="Fig. 9"
+  label="Fig. 8"
   caption="One classifier at the front, ten explicit exits. A default path does not exist."
 />
 
-### Mechanical beats model
-
-One rule kept the whole thing honest.
-
-> Deterministic post-rules outrank the model.
-
-If a mechanical check says this is a request to run a play, then no amount of model cleverness gets to overrule it.[^c4-5] The classifier proposes and the rules dispose.[^c4-3] And every misroute that happened live became a pinned transcript in the test suite,[^c4-2] an actual test containing the real words a real person typed. The router can't quietly regress to a mistake it has already made once. That's a cheap property to buy and I'd buy it again.
-
-### Loud beats silent
-
-There's a gate in front of all of this, deciding whether a given Slack message is even meant for Junto. It has to exist, because Junto lives in shared channels where most of the traffic is people talking to each other and not to a bot.
-
-The gate used to stay quiet whenever it wasn't sure. That sounds like good manners, and it's the worst available behavior. Here is the version that convinced me. Junto asked a rep which account they meant, and the rep answered. The gate ate the answer, because the reply didn't look like it was addressed to a bot. So the bot ignored a reply to its own question, and neither of us noticed until I went looking. I found it in the logs afterward.
-
-`decision: silent, rule: gate`
-
-A silent failure is an invisible failure, sometimes even worse than a loud one, and in a demo it's death.
-
-So the gate flipped. In any thread Junto is part of, it responds. Staying silent now requires positive evidence that a message was addressed to a human, and uncertainty means answer. That moved the failure mode from invisible to visible, which I think is the correct direction. It's also the same rule the nothing-broke section was about, at a much smaller scale. Nothing broke, nobody complained, and nobody decided anything, because nothing was ever loud enough to force a decision.
+One rule keeps the routing honest: deterministic post-rules outrank the model. The classifier proposes and the rules dispose, and you can watch the five rules pass or get the last word in the demo below.
 
 
 <Diagram
   src="junto-widget-seven-steps.html"
-  label="Fig. 10"
+  label="Fig. 9"
   caption="Pick a message and it sends for real. Seven cards settle as the run reaches each phase, and the routing card opens onto the five rules that get the last word."
   height={840}
 />
 
 
+How that classifier grew up, the three seconds a bot gets to acknowledge, the gate that once ate a reply to its own question, and the rest of what it takes for a bot to survive real users became an essay of its own: **[What I learned creating a Slack bot](/slack-bot/)**. This post stays on Junto, and the bot lessons live there.
+
 [^c4-1]: In the code they're ANSWER, RUN, COMPOSE, REMIX, SCHEDULE, DISCOVER, CLARIFY, HELP, SOURCE_MISS and CHAT. Naming them as an enum rather than as behaviors was worth more than it sounds, because you can't add an eleventh exit by accident.
 
-[^c4-3]: The research points the same way. [StateFlow](https://arxiv.org/abs/2403.11322) (Wu et al., 2024) found that framing an LLM task as explicit states with allowed transitions raised success rates and cut costs versus letting the model act freely. And [acpx](https://github.com/openclaw/acpx), a protocol client for coding agents, states it as a design principle: routing is constrained choice, never open-ended generation. Anthropic's [engineering write-up on building effective agents](https://www.anthropic.com/engineering/building-effective-agents) names the same pattern: routing classifies an input and hands it to a specialized followup, and workflows buy predictability for well-defined tasks. It's a pattern note rather than an experiment, and the same document recommends the opposite for open-ended work. Mine is the well-defined case.
-
-[^c4-2]: The front door has 33 tests. Nine of them are named PIN, and those are the ones lifted verbatim out of live conversations, dated. The gate bug described below accounts for two on its own: one rule saying a clarify can't fire when the thread has already resolved to a single subject, and one saying the turn that answers Junto's own clarify can never draw another clarify. The whole gateway suite is 440 tests as I write this.
-
 [^c4-4]: [Sclar et al.](https://arxiv.org/abs/2310.11324) (ICLR 2024) found a single model's accuracy swinging by as much as 76 points on formatting alone, a different separator or a different casing. If differences that meaningless move results that far, differences on purpose certainly will. The effect shrinks on newer models without going away, and the paper says nothing about the other half of that sentence, which is three bots reading three different sets of sources.
-
-[^c4-5]: NVIDIA's [NeMo Guardrails](https://arxiv.org/abs/2310.10501) (EMNLP 2023) is this built as a product: rails that are written by a person, independent of whichever model is underneath, readable afterwards, and enforced while the thing runs. It's a design proof rather than a bake-off. Nobody has shown that rules beat models at routing, only that you can put the rules somewhere the model doesn't get a vote.
 
 
 ## Rules you can't prompt away
@@ -381,7 +333,7 @@ The obvious way to apply a spec like that's to paste it into every prompt. I had
 
 <Diagram
   src="junto-one-seam.png"
-  label="Fig. 11"
+  label="Fig. 10"
   caption="Every prompt passes through the same wrapper. One place to audit, one version in every run log. The non-ideal version: 40 dialects of the same law."
 />
 
@@ -466,7 +418,7 @@ Chapter 1 answers this in reverse. The dead projects all produced outputs that b
 
 <Diagram
   src="junto-d3-normalization.png"
-  label="Fig. 12"
+  label="Fig. 11"
   caption="Everything is qualified before a model touches it. Four questions, four shapes of row, one projection, and evidence filtered by who is asking."
 />
 
@@ -481,7 +433,7 @@ Everything arriving from every source gets qualified first: deduped, thresholded
 
 <Diagram
   src="junto-d4-row-anatomy.png"
-  label="Fig. 13"
+  label="Fig. 12"
   caption="Every field in all four stores, and who writes each one. Underneath them, the single comparable shape they all project into before a question ever reaches them."
 />
 
@@ -495,7 +447,7 @@ Events are for acting. The index is for asking.
 
 <Diagram
   src="junto-factory-library.png"
-  label="Fig. 14"
+  label="Fig. 13"
   caption="Events are for acting, the index is for asking. Work orders fire actions. The filing room answers questions."
 />
 
@@ -512,7 +464,7 @@ My 2025 transcript tagging strategy was bad in a way that took a few dozen calls
 
 <Diagram
   src="junto-d2-call-tagged.png"
-  label="Fig. 15"
+  label="Fig. 14"
   caption="One call becomes many moments, and the seller half never gets tagged at all. Every moment is stamped twice, checked against the transcript, and then sorted. Anything under 0.7 goes to a person."
 />
 
@@ -532,7 +484,7 @@ The Junto version is the same method with me removed from the middle and left at
 
 <Diagram
   src="junto-d1-arrives.png"
-  label="Fig. 16"
+  label="Fig. 15"
   caption="Every source is read at the rate it actually changes. Five cadences feeding four typed stores, and current state never written down at all."
 />
 
@@ -554,7 +506,7 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 
 <Diagram
   src="junto-d8-road.png"
-  label="Fig. 17"
+  label="Fig. 16"
   caption="Four stages, and the only one that involves a model is the answer at the end. Everything before it is deterministic, and most of what arrives never gets past the second box."
 />
 
@@ -562,7 +514,7 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 
 <Diagram
   src="junto-widget-normalize-event.html"
-  label="Fig. 18"
+  label="Fig. 17"
   caption="Pick something that happens at a company. If a connector watches it, you get the row it becomes. If nothing does, you get told so."
   height={900}
 />
@@ -636,7 +588,7 @@ Ramp settled any doubt I had about this direction. In their tooling demo with De
 
 <Diagram
   src="junto-ramp-flywheel.png"
-  label="Fig. 19"
+  label="Fig. 18"
   caption="Ramp's flywheel, as Keyan Sarrafzadeh described it in their tooling demo with Deepline. Their loop, my redraw."
 />
 
@@ -749,7 +701,7 @@ The result came back narrower. The edit lived on the engine, and the engine did 
 
 One thing I didn't expect: the truer claim was the harder one to keep. When the engine was just a mirror, honesty was easy, because all I had to do was describe it correctly. Once the engine actually ran things, every claim about what it does had to stay true run after run, edit after edit. The guard is what makes that possible. I can let reps edit the machine and still say, in print, exactly what it will refuse to do.
 
-[^c9-1]: The gateway as the front door, and why the 3-second answer to Slack isn't negotiable, is the subject of chapter 4.
+[^c9-1]: The gateway as the front door is the subject of the front door chapter. Why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics, live in [What I learned creating a Slack bot](/slack-bot/).
 
 [^c9-2]: The engine is Sim, an open source engine, self-hosted as the execution engine. The canvas in this chapter is its canvas.
 
@@ -882,7 +834,7 @@ Here is what I can show you today, live, with no cuts anywhere in the demo. A se
 
 <Diagram
   src="junto-slack.html"
-  label="Fig. 20"
+  label="Fig. 19"
   caption="The demo, wearing the surface it was built for. The seeded thread is a recording and says so, with its date. The pre-set messages run live against the real service when it is up, and the badge tells you which one you are getting."
   height={800}
 />

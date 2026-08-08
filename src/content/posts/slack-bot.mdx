@@ -28,11 +28,18 @@ Before any of the interesting parts there are three boring ones, and between the
 
 None of that demos well, and all of it is why the demos worked.
 
+
+<Diagram
+  src="junto-mention-flow.png"
+  label="Fig. 1"
+  caption="What happens between the mention and the reply. One place does the thinking. Everything around it is bookkeeping."
+/>
+
 ## The router grew up
 
 Version one matched keywords (i.e. "@junto prep me for my call with Acme" would match "prep" to call prep), and anything it didn't understand fell through to a default skill. That meant guessing. An error costs the user one interaction, whereas a confident wrong answer probably costs you the next ten, because now they have to check everything you tell them. And that balance only ever moves one way.
 
-I later found the same rule written down by people building in a different world entirely. [acpx](https://github.com/openclaw/acpx), a client for the Agent Client Protocol that lets orchestrators talk to coding agents, states it as a design principle: routing is constrained choice, never open-ended generation, because an LLM allowed to route freely will eventually route confidently and wrongly. My keyword router had proven their sentence before I ever read it.
+I later found the same rule written down by people building in a different world entirely. [acpx](https://github.com/openclaw/acpx), a client for the Agent Client Protocol that lets orchestrators talk to coding agents, states it as a design principle: routing is constrained choice, never open-ended generation, because an LLM allowed to route freely will eventually route confidently and wrongly. My keyword router had proven their sentence before I ever read it.[^4]
 
 ## Ten exits
 
@@ -41,7 +48,7 @@ The fix was to stop guessing. One classifier at the front, and ten explicit exit
 
 <Diagram
   src="junto-ten-exits.png"
-  label="Fig. 1"
+  label="Fig. 2"
   caption="One classifier at the front, ten explicit exits. A default path does not exist."
 />
 
@@ -53,7 +60,7 @@ One rule kept the whole thing honest.
 
 > Deterministic post-rules outrank the model.
 
-If a mechanical check says this is a request to run a play, then no amount of model cleverness gets to overrule it. The classifier proposes and the rules dispose. And every misroute that happened live became a pinned transcript in the test suite,[^2] an actual test containing the real words a real person typed. The router can't quietly regress to a mistake it has already made once. That's a cheap property to buy and I'd buy it again.
+If a mechanical check says this is a request to run a play, then no amount of model cleverness gets to overrule it.[^5] The classifier proposes and the rules dispose. And every misroute that happened live became a pinned transcript in the test suite,[^2] an actual test containing the real words a real person typed. The router can't quietly regress to a mistake it has already made once. That's a cheap property to buy and I'd buy it again.
 
 ## Loud beats silent
 
@@ -121,3 +128,7 @@ And four rules, if you only keep four. One bot. Routing is constrained choice, n
 [^2]: The gate bug in the loud-beats-silent story accounts for two of the nine pinned transcripts on its own: one rule saying a clarify can't fire when the thread has already resolved to a single subject, and one saying the turn that answers the bot's own clarify can never draw another clarify.
 
 [^3]: [Sclar et al.](https://arxiv.org/abs/2310.11324) (ICLR 2024) found a single model's accuracy swinging by as much as 76 points on formatting alone, a different separator or a different casing. If differences that meaningless move results that far, differences on purpose certainly will. The effect shrinks on newer models without going away, and the paper says nothing about the other half of that sentence, which is three bots reading three different sets of sources.
+
+[^4]: The research points the same way. [StateFlow](https://arxiv.org/abs/2403.11322) (Wu et al., 2024) found that framing an LLM task as explicit states with allowed transitions raised success rates and cut costs versus letting the model act freely. Anthropic's [engineering write-up on building effective agents](https://www.anthropic.com/engineering/building-effective-agents) names the same pattern: routing classifies an input and hands it to a specialized followup, and workflows buy predictability for well-defined tasks. It's a pattern note rather than an experiment, and the same document recommends the opposite for open-ended work. Mine is the well-defined case.
+
+[^5]: NVIDIA's [NeMo Guardrails](https://arxiv.org/abs/2310.10501) (EMNLP 2023) is this built as a product: rails that are written by a person, independent of whichever model is underneath, readable afterwards, and enforced while the thing runs. It's a design proof rather than a bake-off. Nobody has shown that rules beat models at routing, only that you can put the rules somewhere the model doesn't get a vote.

@@ -14,10 +14,12 @@ interface Props {
   /** Figure number or short label shown above the frame. */
   label?: string;
   height?: number;
+  /** Cap the rendered width in px; the figure centers itself. Images only. */
+  width?: number;
   /** Override the alt text. Defaults to the caption. */
   alt?: string;
 }
-const { src, caption, label, height = 620, alt } = Astro.props;
+const { src, caption, label, height = 620, width, alt } = Astro.props;
 
 const isImage = /\.(png|jpe?g|webp|avif|gif|svg)$/i.test(src);
 const url = src.startsWith('http')
@@ -27,7 +29,10 @@ const url = src.startsWith('http')
     : `/diagrams/${src}`;
 ---
 
-<figure class:list={['bleed', 'diagram', isImage && 'diagram--image']}>
+<figure
+  class:list={['bleed', 'diagram', isImage && 'diagram--image']}
+  style={width ? `max-width:${width}px;margin-inline:auto` : undefined}
+>
   {label && <p class="label diagram__label">{label}</p>}
 
   <div class="diagram__frame" style={isImage ? undefined : `--h:${height}px`}>
@@ -40,10 +45,12 @@ const url = src.startsWith('http')
     }
   </div>
 
-  <figcaption>
-    {caption && <span>{caption}</span>}
-    <a href={url} target="_blank" rel="noopener">Open full ↗</a>
-  </figcaption>
+  {(caption || label) && (
+    <figcaption>
+      {caption && <span>{caption}</span>}
+      <a href={url} target="_blank" rel="noopener">Open full ↗</a>
+    </figcaption>
+  )}
 </figure>
 
 <style>
