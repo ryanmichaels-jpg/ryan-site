@@ -12,9 +12,9 @@ I built a Slack bot called Junto for our GTM team. The bigger story, a shared da
 
 ## One bot, not many
 
-A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot with one name, and that was a decision, not a default.
+A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot, a specific decision that I made.
 
-The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust.[^3] It's a graveyard of dead internal tools rebuilt inside Slack, except now it pings you.
+The alternative (many bots in Slack), at least to my mind, could get messy quickly. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you'd probably get three slightly different answers with different sources, and nobody would know which one to trust.[^3] It's a graveyard of dead internal tools rebuilt inside Slack, except now it pings you.
 
 One outside data point made me confident Slack was the right home at all. In [LangChain's session with Deepline](https://www.youtube.com/watch?v=zx_PGg-cRgE), Vishnu Suresh, an engineer there, described building their internal GTM agent as a data pipeline first, and it only took off, in his words, once it became a two-way Slack chatbot. The capability was the same before and after, and the location changed everything.
 
@@ -43,7 +43,20 @@ I later found the same rule written down by people building in a different world
 
 ## Ten exits
 
-The fix was to stop guessing. One classifier at the front, and ten explicit exits: answer a question, run a play, compose a new one, remix one that already exists, schedule something, discover what is there, ask for clarification, offer help, admit that no source covers this, or just chat.[^1] Nothing runs that wasn't explicitly selected, and there's no default and no fall-through. That last part is what turned "I don't have a source that covers that" from a failure into an answer.
+The fix was to stop guessing. Every message passes through one classifier at the front, with ten explicit exits:
+
+- answer a question
+- run a play
+- compose a new play
+- remix a play that already exists
+- schedule something
+- discover what's there
+- ask for clarification
+- offer help
+- admit that no source covers this
+- or just chat[^1]
+
+Nothing runs that wasn't explicitly selected, and there's no default and no fall-through. If I've learned anything during my time building with AI it's that these suckers will not hesitate to make shit up, and it'll usually sound good.
 
 
 <Diagram
@@ -68,6 +81,17 @@ One rule kept the whole thing honest.
 
 If a mechanical check says this is a request to run a play, then no amount of model cleverness gets to overrule it.[^5] The classifier proposes and the rules dispose. And every misroute that happened live became a pinned transcript in the test suite,[^2] an actual test containing the real words a real person typed. The router can't quietly regress to a mistake it has already made once. That's a cheap property to buy and I'd buy it again.
 
+You can watch the whole front door work, and the five rules pass or get the last word, in the demo below.
+
+
+<Diagram
+  src="junto-widget-seven-steps.html"
+  label="Fig. 3"
+  caption="Pick a message and it sends for real. Seven cards settle as the run reaches each phase, and the routing card opens onto the five rules that get the last word."
+  height={840}
+/>
+
+
 ## Loud beats silent
 
 There's a gate in front of all of this, deciding whether a given Slack message is even meant for the bot. It has to exist, because the bot lives in shared channels where most of the traffic is people talking to each other.
@@ -91,9 +115,16 @@ The first version had four rules:
 3. No formatting theater. Posts stay short, and nothing is ever bold.
 4. Anything that looks like outreach is a draft for a human to review, because nothing sends itself.
 
-The obvious way to apply a spec like that's to paste it into every prompt. I had prompts in about forty files, and I knew what forty copies would turn into. Each one gets edited in a hurry someday, and six months later you have forty dialects of the same law. So the constitution injects at exactly one place in the code, wrapped around every prompt on its way to the model. It works like an airport with exactly one security checkpoint: every passenger passes through the same doorway, so upgrading the scanner once upgrades it for every flight.
+The obvious way to apply a spec like that's to paste it into every prompt. I had prompts in about forty files, and I knew what forty copies would turn into. Each one gets edited in a hurry someday, and six months later you have forty dialects of the same law. So the constitution injects at exactly one place in the code, wrapped around every prompt on its way to the model.[^7] It works like an airport with exactly one security checkpoint: every passenger passes through the same doorway, so upgrading the scanner once upgrades it for every flight.
 
-It's frozen and versioned: v1, with a date. One seam buys three things:
+
+<Diagram
+  src="junto-one-seam.png"
+  label="Fig. 4"
+  caption="Every prompt passes through the same wrapper. One place to audit, one version in every run log. The non-ideal version: 40 dialects of the same law."
+/>
+
+It's frozen and versioned: v1, with a date.[^6] One seam buys three things:
 
 1. One place to audit when a post looks wrong.
 2. One version cited in every run log, so I can say which rules were in force for anything the bot ever produced.
@@ -105,23 +136,42 @@ One rule mattered more than all the others. When a rep asks who to reach out to,
 
 The rule lives in the fetcher, the code that pulls candidate accounts before the model ever runs. Accounts with an open opportunity are filtered out of the query itself, so the model never sees them. You can argue with a prompt all day but you can't argue with a filter.
 
-That became my sorting test for every rule since. Anything that absolutely must hold goes below the model, where there's nothing to persuade. Anything that should usually hold can stay up in the prompt with the other requests.
+That became my sorting test for every rule since. Anything that absolutely must hold goes below the model, where there's nothing to persuade.[^8] Anything that should usually hold can stay up in the prompt with the other requests.
+
+Stripe draws the same boundary in [their write-up of Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), their internal knowledge platform. Coding agents, they point out, work inside decades of fast, verifiable guardrails, where compilers reject invalid syntax, tests catch regressions, and git makes every mistake reversible. Knowledge work has almost none of that. Their example invariant is that data from two unrelated customer contexts must never appear in the same analysis, even when the person asking has legitimate access to both, because the boundary isn't what this person can see, it's what this task should see. That's a fetcher rule, not a prompt rule, and they know it too.
 
 ## The linter
 
-The prompt carries the spirit of the spec, but something has to check the output, word for word. So every post the bot writes passes through a linter before it reaches Slack. The linter is deterministic: same post in, same verdict out, no model anywhere in it. It checks the voice rules, the formatting rules, and that every claim has its source and date attached.
+The prompt carries the spirit of the spec, but something has to check the output, word for word. So every post the bot writes passes through a linter before it reaches Slack. The linter is deterministic: same post in, same verdict out, no model anywhere in it.[^9] It checks the voice rules, the formatting rules, and that every claim has its source and date attached.
 
-Why not let the model review its own work? Because a reviewer you can persuade is just another model, and I already had one of those. The model writes and the linter enforces.
+Why not let the model review its own work? Because a reviewer you can persuade is just another model, and I already had one of those. The linter fails the same way every time, so when it flags a post I can reproduce the flag and fix whichever side is wrong, the rule or the prompt. The model writes and the linter enforces.
+
+## When the enforcer lied
+
+That last sentence was too comfortable, and it cost me.
+
+I asked Junto what an account had said about pricing on past calls. It answered with a named person saying they would "blow through the per-user threshold." The call transcript says per-seat. The string per-user appears nowhere in my data.
+
+The model didn't do it. One of the vocabulary rules says the word seat never appears in rep-facing output, because reps say user. It was written as a whole-text replace. So an answer that quoted the buyer correctly tripped the rule, the retry couldn't drop the word because it sat inside a quotation, and then the mechanical fix rewrote it. The linter took a true quotation, made it false, and passed it.
+
+I caught it three times before I understood it, and the repetition was the clue I kept walking past. A model paraphrasing drifts a little differently each time. A regex does not. Three identical substitutions was a signature, and I read it as the model being stubborn.
+
+Determinism is what makes a linter worth having, and it's also what makes this worse than the model doing it. A model garbles a quote now and then. A script garbles it every time, in every answer that quotes the word, for as long as the rule exists, and it does it after the checking is finished. The same file had already made this mistake once. An earlier rule stripping dashes out of prose had mangled Salesforce opportunity names across every pipeline transcript. That got patched where it stood, and nobody asked the general question.
+
+The general question is which spans a style rule is allowed to touch at all. Quoted material is source, not prose. It belongs to whoever said it. So the style rules now skip anything inside quotation marks, and a separate gate checks that what sits inside them is a character-for-character copy of a cited row. The rules police how the bot writes, and nothing polices how a buyer talks.
 
 ## The pressure test
 
-A spec nobody has attacked is a guess. So I built a fleet of 15 synthetic personas, scripted rep personalities that fire messages at the live gateway through the same entry point Slack messages arrive at. They never had real Slack accounts. The harness drives the backend directly, which is the honest description. Some played impatient reps who wanted an answer right now. Some played confused reps who asked the wrong question in the wrong words. And some were hostile on purpose: prompt injection, direct orders to ignore the rules, bait built to pull a protected account out of hiding.
+A spec nobody has attacked is a guess. So I built a fleet of 15 synthetic personas, scripted rep personalities that fire messages at the live gateway through the same entry point Slack messages arrive at.[^10] They never had real Slack accounts. The harness drives the backend directly, which is the honest description. Some played impatient reps who wanted an answer right now. Some played confused reps who asked the wrong question in the wrong words. And some were hostile on purpose: prompt injection, direct orders to ignore the rules, bait built to pull a protected account out of hiding.
 
-The fleet ran twice, end to end. No account with an open opportunity got past the fetcher. No injection won. The cost of finding that out was about twelve dollars for both runs, total.
+
+{/* TK: [ASSET: proof of the fleet, e.g. a persona run transcript or the harness output from the repo] */}
+
+The fleet ran twice, end to end. No account with an open opportunity got past the fetcher. No injection won. The cost of finding that out was about twelve dollars for both runs, total.[^11]
 
 The same runs embarrassed the intent gate, the piece from the loud-beats-silent story. It misread 58% of the fleet's casual thread chatter and ate legitimate asks along with the noise. I retuned it after those runs, and later demoted it entirely. The part that I was proud of was that the fleet caught it, for a few dollars, before anyone real got ignored.
 
-The question I kept circling afterward was which of my prompt rules were really data-path rules that hadn't been found yet. It's the difference between a speed limit sign and a speed bump. Every rule starts as a sign, and the ones that really matter should end up as bumps.
+What stays with me is the symmetry. The hard rule held because it never depended on the model behaving. The gate failed because it did.[^12] The question I kept circling afterward was which of my prompt rules were really data-path rules that hadn't been found yet. It's the difference between a speed limit sign and a speed bump. Every rule starts as a sign, and the ones that really matter should end up as bumps.
 
 ## The scorecard
 
@@ -138,3 +188,17 @@ And four rules, if you only keep four. One bot. Routing is constrained choice, n
 [^4]: The research points the same way. [StateFlow](https://arxiv.org/abs/2403.11322) (Wu et al., 2024) found that framing an LLM task as explicit states with allowed transitions raised success rates and cut costs versus letting the model act freely. Anthropic's [engineering write-up on building effective agents](https://www.anthropic.com/engineering/building-effective-agents) names the same pattern: routing classifies an input and hands it to a specialized followup, and workflows buy predictability for well-defined tasks. It's a pattern note rather than an experiment, and the same document recommends the opposite for open-ended work. Mine is the well-defined case.
 
 [^5]: NVIDIA's [NeMo Guardrails](https://arxiv.org/abs/2310.10501) (EMNLP 2023) is this built as a product: rails that are written by a person, independent of whichever model is underneath, readable afterwards, and enforced while the thing runs. It's a design proof rather than a bake-off. Nobody has shown that rules beat models at routing, only that you can put the rules somewhere the model doesn't get a vote.
+
+[^6]: Frozen doesn't mean forever. It means any change gets a new version number and a new date, so the citation in an old run log stays true.
+
+[^7]: The shape is borrowed from Anthropic's [Constitutional AI](https://arxiv.org/abs/2212.08073) (Bai et al., 2022), where the only human oversight is one explicit list of principles. Theirs is a training method and the principles end up in the weights. Mine is a string wrapped around a prompt, which is much weaker, and OpenAI's [instruction-hierarchy work](https://arxiv.org/abs/2404.13208) is the reason to say so out loud: a spec that lives in the prompt layer is soft governance unless the model was trained to privilege it. Which is why the rules that have to hold don't live here.
+
+[^8]: DeepMind and ETH Zurich's [CaMeL](https://arxiv.org/abs/2503.18813) (2025) is this rule taken all the way: a code layer around the model built so untrusted data can never reach program flow, which holds even if the model is completely compromised. Theirs is a security architecture and mine is a WHERE clause, so only the principle carries over. They name their cost, 84% down to 77% on AgentDojo, so I should name mine: the filter can never surface an account that's genuinely relevant and happens to have an open opportunity.
+
+[^9]: [AgentSpec](https://arxiv.org/abs/2503.18666) (ICSE 2026) is the same design written down as a system: trigger, predicate, enforcement, no model anywhere in the checker, overhead in milliseconds. Their numbers are about stopping unsafe agent actions rather than checking prose, so I'm citing the shape and leaving the score alone. The reason a model isn't doing the checking is that models are measurably soft graders of their own work: [Panickssery et al.](https://arxiv.org/abs/2404.13076) (NeurIPS 2024) found evaluators recognise their own output and prefer it, and the preference gets stronger the better they recognise it. A reviewer you can persuade, measured.
+
+[^10]: Attacking your own system with generated users is established practice. [Perez et al.](https://aclanthology.org/2022.emnlp-main.225/) did it at DeepMind (EMNLP 2022) by having one language model write test cases for another and mining the failures before users found them. Theirs ran to hundreds of thousands of cases and mine is fifteen hand-written personalities, so the technique is shared and the scale isn't. A fleet like this is good at finding bugs and bad at scoring them, which is why the 58% is a flag and not a measurement.
+
+[^11]: About twelve dollars covers model spend for both runs together. The time it took to build the fleet isn't in that number.
+
+[^12]: [RuLES](https://arxiv.org/abs/2311.04235) (Berkeley and CAIS, 2023) found almost all models struggle to follow plainly written scenario rules even when nobody is attacking them, and much worse when someone is. My gate failed benignly rather than adversarially, so the paper backs the principle and not my diagnosis of this particular failure.

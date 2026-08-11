@@ -311,14 +311,6 @@ The mechanics of standing it up were plainer than I expected.
 
 The brand settings ride in environment variables the engine ships, and every change I made to the code itself is the one small patch from earlier.
 
-### The road to production
-
-The road from here to something that a company could actually run on now came down to three things:
-
-1. The Slack install, which was nearly done for me already. A Slack app installs once per workspace, not once per person, so putting the bot in front of a whole team is one installation, plus mapping Slack users to reps and deciding who's allowed to see what. Real work, but ordinary work.
-2. Per-rep authentication, which is the next thing to build. Today every run executes under my credentials, because a run triggered through an API key executes as the one user the key belongs to. Building it means giving each rep their own scope on the CRM and the call recordings, so that a run executes as the person who asked for it. Ramp's team reached the same conclusion at scale in their tooling demo with Deepline: auth is the unlock, not the model. In their words, getting the AI to call an API was never the hard part.
-3. A hosting decision with a known tradeoff. Sim's hosted product runs $25 to $100 per user per month, with an enterprise tier above that, and moving to it would take the ops off my hands. But the beat this whole story builds toward, a sentence in Slack becoming a workflow on the engine, depends on creating and changing workflows programmatically, and changing an existing one still has no public API path, so that today requires self-hosting. The gap is closing: creating a workflow through the public API became possible while I was writing this. When changing one does too, the decision opens up.
-
 ### First receipts
 
 By the end of the first day: all services were healthy on the server, the admin UI was reachable, seed data loaded into tables, and the first workflow I created in the composer had saved.
@@ -334,144 +326,11 @@ Nobody had asked the bot anything (because there was no bot to ask) and nothing 
 [^c3-3]: [Ray and Kim](https://doi.org/10.1145/2393596.2393659) measured this across eighteen years of the BSD forks (FSE 2012): between 10.7 and 15.5% of all patch lines were edits being re-ported between forks, work that occupied 26 to 59% of active developers in a release, and the porting rate does not necessarily decrease over time. That last clause is the whole point. The interest never tapers. Their setting is peer forks rather than a thin fork tracking an upstream, so what I'm borrowing is the shape and not the number.
 
 
-## The front door
+## The Slack bot
 
-Next came the Slack bot. Making a bot survive real users turned out to be enough material for its own essay, so I wrote one: **[What I learned creating a Slack bot](/slack-bot/)**. The lessons live there. What stays here is the part that is Junto's front door.
+Junto needed a front door: a bot in Slack, one name you can talk to, that watches channels, answers when spoken to, and does work behind the scenes.
 
-A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot, a specific decision that I made.
-
-The alternative (many bots in Slack), at least to my mind, could get messy quickly. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you'd probably get three slightly different answers with different sources, and nobody would know which one to trust.[^c4-4] It's the graveyard from the opening section rebuilt inside Slack, except now it pings you.
-
-### Ten exits
-
-Every message to Junto passes through one classifier at the front, with ten explicit exits:
-
-- answer a question
-- run a play
-- compose a new play
-- remix a play that already exists
-- schedule something
-- discover what's there
-- ask for clarification
-- offer help
-- admit that no source covers this
-- or just chat[^c4-1]
-
-Nothing runs that wasn't explicitly selected, and there's no default and no fall-through. If I've learned anything during my time building with AI it's that these suckers will not hesitate to make shit up, and it'll usually sound good.
-
-
-<Diagram
-  src="junto-ten-exits.png"
-  label="Fig. 8"
-  caption="One classifier at the front, ten explicit exits. A default path does not exist."
-/>
-
-One rule keeps the routing honest: deterministic post-rules outrank the model. The classifier proposes and the rules dispose, and you can watch the five rules pass or get the last word in the demo below.
-
-
-<Diagram
-  src="junto-widget-seven-steps.html"
-  label="Fig. 9"
-  caption="Pick a message and it sends for real. Seven cards settle as the run reaches each phase, and the routing card opens onto the five rules that get the last word."
-  height={840}
-/>
-
-
-[^c4-1]: In the code they're ANSWER, RUN, COMPOSE, REMIX, SCHEDULE, DISCOVER, CLARIFY, HELP, SOURCE_MISS and CHAT. Naming them as an enum rather than as behaviors was worth more than it sounds, because you can't add an eleventh exit by accident.
-
-[^c4-4]: [Sclar et al.](https://arxiv.org/abs/2310.11324) (ICLR 2024) found a single model's accuracy swinging by as much as 76 points on formatting alone, a different separator or a different casing. If differences that meaningless move results that far, differences on purpose certainly will. The effect shrinks on newer models without going away, and the paper says nothing about the other half of that sentence, which is three bots reading three different sets of sources.
-
-
-## Rules you can't prompt away
-
-Before I let Junto talk in a shared channel, I wrote it a constitution. Not guidelines but a written spec for how it behaves, with a version number on top.
-
-The first version had four rules:
-
-1. Surface, never instruct. Junto posts observations, not orders, and the reps decide what to do with them.
-2. Every fact carries its source and its date.
-3. No formatting theater. Posts stay short, and nothing is ever bold.
-4. Anything that looks like outreach is a draft for a human to review, because nothing sends itself.
-
-### One seam
-
-The obvious way to apply a spec like that's to paste it into every prompt. I had prompts in about forty files, and I knew what forty copies would turn into. Each one gets edited in a hurry someday, and six months later you have forty dialects of the same law. So the constitution injects at exactly one place in the code, wrapped around every prompt on its way to the model.[^c5-3] It works like an airport with exactly one security checkpoint: every passenger passes through the same doorway, so upgrading the scanner once upgrades it for every flight.
-
-
-<Diagram
-  src="junto-one-seam.png"
-  label="Fig. 10"
-  caption="Every prompt passes through the same wrapper. One place to audit, one version in every run log. The non-ideal version: 40 dialects of the same law."
-/>
-
-It's frozen and versioned: v1, with a date.[^c5-1] One seam buys three things:
-
-1. One place to audit when a post looks wrong.
-2. One version cited in every run log, so I can say which rules were in force for anything Junto ever produced.
-3. No copies drifting apart while nobody is looking.
-
-### The hard rule
-
-One rule mattered more than all the others. When a rep asks who to reach out to, never suggest an account that already has an open opportunity. Get that wrong once and a rep emails into a live deal, which is the fastest way I know to make the whole tool untrusted.
-
-The rule lives in the fetcher, the code that pulls candidate accounts before the model ever runs. Accounts with an open opportunity are filtered out of the query itself, so the model never sees them. You can argue with a prompt all day but you can't argue with a filter.
-
-That became my sorting test for every rule since. Anything that absolutely must hold goes below the model, where there's nothing to persuade.[^c5-4] Anything that should usually hold can stay up in the prompt with the other requests.
-
-Stripe draws the same boundary in [their write-up of Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), their internal knowledge platform. Coding agents, they point out, work inside decades of fast, verifiable guardrails, where compilers reject invalid syntax, tests catch regressions, and git makes every mistake reversible. Knowledge work has almost none of that. Their example invariant is that data from two unrelated customer contexts must never appear in the same analysis, even when the person asking has legitimate access to both, because the boundary isn't what this person can see, it's what this task should see. That's a fetcher rule, not a prompt rule, and they know it too.
-
-### The linter
-
-The prompt carries the spirit of the spec, but something has to check the output, word for word. So every post Junto writes passes through a linter before it reaches Slack. The linter is deterministic: same post in, same verdict out, no model anywhere in it.[^c5-5] It checks the voice rules, the formatting rules, and that every claim has its source and date attached.
-
-Why not let the model review its own work? Because a reviewer you can persuade is just another model, and I already had one of those. The linter fails the same way every time, so when it flags a post I can reproduce the flag and fix whichever side is wrong, the rule or the prompt. The model writes and the linter enforces.
-
-### When the enforcer lied
-
-That last sentence was too comfortable, and it cost me.
-
-I asked Junto what an account had said about pricing on past calls. It answered with a named person saying they would "blow through the per-user threshold." The call transcript says per-seat. The string per-user appears nowhere in my data.
-
-The model didn't do it. One of the vocabulary rules says the word seat never appears in rep-facing output, because reps say user. It was written as a whole-text replace. So an answer that quoted the buyer correctly tripped the rule, the retry couldn't drop the word because it sat inside a quotation, and then the mechanical fix rewrote it. The linter took a true quotation, made it false, and passed it.
-
-I caught it three times before I understood it, and the repetition was the clue I kept walking past. A model paraphrasing drifts a little differently each time. A regex does not. Three identical substitutions was a signature, and I read it as the model being stubborn.
-
-Determinism is what makes a linter worth having, and it's also what makes this worse than the model doing it. A model garbles a quote now and then. A script garbles it every time, in every answer that quotes the word, for as long as the rule exists, and it does it after the checking is finished. The same file had already made this mistake once. An earlier rule stripping dashes out of prose had mangled Salesforce opportunity names across every pipeline transcript. That got patched where it stood, and nobody asked the general question.
-
-The general question is which spans a style rule is allowed to touch at all. Quoted material is source, not prose. It belongs to whoever said it. So the style rules now skip anything inside quotation marks, and a separate gate checks that what sits inside them is a character-for-character copy of a cited row. The rules police how Junto writes, and nothing polices how a buyer talks.
-
-### The pressure test
-
-A spec nobody has attacked is a guess. So I built a fleet of 15 synthetic personas, scripted rep personalities that fire messages at the live gateway through the same entry point Slack messages arrive at.[^c5-6] They never had real Slack accounts. The harness drives the backend directly, which is the honest description. Some played impatient reps who wanted an answer right now. Some played confused reps who asked the wrong question in the wrong words. And some were hostile on purpose: prompt injection, direct orders to ignore the rules, bait built to pull a protected account out of hiding.
-
-
-{/* TK: [ASSET: proof of the fleet, e.g. a persona run transcript or the harness output from the repo] */}
-
-The fleet ran twice, end to end. No account with an open opportunity got past the fetcher. No injection won.
-
-The cost of finding that out? About twelve dollars for both runs, total.[^c5-2]
-
-### What didn't hold
-
-The same runs embarrassed the intent gate, the piece that decided whether channel chatter was actually a request for Junto. It misread 58% of the fleet's casual thread chatter and ate legitimate asks along with the noise. A rep would ask a real question and get silence. I retuned the gate after those runs, and later demoted it entirely. The front-door section tells that story.
-
-The part that I was proud of was that the fleet caught it, for a few dollars, before anyone real got ignored.
-
-What stays with me is the symmetry. The hard rule held because it never depended on the model behaving. The gate failed because it did.[^c5-7] Fifteen personas is fifteen imaginations, and a channel full of reps has more than that. The question I kept circling was which of my prompt rules were really data-path rules that hadn't been found yet. It's the difference between a speed limit sign and a speed bump. Every rule starts as a sign, and the ones that really matter should end up as bumps.
-
-[^c5-1]: Frozen doesn't mean forever. It means any change gets a new version number and a new date, so the citation in an old run log stays true.
-
-[^c5-2]: About twelve dollars covers model spend for both runs together. The time it took to build the fleet isn't in that number.
-
-[^c5-3]: The shape is borrowed from Anthropic's [Constitutional AI](https://arxiv.org/abs/2212.08073) (Bai et al., 2022), where the only human oversight is one explicit list of principles. Theirs is a training method and the principles end up in the weights. Mine is a string wrapped around a prompt, which is much weaker, and OpenAI's [instruction-hierarchy work](https://arxiv.org/abs/2404.13208) is the reason to say so out loud: a spec that lives in the prompt layer is soft governance unless the model was trained to privilege it. Which is why the rules that have to hold don't live here.
-
-[^c5-4]: DeepMind and ETH Zurich's [CaMeL](https://arxiv.org/abs/2503.18813) (2025) is this rule taken all the way: a code layer around the model built so untrusted data can never reach program flow, which holds even if the model is completely compromised. Theirs is a security architecture and mine is a WHERE clause, so only the principle carries over. They name their cost, 84% down to 77% on AgentDojo, so I should name mine: the filter can never surface an account that's genuinely relevant and happens to have an open opportunity.
-
-[^c5-5]: [AgentSpec](https://arxiv.org/abs/2503.18666) (ICSE 2026) is the same design written down as a system: trigger, predicate, enforcement, no model anywhere in the checker, overhead in milliseconds. Their numbers are about stopping unsafe agent actions rather than checking prose, so I'm citing the shape and leaving the score alone. The reason a model isn't doing the checking is that models are measurably soft graders of their own work: [Panickssery et al.](https://arxiv.org/abs/2404.13076) (NeurIPS 2024) found evaluators recognise their own output and prefer it, and the preference gets stronger the better they recognise it. A reviewer you can persuade, measured.
-
-[^c5-6]: Attacking your own system with generated users is established practice. [Perez et al.](https://aclanthology.org/2022.emnlp-main.225/) did it at DeepMind (EMNLP 2022) by having one language model write test cases for another and mining the failures before users found them. Theirs ran to hundreds of thousands of cases and mine is fifteen hand-written personalities, so the technique is shared and the scale isn't. A fleet like this is good at finding bugs and bad at scoring them, which is why the 58% is a flag and not a measurement.
-
-[^c5-7]: [RuLES](https://arxiv.org/abs/2311.04235) (Berkeley and CAIS, 2023) found almost all models struggle to follow plainly written scenario rules even when nobody is attacking them, and much worse when someone is. My gate failed benignly rather than adversarially, so the paper backs the principle and not my diagnosis of this particular failure.
+I built one, and making it survive real users turned out to be a story of its own. The one-bot decision, the ten exits, the rules that get the last word, and the tests that beat on all of it live in their own essay: **[What I learned creating a Slack bot](/slack-bot/)**. From here on, this post assumes the bot exists and behaves. How it earned that is over there.
 
 
 ## The shared memory
@@ -485,7 +344,7 @@ Chapter 1 answers this in reverse. The dead projects all produced outputs that b
 
 <Diagram
   src="junto-d3-normalization.png"
-  label="Fig. 11"
+  label="Fig. 8"
   caption="Everything is qualified before a model touches it. Four questions, four shapes of row, one projection, and evidence filtered by who is asking."
 />
 
@@ -500,7 +359,7 @@ Everything arriving from every source gets qualified first: deduped, thresholded
 
 <Diagram
   src="junto-d4-row-anatomy.png"
-  label="Fig. 12"
+  label="Fig. 9"
   caption="Every field in all four stores, and who writes each one. Underneath them, the single comparable shape they all project into before a question ever reaches them."
 />
 
@@ -514,7 +373,7 @@ Events are for acting. The index is for asking.
 
 <Diagram
   src="junto-factory-library.png"
-  label="Fig. 13"
+  label="Fig. 10"
   caption="Events are for acting, the index is for asking. Work orders fire actions. The filing room answers questions."
   width={640}
 />
@@ -532,7 +391,7 @@ My 2025 transcript tagging strategy was bad in a way that took a few dozen calls
 
 <Diagram
   src="junto-d2-call-tagged.png"
-  label="Fig. 14"
+  label="Fig. 11"
   caption="One call becomes many moments, and the seller half never gets tagged at all. Every moment is stamped twice, checked against the transcript, and then sorted. Anything under 0.7 goes to a person."
 />
 
@@ -552,7 +411,7 @@ The Junto version is the same method with me removed from the middle and left at
 
 <Diagram
   src="junto-data-arrives.png"
-  label="Fig. 15"
+  label="Fig. 12"
   caption="Every source is read at the rate it actually changes. Five cadences feeding four typed stores, and current state never written down at all."
 />
 
@@ -574,7 +433,7 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 
 <Diagram
   src="junto-d8-road.png"
-  label="Fig. 16"
+  label="Fig. 13"
   caption="Four stages, and the only one that involves a model is the answer at the end. Everything before it is deterministic, and most of what arrives never gets past the second box."
 />
 
@@ -582,7 +441,7 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 
 <Diagram
   src="junto-widget-normalize-event.html"
-  label="Fig. 17"
+  label="Fig. 14"
   caption="Pick something that happens at a company. If a connector watches it, you get the row it becomes. If nothing does, you get told so."
   height={900}
 />
@@ -656,7 +515,7 @@ Ramp settled any doubt I had about this direction. In their tooling demo with De
 
 <Diagram
   src="junto-ramp-flywheel.png"
-  label="Fig. 18"
+  label="Fig. 15"
   caption="Ramp's flywheel, as Keyan Sarrafzadeh described it in their tooling demo with Deepline. Their loop, my redraw."
 />
 
@@ -747,7 +606,7 @@ The result came back narrower. The edit lived on the engine, and the engine did 
 
 One thing I didn't expect: the truer claim was the harder one to keep. When the engine was just a mirror, honesty was easy, because all I had to do was describe it correctly. Once the engine actually ran things, every claim about what it does had to stay true run after run, edit after edit. The guard is what makes that possible. I can let reps edit the machine and still say, in print, exactly what it will refuse to do.
 
-[^c9-1]: The gateway as the front door is the subject of the front door chapter. Why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics, live in [What I learned creating a Slack bot](/slack-bot/).
+[^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
 [^c9-2]: The engine is Sim, an open source engine, self-hosted as the execution engine. The canvas in this chapter is its canvas.
 
@@ -785,6 +644,14 @@ When the renderer is deterministic,[^c10-1] a bad spec is cheap, because redoing
 
 ### The org chart, right
 
+
+<Diagram
+  src="junto-org-chart.png"
+  label="Fig. 16"
+  caption="The org chart the demo drew for CoreFlow, rendered from the fetched rows. Color is state: engaged, champion, open role. No model in this path."
+/>
+
+
 The version that worked for me was a top-down graph where the arrow is the reporting line. No "reports to" text anywhere, because the geometry says it. Clusters group the functions that matter to the deal. Color marks who's engaged, who's a champion, which role is open.
 
 And the chart has an opinion. Functions outside the buying center simply don't render. How does the chart know who the buying center is? The list of functions that count as the buying center is configuration, an allowlist, not a model's guess. The caption says so, with a count,[^c10-2] so nobody mistakes the filter for the whole company. What does render is ranked by relevance, never silently cut. If the chart drops something, it tells you what it dropped, and how much.
@@ -792,6 +659,14 @@ And the chart has an opinion. Functions outside the buying center simply don't r
 As for where the people come from: the chart doesn't discover anyone. Names, titles, and reporting lines are read from the contact records already in the CRM, and the renderer only draws what those records say. If the CRM is missing a person, so is the chart, and the caption's counts make that visible.[^c10-3]
 
 ### Pictures are tests
+
+
+<Diagram
+  src="junto-run-journey.png"
+  label="Fig. 17"
+  caption="A run journey card, rendered deterministically from the run's own trace. This one is the account pov: 12 signals in, 6 sourced claims out."
+/>
+
 
 If visuals are claims, they can be wrong, and (in my mind) things that can be wrong need tests. So the test suite stores an approved copy of each diagram type, the pinned snapshot. Every build re-renders every diagram from a fixed trace and compares the result against the approved copy. Any pixel-level difference fails the build until a human approves the new picture. The picture is the assertion. The snapshot is the expected value.
 
@@ -880,7 +755,7 @@ Here is what I can show you today, live, with no cuts anywhere in the demo. A se
 
 <Diagram
   src="junto-slack.html"
-  label="Fig. 19"
+  label="Fig. 18"
   caption="The demo, wearing the surface it was built for. The seeded thread is a recording and says so, with its date. The pre-set messages run live against the real service when it is up, and the badge tells you which one you are getting."
   height={800}
 />
