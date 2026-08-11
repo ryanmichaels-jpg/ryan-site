@@ -17,36 +17,42 @@ import Lede from '../../components/Lede.astro';
 ## Nothing broke
 
 <Lede>
-Every AI project our GTM team built ended up dying. I counted eight over the last year, some of them mine, some built by teammates, even some that the company bought from vendors.
+Every AI project our GTM team built ended up dying. Off the top of my head I can count eight over the last year, many of them mine, some built by teammates, even some that we bought from vendors. Before building something else, I wanted to know what was killing everything.
 </Lede>
-
-Before building something else, I wanted to know what killed the other eight.
 
 I should say where I sit, because it changes what this initiative means. I'm an SDR, so this isn't something I read about in a newsletter. It shows up at eight in the morning, when I open something to work out who I should be talking to today. Everything that we built to answer that question is either gone, or was never worth trusting.
 
 ### The specimens
 
-There were 3 kinds of dead projects. First, the scattered ones: Claude projects, spreadsheets, a dashboard someone spun up. One of them is still running right now, pulling a fresh list of accounts every morning that nobody will ever look at. It has never failed once.
+In my mind there were 3 kinds of dead projects. First, the scattered ones: Claude projects, spreadsheets, dashboards. Most of them are still running right now, pulling a fresh list of accounts every morning that nobody ever looks at. Many of them have never failed once.
 
-Second, my projects. A teammate and I built a dashboard that read our accounts out of Salesforce, showed which ones had been outbounded, and laid the week's work out in a single view. It worked, and it did exactly what we had asked it to do. It lived three weeks. The last time anyone opened it was August 6th, 2025.
+Second, my projects. A teammate and I built a dashboard that read our accounts out of Salesforce, showed which ones had been outbounded, and laid the week's work out in a single view. It did exactly what we had asked it to do and it lived three weeks. The last time either of us opened it was August 6th, 2025.
 
 Third, paid platforms. Actual products, from actual vendors, bought with actual money.
 
-The part that took me a while to notice was that none of the projects had exploded. There was no incident, no postmortem, no angry thread in Slack, and nobody ever wrote "we're sunsetting this." Nobody argued about it, and nobody defended it. One quiet week nobody opens the tab, then another, and eventually it's a bookmark.
-
-Nothing broke, nobody complained, and nobody decided anything.
+The part that took me a while to notice was that none of the projects had exploded. There was no incident, no postmortem, no angry thread in Slack, and nobody ever wrote "we're sunsetting this." One quiet week nobody opens the tab, then another, and eventually it's a bookmark.
 
 ### The wrong question
 
-My first question was the obvious one: what were they missing? That went nowhere. The dashboard displayed. The Claude projects produced output, and the output was good. The vendor platforms showed us our Salesforce data in a nicer arrangement than Salesforce did. Every one of them did the job it was built to do, right up to the day it stopped mattering.
+My first question was: well what were they not doing correctly? That went nowhere. Dashboards displayed, Claude projects produced output (and the outputs are usually great!), and the vendor platforms showed us our data. Every one of them did the job it was built to do, right up until the day they stopped mattering.
 
-The vendor platforms are what convinced me to dig into this. Those things had design teams, roadmaps, support addresses and onboarding calls, and they died the same death as a dashboard two of us threw together in a week. If craft were the variable, meaning that the projects we made ourselves just weren't good enough to be adopted, then the expert-built versions should have survived. They didn't. And when very different parts keep producing the identical outcome, the interesting place to look stops being the parts and becomes the system around them.
+The vendor platforms are what really convinced me to dig into this. Those things had design teams, roadmaps, support addresses and onboarding calls, and they died the same death as a dashboard two of us threw together in a week. If craft were the variable, meaning that the projects we made ourselves just weren't good enough to be adopted, then the expert-built versions should've survived. They didn't. And when very different parts keep producing the identical outcome, the interesting place to look stops being the parts and becomes the system around them.
 
-What did all of these projects have in common? Not quality, not budget or polish. What they shared was their situation: where they lived, who could see them, and how they related to the rest of the work. So the cause probably wasn't craft.
+What did all of these projects have in common? Not quality, not budget or polish.
 
-It was structural, meaning the failure lived in how the projects were situated, not in what they were made of. It wouldn't have mattered how good they were, because two projects with the same structure get the same outcome regardless of craft.
+I took a couple of days away from my laptop after not getting very far by trying to understand what the projects weren't doing correctly. I knew that a problem couldn't be solved in the same situation that it arose from, but I still didn't know the questions that I should've been asking to solve this.
 
-Which makes it a different question. Not what did these projects lack, but what did they lack a *relationship* to? I got there by giving up on examining each project as an isolated object and looking instead at the system around it: what fed it, what it fed, what would notice if it failed. A systems view asks about connections instead of features. That reframing did something the first question couldn't. Every dead project consumed inputs and produced outputs, and that part worked fine. The problem was that the outputs weren't anybody's inputs. My dashboard pulled from Salesforce every morning and rendered a view, and the view fed nothing at all.
+As I do for most of the problems I face, I read. Albert Rutherford's The Systems Thinker sat on the floor of my apartment, making a home for itself there since I finished it in April, and with the attitude of "well, this was pretty good, maybe it could show me something I forgot" I re-read it that night.
+
+The next day, still without much motivation to solve this problem, I sat down and started writing down everything that I could remember from the book. I scribbled for an hour or so and it was apparent that the book was intended to teach the reader to look at the systems around things.
+
+A systems thinker asks about connections instead of features. Trying to be a systems thinker myself, I thought about what inputs fed these projects and what their outputs fed. This reframing might seem abstract or vague now but it is arguably the most important pivot of this project and is the basis for everything I did after.
+
+Every dead project consumed inputs and produced outputs, and that part worked fine. The problem was that the outputs weren't anybody's inputs.
+
+My hypothesis was: the failures are structural, meaning the failure lived in how the projects were situated, not in what they were made of. It wouldn't have mattered how good the projects were, two projects with the same structure get the same outcome regardless of craft.
+
+Which led us to our final and best question yet: what did each of the projects lack a relationship to?
 
 
 <Diagram
@@ -57,53 +63,64 @@ Which makes it a different question. Not what did these projects lack, but what 
 
 ### 4 relationships
 
-When I thought about it this way, the causes sorted themselves into four, and each one was a relationship the project didn't have.
+When I thought about it this way, the causes of death sorted themselves into four categories, and each one was a relationship the project didn't have. Here are the relationships that I landed on:
 
-Location is a relationship to the workday, and ours lived somewhere you had to go on purpose.
+Location is a relationship to the workday. Most of the projects lived somewhere you had to go on purpose.
 
-Sharing is a relationship to teammates, and nobody else could see ours, so nobody else could build on it.
+Sharing is a relationship to teammates. Nobody could see the majority of projects, so nobody built on top of them.
 
-Learning is a relationship to your own failures. Ours answered wrong on Tuesday and answered exactly as wrong on Wednesday.
+Learning is a relationship to your own failures. For most of the projects, if they answered wrong on Tuesday, they answered exactly as wrong on Wednesday.
 
-Compounding is a relationship to every other piece of work, and nothing anyone built made the next thing easier to build.
+Compounding is a relationship to every other piece of work. Nothing anyone built made the next thing easier to build.
 
-Location, sharing, learning, compounding. (Creating is deliberately not on that list. Creation was never our problem, because we created constantly, and the creations died.)
+Location, sharing, learning, compounding.
 
 ### The survivors
 
-While taking inventory of our tooling, something dawned on me. Slack didn't die, Gong didn't die, and Salesforce certainly didn't die, even though those tools get used every day by people who never chose them and possibly even resent them. So what do the survivors have that ours didn't?
+Holding the 4 relationships in my mind, I wanted to take inventory of the tools that hadn't died. The ones that stood out were: Slack, Gong, and Salesforce. With our belief from above that craftsmanship wasn't a factor in the death or survival of tools, whether you also believe that to be true or not, I asked: what'd the survivors have that internal AI projects didn't? And landed on this explanation: work flowed through each of those tools and left something behind.
 
-What I think it is: work flowed through each of those tools and left something behind. Nobody sits down to use Gong. A call happens, and Gong is where the call becomes an asset. Nobody sits down to use Salesforce either. An opportunity moves, Salesforce is updated, and it becomes the source of record. And nobody sits down to use GitHub. Code is written and pushed, GitHub merges it, and the repo grows.
+Nobody sits down to use Slack. They communicate, and their words are held there.
 
-The survivors are the things work deposits into, and using them produces the thing that makes them more valuable tomorrow.
+Nobody sits down to use Gong. A call happens, and Gong is where the call becomes an asset.
+
+Nobody sits down to use Salesforce. An opportunity moves, Salesforce is updated, and it becomes the source of record.
+
+And nobody sits down to use GitHub or Outreach. Code is written and pushed, and the repo grows, or an email sequence is written and used.
+
+The survivors were the things work deposits into, and by using them we were producing the thing that makes them more valuable tomorrow.
 
 
 {/* TK: [NEEDS REF: 2025/2026 research backing the deposit/accumulation idea. Nearest candidates logged in doc 60] */}
 
-The map was almost too neat: four relationships our projects never had. Slack was location, Gong was learning, Outreach and GitHub were sharing,[^c1-2] and Salesforce was the record everything else deposited into.
+The map was almost too neat: four relationships our projects never had.
+
+Slack was location, Gong was learning, Outreach and GitHub were sharing,[^c1-2] and Salesforce was the record everything else deposited into.
 
 
 <Diagram
   src="junto-four-relationships.png"
   label="Fig. 3"
   caption="Between them the survivors cover all four. Not one of the eight covered any."
+  width={620}
 />
 
 ### Cheap creation
 
-There's a second-order effect here that I missed at first, and it's the reason this gets worse rather than better.
+There's a second-order effect here that I missed at first.
 
-Creation used to be expensive, so not many people did it. Now it's cheap, so everyone (including myself) does, which sounds like progress and mostly is. But every creation carries its own private copy of the context it needs: its own definition of who we sell to, its own instructions, its own lessons about what works. And the copies don't just duplicate, they diverge. The AI era is relearning this the hard way: the current push to give coding agents one canonical instructions file exists precisely because agents reading different copies of the truth act on different truths.[^c1-3] Two reps' definitions of the same customer drift apart quietly, and nobody can tell which one is right, because no version is the version. Then the creation dies, and its copy dies with it.
+Creation used to be expensive, so not many people did it. Now it's cheap, so everyone (including myself) does, which sounds like progress and mostly is.
 
-Stripe just published what this looks like at enterprise scale. Before they consolidated onto Kai, their internal knowledge platform, anyone at the company could build and deploy workflow agents, and over 4,000 got built. Their write-up says teams were writing conceptually similar prompts with varying levels of quality, and that the proliferation became increasingly hard to monitor and maintain.[^c1-4] Four thousand agents is four thousand private copies of the context, drifting.
+But in the context of GTM tools, every creation carries its own private copy of the context it needs: its own definition of who we sell to, its own instructions, its own lessons about what works. And the copies diverge.
 
-So cheap creation doesn't solve the death problem, it multiplies it, and what the company knows fragments across a graveyard that grows faster every quarter. In my opinion, the scarce thing is now shared memory, and building is exactly what doesn't produce it.
+The current push to give coding agents one canonical instructions file exists precisely because agents reading different copies of the truth act on different truths.[^c1-3] Two reps' definitions of their company's ICP drift apart quietly, and nobody can tell which one is right, because no version is the version. Then the creation dies, and its copy dies with it.
+
+Stripe recently published what this looks like at enterprise scale. Before they consolidated onto Kai, their internal knowledge platform, anyone at the company could build and deploy workflow agents, and over 4,000 got built. Their write-up says teams were writing conceptually similar prompts with varying levels of quality, and that the proliferation became increasingly hard to monitor and maintain.[^c1-4] Four thousand agents is four thousand private copies of the context, drifting.
 
 ### The question
 
-So could one tool hold all four relationships at once? I didn't know, and it seemed like a great deal to ask of any single tool. Or was that still the wrong shape for the question? Maybe the answer wasn't another project at all, but "the thing that every other project runs on."
+So could one tool hold all four relationships at once? I didn't know, and it seemed like a great deal to ask of a tool. Or was that still the wrong shape for the question? Maybe the answer wasn't another project at all, but "the thing that every other project runs on."
 
-I had no idea what that would look like, but I knew what world I wanted to live in: one where what GTM writes in emails to prospects comes from what customers actually say, where nobody ever discovers the same thing twice, and where a GTM team knows the expiration date of everything it believes.
+I had no idea what that would look like, but I knew what world I wanted to live in. One where what GTM writes in emails to prospects comes from what customers actually say, where nobody ever discovers the same thing twice, and where a GTM team knows the expiration date of everything it believes.
 
 [^c1-2]: This is the weakest of the four mappings and worth saying so. A deposit does happen in both tools: a sequence you write is visible to the team, a commit is visible to the repo. But discovery barely happens, and nobody browses Outreach to learn what worked. The sharing relationship needs both halves, and these two tools have one.
 
@@ -118,6 +135,17 @@ So our hypothesis was now: the scarce thing is shared memory. Could we just conn
 
 Lay chapter 1's map out as a matrix, tools down one side and the four relationships across the top, and the survivors make a clean diagonal. Slack has location. Gong has learning. Outreach and GitHub have sharing. Salesforce has compounding. A clean diagonal invited a thought: wire the survivors together and collect the shared memory at the seams.
 
+After investigating the possibilities of wiring the tools together and collecting the shared memory, it became clear that the four relationships belonged to a tool's own content. What I mean by this is: a relationship cannot transfer from one tool to another.
+
+For example:
+
+- Post your dashboard's output to Slack and the message gets location but the dashboard doesn't.
+- Write your results to Salesforce and the rows compound, but the outreach your team does the next day doesn't, because it's not a tool system that was built for discovery.
+- Read call data out of Gong and you get the benefit of everything Gong learned, but your own tool never learns a thing, because nobody can grade it.
+- Create an email sequence in Outreach and the sequence is shared, but the learning isn't. Integration isn't inheritance.
+
+Run any combination through the grid and the residue is the same: at least two relationships are left unowned. And even the version where you wire all four in properly hands every builder four connections, four auth stories, and their own private copy of the context, which is the private-copy problem.
+
 
 <Diagram
   src="junto-punnett.png"
@@ -125,45 +153,45 @@ Lay chapter 1's map out as a matrix, tools down one side and the four relationsh
   caption="No combination of the survivors reaches a green square. The layer and the social loop are the squares the rest of this post is about."
 />
 
-But the trap in that move was that the four relationships belong to a tool's own content. They don't transfer to whatever you attach. Post your dashboard's output to Slack and the message gets location but the dashboard doesn't. Write your results to Salesforce and the rows compound, but the outreach your team does the next day doesn't, because it's not a tool system that was built for discovery. Read call data out of Gong and you get the benefit of everything Gong learned, but your own tool never learns a thing, because nobody can grade it. Create an email sequence in Outreach and the sequence is shared, but the learning isn't. Integration isn't inheritance.
-
-Run any combination through the grid and the residue is the same: at least two relationships are left unowned. And even the version where you wire all four in properly hands every builder four connections, four auth stories, and their own private copy of the context, which is the private-copy problem.
-
-This led me to believe that the four relationships needed to be properties of the substrate a thing is built on, which is the difference between an integration and a layer.
-
-There was a plainer way to see the same thing.
-
-> The survivors were places where work ended up. Everything I had built was a place you had to go.
+This led me to believe that the four relationships needed to be properties of the substrate a thing is built on, which is the difference between an integration and a layer. In other words, the survivors were places where work ended up. Everything I had built was a place you had to go.
 
 So could one tool hold all four relationships at once? The answer is probably no, and asking for one was the wrong request in the first place.
 
 Every corpse on that list was a destination: a thing you opened on purpose, that showed you something, that you may or may not have taken actions within, that you then closed. And a destination competes for attention every single morning, and it loses that competition eventually, because attention is the one budget nobody can grow.
 
-Stripe's team wrote down the same conclusion while building Kai, their internal knowledge platform: a standalone agent product wouldn't work, because it would force users out of their natural workflows and into a new app. The platform has to meet the user where they are. Their sentence, my corpses.
+Stripe's team wrote down the same conclusion while building Kai: a standalone agent product wouldn't work, because it would force users out of their natural workflows and into a new app. The platform has to meet the user where they are. Their sentence, my corpses.
 
-The fix was a growing, actionable layer underneath the destinations.
+It was at this point that I firmly believed that the fix was a growing, actionable layer underneath the destinations.
 
 ### The principle
 
-Centralize the data. Decentralize the builders.
+> Centralize the data. Decentralize the builders.
 
-One shared memory underneath, and many hands building on top. The phrasing comes from a talk Chris Prinz, a former colleague, now a GTM Engineer at Modal, gave in [Modal's session with Deepline](https://www.youtube.com/watch?v=C-7NljdnSR0), where he put his team's core philosophy on a slide: centralize the data, decentralize the agents. Consolidate the data and the business logic into one warehouse, then give everyone access to it through their agents, and he presented it as the philosophy that lets a small team iterate fast without getting blindsided. Every decision in the rest of this post is that sentence applied to something.
+One shared memory underneath, and many hands building on top.
 
-Stripe reached the same principle from the other direction. [Their write-up of Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform) says building it required getting three things right: scaling expertise without centralizing it, meeting users wherever they work, and enforcing guardrails that don't exist in code. That first one is this exact sentence. The people who know how to triage an escalation or model a revenue scenario are, in their words, certainly not on the team building the agent infrastructure. The expertise stays where it lives, and the platform carries everything else.
+The phrasing comes from a talk Chris Prinz, a former colleague, now a GTM Engineer at Modal, gave in [Modal's session with Deepline](https://www.youtube.com/watch?v=C-7NljdnSR0), where he put his team's core philosophy on a slide: centralize the data, decentralize the agents. Consolidate the data and the business logic into one warehouse, then give everyone access to it through their agents.
+
+He presented it as the philosophy that lets a small team iterate fast without getting blindsided. Every decision in the rest of this post is that sentence applied to something.
+
+Stripe reached the same principle from the other direction. [Their write-up of Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform) says building it required getting 3 things right:
+
+- scaling expertise without centralizing it
+- meeting users wherever they work
+- enforcing guardrails that don't exist in code
 
 One thing to clarify. Centralizing the data doesn't mean centralizing the interface. "One place to go for everything" is a destination, and destinations were a factor in other tools failing. So the data is what gets pooled. Where you stand when you ask for it should stay wherever you already were.
 
 ### Four requirements
 
-The four deaths flip cleanly into a spec. Each relationship becomes something the layer has to guarantee, rather than something every project has to remember on its own.
+The four deaths flipped cleanly into a spec. Each relationship becomes something the layer has to guarantee, rather than something every project has to remember on its own. My first blueprint for Junto became:
 
-*Location.* It lives where the workday already is, which for a GTM team means Slack. If someone has to decide to go somewhere, you have already lost the argument with their morning.
+Location. It lives where the workday already is, which for a GTM team means Slack. If someone has to decide to go somewhere, you have already lost the argument with their morning.
 
-*Sharing.* Usage is visible by default. Discovery can't be a favor that one person does another, because favors don't scale and the people who most need to find your work are the ones least likely to ask you for it.
+Sharing. Usage is visible by default. Discovery can't be a favor that one person does another, because favors don't scale and the people who most need to find your work are the ones least likely to ask you for it.
 
-*Learning.* Every run can be graded, and the grades reach whoever built the thing. A tool that can't be told it was wrong will be wrong the same way forever.
+Learning. Every run can be graded, and the grades reach whoever built the thing. A tool that can't be told it was wrong will be wrong the same way forever.
 
-*Compounding.* Every output is stored somewhere it can become someone else's input. This is the one that sounds like a storage detail and is actually the whole argument.
+Compounding. Every output is stored somewhere it can become someone else's input. This is the one that sounds like a storage detail and is actually the whole argument.
 
 The difference between a tool and a layer is that a layer has to hold for work that nobody has built yet.
 
@@ -173,15 +201,25 @@ Here is why I think this gap exists at all, which is to nobody's fault. The engi
 
 The risky part was the bet that reps would build things if the substrate carries the hard parts.
 
-The reason I believed reps would build anyway is the same one Keyan Sarrafzadeh at Ramp gave in [their tooling demo with Deepline](https://www.youtube.com/watch?v=LfrzaAr69d4): "salespeople are the most rational users on earth" because "there's a direct correlation between the output of their work and their paycheck," and they're "really not going to waste time on building things that just look cool." If the tooling helps them hit the number, they will use it and extend it. Ramp made that bet before knowing it would pay, and it paid.
+The reason I believed reps would build anyway is the same one Keyan Sarrafzadeh at Ramp gave in [their tooling demo with Deepline](https://www.youtube.com/watch?v=LfrzaAr69d4): "salespeople are the most rational users on earth" because "there's a direct correlation between the output of their work and their paycheck," and they're "really not going to waste time on building things that just look cool."
 
-Being a curious person, I wanted to try and close that gap. If a tool could give reps the foundation to build on top of, then the reps would just have to describe their goals to build. If that bet is wrong, everything after this chapter is wasted motion. I come back to it at the end, because it's the one claim that's still unproven.[^c2-1]
+If the tooling helps them hit the number, they will use it and extend it. Ramp made that bet before knowing it would pay, and it paid off handsomely.
+
+Being the curious person I am, I wanted to close that gap. If a tool could give reps the foundation to build on top of, then the reps would just have to describe their goals to build. If that bet is wrong, everything after this chapter is wasted motion. I come back to it at the end, because it's the one claim that's still unproven.[^c2-1]
 
 ### The shape
 
-So we knew what our surviving tools were and what each was good at. The design in my head at this point was: somewhere to see what others are doing and put your own spin on it, like Outreach or GitHub. The ability to connect the relevant integrations for your role, and creative freedom to build agents that align to how you personally work, like n8n or Cowork. Built on top of one data repo that can push canned plays like a sales insights tool, while giving enough room for AI-forward team members to build on the data like they would in a Claude Code session pointed at an internal GTM repo. Native to the only tool every GTM team member has open all day, Slack. With the visibility to see and improve agent runs, like LangChain.
+So we knew what our surviving tools were and what each was good at. The design in my head at this point was:
 
-I didn't draw that shape unaided. Right as this started, Cerebras [published how they built their internal knowledge base](https://www.cerebras.ai/blog/how-we-built-our-knowledge-base): one shared schema, a connector for every source, threads distilled into notes a question can find. It was answering 15,000 questions a day within three months. I read it before designing anything, and it gave me direction and a useful kind of nerve. [This thread](https://x.com/DBredvick/status/2078150905078206789) restated their design as a numbered list, and point by point it's the shape above. What the list doesn't contain is a single social word. No credit, no remix, no grading. The part that was mine was never the plumbing but everything that makes the plumbing worth sharing.
+- Somewhere to see what others are doing and put your own spin on it, like Outreach or GitHub.
+- The ability to connect the relevant integrations for your role, and creative freedom to build agents that align to how you personally work, like n8n or Cowork.
+- Built on top of one data repo that can push canned plays like a sales insights tool, while giving enough room for AI-forward team members to build on the data like they would in a Claude Code session pointed at an internal GTM repo.
+- Native to the only tool every GTM team member has open all day, Slack.
+- With the visibility to see and improve agent runs, like LangChain.
+
+I didn't draw this shape unaided. Right as I started to research ideas, Cerebras [published how they built their internal knowledge base](https://www.cerebras.ai/blog/how-we-built-our-knowledge-base): one shared schema, a connector for every source, threads distilled into notes a question can find. Nice.
+
+It was answering 15,000 questions a day within three months. I read it before designing anything, and it gave me direction and a useful kind of nerve. [This thread](https://x.com/DBredvick/status/2078150905078206789) restated their design as a numbered list, and point by point it's the shape above:
 
 
 <Diagram
@@ -190,11 +228,17 @@ I didn't draw that shape unaided. Right as this started, Cerebras [published how
   width={400}
 />
 
-I named it Junto, after the club Ben Franklin started for mutual improvement.[^c2-2] What its members did was pool what each of them knew, which was a fair description of what I wanted from a GTM team. One line for what Junto is: a shared, compounding knowledge layer.
+What their list doesn't contain is a single social word. No credit, no remix, no grading.
 
-If you have spent any time in a GTM org you might already have an objection ready. Isn't this just a warehouse? Isn't this enterprise search with extra steps? Why not hand every rep a chatbot and let them get on with it? The short version is that each alternative satisfies some of the four requirements and fails at least one, and the one it usually fails is compounding. Those are the right questions, and they deserve real answers rather than competitive ones, so they get their own section later on.
+I named it Junto, after a club Ben Franklin started for mutual improvement.[^c2-2] Junto members would meet and pool what each of them knew, which was a fair description of what I wanted from a GTM team.
 
-So that's where the design came from. Mapping the survivors as a matrix showed which tool owned which relationship, a clean diagonal with no tool owning a second square. Trying to union the diagonal showed that a tool's relationships stay with its own content and never transfer to the things bolted onto it. Together those two findings fixed the schema this chapter ends on, a layer that things are built on rather than connected to, carrying the four guarantees itself and wearing Slack as its front door. The next question was how much of it I could actually build as an SDR.
+One line for what Junto is: a shared, compounding knowledge layer.
+
+If you've spent any time in a GTM org you might already have an objection ready. Isn't this just a warehouse? Isn't this enterprise search with extra steps? Why not hand every rep a chatbot and let them get on with it?
+
+The short version is that each alternative satisfies some of the four requirements and fails at least one, and the one it usually fails is compounding. Those are the right questions, and they deserve real answers rather than competitive ones, so they get their own section later on.
+
+So that's where the design came from. Mapping the survivors as a matrix showed which tool owned which relationship, a clean diagonal with no tool owning a second square. Trying to union the diagonal showed that a tool's relationships stay with its own content and never transfer to the things bolted onto it. Together those two findings fixed the schema this chapter ends on, a layer that things are built on rather than connected to, carrying the four guarantees itself and wearing Slack as its front door.
 
 [^c2-1]: Proving it needs a second person to build something unprompted, and then a third person to use what the second person built. Neither of those is something you can make happen by working harder, which is what makes it a bet rather than a task.
 
@@ -212,25 +256,25 @@ So that's where the design came from. Mapping the survivors as a matrix showed w
 
 I didn't want this to just pull information from somewhere and deliver it back to Slack. I needed an engine behind the Slack bot that could take plain-text prompts and build multi-step workflows. The parts I identified as difficult for a non-technical person like me were:
 
-- connecting the integrations
-- giving reps a visual composer to see and edit workflows
+- giving every tool an integration for the different tasks that each GTM team has
+- giving reps a visual composer to see and edit workflows on a granular level
 - ensuring that whatever was typed in Slack would actually happen and be created in the visual composer
 
-But if our thesis was that people should stop rebuilding plumbing from zero, then I figured I shouldn't either.
+But if my thesis was that people should stop rebuilding plumbing from zero, then I figured I shouldn't either.
 
-So I went looking for an engine instead of writing one. What I found was an open source workflow engine under an Apache license, a YC company named [Sim](https://sim.ai). It had a visual canvas, tables, a knowledge base, scheduled runs, and an API for executing workflows from outside.
+So I looked for an engine on GitHub instead of writing one. What I found was an open source workflow engine under an Apache license, a YC company named [Sim](https://sim.ai/). It had a visual canvas, tables, a knowledge base, scheduled runs, and an API for executing workflows from outside.
 
 The canvas would be how a rep sees what a play does without reading code. Tables would be where the shared memory lives. Scheduled runs would be how a play fires on a clock instead of waiting to be remembered. And the execution API would be how a bot runs something without a person clicking a button.
 
-Sim is an open source AI workspace, which means a place to build, deploy and run agents and workflows, visually on a canvas or in code. Waleed Latif and Emir Karabeg started it, it went through Y Combinator, and it raised a $7M Series A in November 2025.[^c3-1] In an interview, Emir described the aim as democratizing how agents get built, so that "anyone can build agents, not just developers."[^c3-4] Swap two words and it's close to being Junto's mission too: democratize the way that any rep can build plays.
+Sim is an open source AI workspace, which means a place to build, deploy and run agents and workflows, visually on a canvas or in code. Waleed Latif and Emir Karabeg started it, it went through Y Combinator, and it raised a $7M Series A in November 2025.[^c3-1] In an interview, Emir described the aim as democratizing how agents get built, so that "anyone can build agents, not just developers."[^c3-4]
 
 Junto is built on it, self-hosted as the execution engine, with attribution kept and the license respected.[^c3-2]
 
 ### The constraint
 
-My laptop has 8GB of RAM. Docker capped out almost immediately. And that settled where any of this was going to run.
+My laptop only has 8GB of RAM. Docker capped out almost immediately and that settled where any of this was going to run.
 
-So the engine went onto a rented server instead. Eight virtual CPUs, 16GB of memory, about €25 a month, billed by the hour.
+So the engine is on a rented server instead. Eight virtual CPUs, 16GB of memory, about €25 a month, billed by the hour.
 
 The constraint then made the right choice for me. Server-first from day one, with nothing on my machine but a terminal. Everything built since runs somewhere I could hand to another person.
 
@@ -238,13 +282,17 @@ The constraint then made the right choice for me. Server-first from day one, wit
 
 One rule governed every change I made to the engine: stay thin.
 
-Every change I've ever made to the engine itself fits in one patch file, and the patch is small enough to describe completely. 19 files changed, 107 lines added. 13/19 files are logos and icons, and image bytes are 97% of the patch. The code that changed comes to about 45 lines. 18 more lines of Docker configuration pass brand settings through hooks the engine ships for exactly this purpose. And the executor, the scheduler, the database schema, the API handlers: zero files, zero lines.
+Every change I made to the engine itself fit in one patch file, and the patch is small enough to describe completely.
 
-The deepest change I've made to Sim's code is a 43-line edit to the component that draws the logo. About half of those lines are the comment explaining the change.
+19 files changed, 107 lines added. 13/19 files are logos and icons, and image bytes are 97% of the patch.
+
+The code that changed comes to about 45 lines. 18 more lines of Docker configuration pass brand settings through hooks the engine ships for exactly this purpose. And the executor, the scheduler, the database schema, the API handlers: zero files, zero lines.
+
+The deepest change I've made to Sim's code is a 43-line edit to the component that draws the logo and about half of those lines are vibe coded comments explaining the change.
 
 Everything that makes Junto Junto, the Slack layer, the behavior rules, the credit system, the play contract, lives outside the engine, in services of mine that talk to it over its APIs.
 
-The logic behind my rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges, forever.[^c3-3] Thin changes keep the upgrade path cheap.
+The logic behind my rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges that I'd have to do.[^c3-3] Thin changes can keep the upgrade path cheap.
 
 
 <Diagram
@@ -255,11 +303,17 @@ The logic behind my rule was this: a deep change would be a loan taken out again
 
 ### The setup
 
-The mechanics of standing it up were plainer than I expected. I copied Sim's repository down to the rented server, pointed Docker at its compose file, and put a reverse proxy in front so the canvas would load over a plain HTTP port. The brand settings ride in environment variables the engine ships, and every change I made to the code itself is the one small patch from earlier.
+The mechanics of standing it up were plainer than I expected.
+
+1. I copied Sim's repository down to the rented server
+2. pointed Docker at its compose file
+3. put a reverse proxy in front so the canvas would load over a plain HTTP port.
+
+The brand settings ride in environment variables the engine ships, and every change I made to the code itself is the one small patch from earlier.
 
 ### The road to production
 
-The road from here to something a real company runs on comes down to three things:
+The road from here to something that a company could actually run on now came down to three things:
 
 1. The Slack install, which was nearly done for me already. A Slack app installs once per workspace, not once per person, so putting the bot in front of a whole team is one installation, plus mapping Slack users to reps and deciding who's allowed to see what. Real work, but ordinary work.
 2. Per-rep authentication, which is the next thing to build. Today every run executes under my credentials, because a run triggered through an API key executes as the one user the key belongs to. Building it means giving each rep their own scope on the CRM and the call recordings, so that a run executes as the person who asked for it. Ramp's team reached the same conclusion at scale in their tooling demo with Deepline: auth is the unlock, not the model. In their words, getting the AI to call an API was never the hard part.
@@ -267,9 +321,9 @@ The road from here to something a real company runs on comes down to three thing
 
 ### First receipts
 
-By the end of the first day: all services healthy on the server, the admin UI reachable, seed data loaded into tables, the first workflow saved.
+By the end of the first day: all services were healthy on the server, the admin UI was reachable, seed data loaded into tables, and the first workflow I created in the composer had saved.
 
-Nobody had asked the bot anything (because there was no bot to ask) and nothing impressive had happened yet either, but the ground under everything after this was real, and it was somewhere other than my laptop.
+Nobody had asked the bot anything (because there was no bot to ask) and nothing impressive had happened yet either, but the ground under everything after this was real. Small wins, but accomplishing this was huge, and made me believe that I could in fact ship this.
 
 [^c3-1]: Series A led by Standard Capital, with Perplexity Fund, SV Angel and Y Combinator participating. I'm naming the round because "open source project" and "venture-funded company whose open source project this is" are different things to build on, and the reader deserves to know which one this is.
 
@@ -282,13 +336,28 @@ Nobody had asked the bot anything (because there was no bot to ask) and nothing 
 
 ## The front door
 
-A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot with one name, and that was a decision, not a default.
+Next came the Slack bot. Making a bot survive real users turned out to be enough material for its own essay, so I wrote one: **[What I learned creating a Slack bot](/slack-bot/)**. The lessons live there. What stays here is the part that is Junto's front door.
 
-The alternative shows up fast in any team that starts building. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you get three answers with three sources, and nobody knows which one to trust.[^c4-4] It's the graveyard from the opening section rebuilt inside Slack, except now it pings you.
+A bot, for this purpose, is one name in Slack you can talk to: an account that watches channels, answers when spoken to, and does work behind the scenes. Junto is one bot, a specific decision that I made.
+
+The alternative (many bots in Slack), at least to my mind, could get messy quickly. A bot for research, a bot for signals, a bot for call prep, each with its own name, its own instructions, and its own private copy of the context. Ask three of them the same question and you'd probably get three slightly different answers with different sources, and nobody would know which one to trust.[^c4-4] It's the graveyard from the opening section rebuilt inside Slack, except now it pings you.
 
 ### Ten exits
 
-Every message to Junto passes through one classifier at the front, with ten explicit exits: answer a question, run a play, compose a new one, remix one that already exists, schedule something, discover what is there, ask for clarification, offer help, admit that no source covers this, or just chat.[^c4-1] Nothing runs that wasn't explicitly selected, and there's no default and no fall-through. That last part is what turned "I don't have a source that covers that" from a failure into an answer.
+Every message to Junto passes through one classifier at the front, with ten explicit exits:
+
+- answer a question
+- run a play
+- compose a new play
+- remix a play that already exists
+- schedule something
+- discover what's there
+- ask for clarification
+- offer help
+- admit that no source covers this
+- or just chat[^c4-1]
+
+Nothing runs that wasn't explicitly selected, and there's no default and no fall-through. If I've learned anything during my time building with AI it's that these suckers will not hesitate to make shit up, and it'll usually sound good.
 
 
 <Diagram
@@ -307,8 +376,6 @@ One rule keeps the routing honest: deterministic post-rules outrank the model. T
   height={840}
 />
 
-
-How that classifier grew up, the three seconds a bot gets to acknowledge, the gate that once ate a reply to its own question, and the rest of what it takes for a bot to survive real users became an essay of its own: **[What I learned creating a Slack bot](/slack-bot/)**. This post stays on Junto, and the bot lessons live there.
 
 [^c4-1]: In the code they're ANSWER, RUN, COMPOSE, REMIX, SCHEDULE, DISCOVER, CLARIFY, HELP, SOURCE_MISS and CHAT. Naming them as an enum rather than as behaviors was worth more than it sounds, because you can't add an eleventh exit by accident.
 
@@ -449,6 +516,7 @@ Events are for acting. The index is for asking.
   src="junto-factory-library.png"
   label="Fig. 13"
   caption="Events are for acting, the index is for asking. Work orders fire actions. The filing room answers questions."
+  width={640}
 />
 
 A play is a small workflow a rep builds and runs: watch for something, fetch something, produce something. A typed row is a database row whose kind is declared up front, a signal row or an activity row, so code can rely on its fields. Plays act on typed rows, and that path is deterministic end to end. A detector reads usage and emits signals. A play consumes the signals and does its work, and no model decides any of it. Acting needs types, because a play that fires on a signal can't fire on a vague blob of relevance. The rows are the API.[^c6-1]
@@ -483,7 +551,7 @@ The Junto version is the same method with me removed from the middle and left at
 
 
 <Diagram
-  src="junto-d1-arrives.png"
+  src="junto-data-arrives.png"
   label="Fig. 15"
   caption="Every source is read at the rate it actually changes. Five cadences feeding four typed stores, and current state never written down at all."
 />
@@ -601,51 +669,29 @@ Two small details I thought about more than I probably should have: Recognition 
 
 ## Why not just
 
-Every early demo of Junto ended in the same place, no matter who I was giving it to. Someone nods, waits a polite beat, and asks the question. Why not just use X? It's a fair question, and it deserves a structural answer, not a feature war. Feature grids are where these arguments go to die, because every tool wins some row.
+Every early demo of Junto ended the same way. Someone nods, waits a polite beat, and asks: why not just use X? It's a fair question, and it deserves a structural answer instead of a feature war, because feature grids are where these arguments go to die. Every tool wins some row.
 
-So I run one test on every X. This journal named four deaths: location, sharing, learning, compounding. For each alternative I ask which of the four it closes, and which it leaves dead. A loop either closes or it doesn't, and no feature count changes that.
+So I run one test on every X. This journal named four deaths: location, sharing, learning, compounding. For each alternative I ask which of the four it closes, and which it leaves dead.
 
 ### Why not Zapier?
 
-Why not just wire the plays up in Zapier or n8n? For any single workflow, you could. Those tools have solved workflow execution, solved it years ago, and solved it well. That's exactly why Junto stands on an engine instead of shipping its own. Running steps was never the hard part.[^c8-1] If Junto vanished tomorrow, I'd still keep both on the shortlist for plain plumbing.
-
-What these tools lack is a memory, some record of context that anyone else can see. Every zap is another private copy of context, owned by one person, invisible to the team. When that person leaves, the zap keeps firing until it breaks. It's the graveyard with better uptime. So the test comes back: location half closed at best, and sharing, learning, and compounding all dead.
+For any single workflow, you could. Zapier and n8n solved workflow execution years ago, and solved it well, which is exactly why Junto stands on an engine instead of shipping its own.[^c8-1] What they lack is a shared memory. Every zap is another private copy of context, owned by one person, invisible to the team, and when that person leaves, the zap keeps firing until it breaks. The graveyard with better uptime. Location half closed at best, and sharing, learning, and compounding all dead.
 
 ### Why not a chatbot?
 
-The most common suggestion is the simplest: give every rep an AI chat window and let them go. The reps will love it, because the chats are genuinely good. I know, because I practically live in one. For one question on one afternoon, the chat wins.
-
-But a thousand brilliant private chats compound nothing. My best prompt dies in my history. The next rep's best answer dies in theirs. Nobody learns from a win they never see, and nothing anyone figures out today makes tomorrow's work cheaper. A solo tool dies all four deaths no matter how smart the model is.
-
-The strongest version of this warning comes from the far end of the road. [Stripe's Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), their internal knowledge platform, serves most of their company, and their own roadmap still names the problem: users generate a lot of context in their sessions that is currently locked in, and, in their words, that's not how work gets done. Thousands of sessions a day, and the private-chat death is still the one they're engineering against. That's how strong the default is.
+The most common suggestion is the simplest: give every rep an AI chat window and let them go. The reps will love it, and I know because I practically live in one. For one question on one afternoon, the chat wins. But a thousand brilliant private chats compound nothing. My best prompt dies in my history, the next rep's best answer dies in theirs, and nothing anyone figures out today makes tomorrow's work cheaper. Even [Stripe's Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), serving most of their company, still names this problem on its roadmap: context generated in sessions stays locked in, and in their words, that's not how work gets done. That's how strong the default is.
 
 ### Why not enterprise search?
 
-Enterprise search is the objection I take most seriously, because it half sounds like Junto. Products like Glean are genuinely good at what they built: point one at your docs and it finds the answer faster than any person could. If your problem is that knowledge exists but can't be found, buy one and be done. That's a real job, and search does it better than anything I could write.
-
-But retrieval isn't execution: finding the doc isn't running the play, and search doesn't act on what it finds.
-
-It carries no credit, because nobody runs anything. And it holds no write-safety rules, because it never writes. Junto needed all three, which is why search is one primitive inside it and not the product.
+The objection I take most seriously, because it half sounds like Junto. Products like Glean are genuinely good at what they built. If your problem is that knowledge exists but can't be found, buy one and be done. But retrieval isn't execution. Finding the doc isn't running the play, search carries no credit because nobody runs anything, and it holds no write-safety rules because it never writes. Junto needed all three, which is why search is one primitive inside it and not the product.
 
 ### Why not the internal tier
 
-This objection came from inside the building. Our engineers had already shipped an internal path for hosting static apps, and it's excellent. It was built by people who know hosting, version control, and security far better than I ever will, and my gut knew it. So why build something else? Because that tier is right for exactly what it does, and what it does is front-ends: no data, no actions.
-
-Junto is the tier next to it: data plus action plus Slack. Front-ends live on their tier. Plays that read and write live on ours. The two compose the way layers should.
-
-In their tooling demo with Deepline, Ramp showed the same stack shape, which is part of why I trust it. They have an internal platform called Ramplify where anyone can deploy a web app and share it with teammates, and a governed data-and-action layer underneath that reps reach from their own AI clients. The tiers compose there too.
+This one came from inside the building. Our engineers already ship an internal path for hosting static apps, and it's excellent. It's also front-ends only: no data, no actions. Junto is the tier next to it, data plus action plus Slack, and the two compose the way layers should. Ramp showed the same stack shape in their tooling demo with Deepline. Anyone there can deploy a web app on Ramplify, and a governed data-and-action layer sits underneath. The tiers compose there too.
 
 ### The caveat
 
-Behind every why-not-just there's a bigger question, which is build versus buy. Now I have to answer it against my own interest. I don't think that most teams should build this. I mean that plainly, not as false modesty from a guy who did.
-
-In my mind there are 3 prerequisites:
-
-1. Someone has to feel the pain daily, not hear about it from someone else.
-2. Someone has to have permission to run infrastructure.
-3. The team has to be one that will actually build on top, because a platform nobody builds on is just a bot with opinions.
-
-Miss any one of those 3 criteria and the answer flips. Buy the tools, use them for what they're good at, and be happy. Zapier will run your workflows and search will find your docs, and both will do it better than a thing you built in a hurry. What they won't do is close the four loops, and they don't claim to. But closing loops only pays if someone keeps them closed.
+Behind every why-not-just is build versus buy, and I have to answer it against my own interest: I don't think most teams should build this. Three prerequisites, and missing any one flips the answer. Someone has to feel the pain daily, not hear about it from someone else. Someone has to have permission to run infrastructure. And the team has to be one that will actually build on top, because a platform nobody builds on is just a bot with opinions. If that's not you, buy the tools and be happy. Zapier will run your workflows and search will find your docs, and both will do it better than a thing you built in a hurry. What they won't do is close the four loops, and they don't claim to.
 
 [^c8-1]: Junto is built on Sim, self-hosted as the execution engine. Standing on an engine that already worked is most of why the four loops, and not the plumbing, got the build effort.
 

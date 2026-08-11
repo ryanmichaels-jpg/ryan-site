@@ -54,6 +54,12 @@ The fix was to stop guessing. One classifier at the front, and ten explicit exit
 
 The exits are described to the classifier in plain language, and the descriptions do real work. In [Ramp's tooling demo with Deepline](https://www.youtube.com/watch?v=LfrzaAr69d4), whose internal MCP serves hundreds of reps, they put it on a slide: tool descriptions are the interface. The agent picks from the description, not the code, so a precise description is the difference between a tool that gets called correctly and one that gets misused or ignored.
 
+## The restaurant version
+
+The mechanics are easier to hold as a restaurant. The bot is a waiter. A mention is the waiter coming over to take an order, and the internal queue is the ticket rail in the kitchen, worked by a small crew of line cooks. The dedupe on the message id is the waiter checking the order number against the ledger, because Slack will happily send the same order twice. And two friends debating dessert isn't an order. It might become one if the waiter is standing at the table, and deciding that is the gate's whole job.
+
+The router is the waiter reading the menu against your words. Order chicken and chicken gets made, because chicken is on the menu. Tell them you're feeling seafood and they'll point out a dish or two, but they won't cook one you didn't order. What's good here gets you the popular dishes and the chefs who make them. And steak? There's no steak. The waiter says so instead of improvising one, then adds it to the list of dishes people keep asking for.
+
 ## Mechanical beats model
 
 One rule kept the whole thing honest.
