@@ -201,11 +201,13 @@ Here is why I think this gap exists at all, which is to nobody's fault. The engi
 
 The risky part was the bet that reps would build things if the substrate carries the hard parts.
 
+Notion's experience says the ideas are already there. As Julia Biedry Gonzalez, head of go-to-market innovation at Notion, put it in [her talk with Deepline](https://www.youtube.com/watch?v=4fCKzPW0Gqg): "the constraint isn't really the creativity of our reps, or the ideas that they have about their workflows... it's more about how we bring them together again on that shared context and make sure that they and their agents are working off of that."[^c2-1] Her reps were already building. Her team's job was getting the systems out of their way.
+
 The reason I believed reps would build anyway is the same one Keyan Sarrafzadeh at Ramp gave in [their tooling demo with Deepline](https://www.youtube.com/watch?v=LfrzaAr69d4): "salespeople are the most rational users on earth" because "there's a direct correlation between the output of their work and their paycheck," and they're "really not going to waste time on building things that just look cool."
 
 If the tooling helps them hit the number, they will use it and extend it. Ramp made that bet before knowing it would pay, and it paid off handsomely.
 
-Being the curious person I am, I wanted to close that gap. If a tool could give reps the foundation to build on top of, then the reps would just have to describe their goals to build. If that bet is wrong, everything after this chapter is wasted motion. I come back to it at the end, because it's the one claim that's still unproven.[^c2-1]
+Being the curious person I am, I wanted to close that gap. If a tool could give reps the foundation to build on top of, then the reps would just have to describe their goals to build. If that bet is wrong, everything after this chapter is wasted motion. I come back to it at the end, because it's the one claim that's still unproven.[^c2-2]
 
 ### The shape
 
@@ -230,7 +232,7 @@ It was answering 15,000 questions a day within three months. I read it before de
 
 What their list doesn't contain is a single social word. No credit, no remix, no grading.
 
-I named it Junto, after a club Ben Franklin started for mutual improvement.[^c2-2] Junto members would meet and pool what each of them knew, which was a fair description of what I wanted from a GTM team.
+I named it Junto, after a club Ben Franklin started for mutual improvement.[^c2-3] Junto members would meet and pool what each of them knew, which was a fair description of what I wanted from a GTM team.
 
 One line for what Junto is: a shared, compounding knowledge layer.
 
@@ -240,9 +242,11 @@ The short version is that each alternative satisfies some of the four requiremen
 
 So that's where the design came from. Mapping the survivors as a matrix showed which tool owned which relationship, a clean diagonal with no tool owning a second square. Trying to union the diagonal showed that a tool's relationships stay with its own content and never transfer to the things bolted onto it. Together those two findings fixed the schema this chapter ends on, a layer that things are built on rather than connected to, carrying the four guarantees itself and wearing Slack as its front door.
 
-[^c2-1]: Proving it needs a second person to build something unprompted, and then a third person to use what the second person built. Neither of those is something you can make happen by working harder, which is what makes it a bet rather than a task.
+[^c2-1]: Worth naming, because it cuts against this chapter: what her team built is a set of customer hubs you open inside Notion, and that's a place you go, which is one of the reasons I said tools die. But they work at Notion and they sell Notion, so I'd guess that's where most of their workday already happens.
 
-[^c2-2]: Its members shared a spirit of inquiry and a wish to improve themselves, their community, and the people around them. Mutual improvement was the stated point, and pooling what they knew was the mechanism.
+[^c2-2]: Proving it needs a second person to build something unprompted, and then a third person to use what the second person built. Neither of those is something you can make happen by working harder, which is what makes it a bet rather than a task.
+
+[^c2-3]: Its members shared a spirit of inquiry and a wish to improve themselves, their community, and the people around them. Mutual improvement was the stated point, and pooling what they knew was the mechanism.
 
 
 <Diagram
@@ -530,6 +534,36 @@ Two small details I thought about more than I probably should have: Recognition 
 
 Every early demo of Junto ended the same way. Someone nods, waits a polite beat, and asks: why not just use X? It's a fair question, and it deserves a structural answer instead of a feature war, because feature grids are where these arguments go to die. Every tool wins some row.
 
+### What people actually type
+
+Before the answers, it helps to have something concrete in hand. Here are seven things a rep would type into Slack, and what each one needs underneath it to work.
+
+> @junto a former colleague and an SE met with Contoso about six months ago, before this was my account. What did they ask each other beforehand, what did the customer actually say, and what did they conclude afterward?
+
+One question crossing a Slack thread, a call, and a person who doesn't work here anymore. Slack holds half of it. Gong holds the other half. Neither one knows the other exists, and the person who could have connected them for me is gone.
+
+> @junto someone at Fabrikam raised this pain on a disco call today. Is that specific to their industry, or is everyone saying it?
+
+Call search gives you hits. This needs counts you can trust, which is what the locked vocabulary buys, and it needs to know what industry Fabrikam is in, which is a join to the CRM.
+
+> @junto before I build a sequence around this pain, check it's come up on calls with at least three different companies in at least two industries. If it hasn't, say so and I'll drop it.
+
+This is the one I'd point at if I only got one. It stops a rep from spending a week on something one person said once. No dashboard has ever told anyone not to bother.
+
+> @junto run signal scanner on my book, and if Contoso turned up anything, fold it into my call prep for them.
+
+One play eating another play's output. That's compounding in a single sentence.
+
+> @junto we lost Northwind to Acme. Every Monday, check my open opps for two things. Are they hiring for roles that name Acme's tooling, and is anyone there engaging with Acme on LinkedIn.
+
+> @junto build me a weekly play. Flag an account when three things are true at once. Seats have grown, they've posted a role that touches the problem we solve, and three or more companies within a hundred heads of their size have raised that same problem on a call.
+
+Today there's one detector that reads two sources at once, usage falling inside a renewal window. The general version, where any three sources agree about one account, is architecture I have and code I haven't written.
+
+> @junto a teammate has been prioritizing off his own signal scanner. Take the accounts it ranked hottest last quarter and line them up against what actually became pipeline. I want to know which signals are worth anything.
+
+That last one is the learning loop closing on itself, and it's harder than it looks for a reason worth saying out loud. Reading a teammate's results means reading data that was pulled with his permissions and not mine. So the honest version of that play needs a door built for it rather than a gap left open. Nothing else in this chapter has that problem, because nothing else lets one person's work become another person's input.
+
 So I run one test on every X. This journal named four deaths: location, sharing, learning, compounding. For each alternative I ask which of the four it closes, and which it leaves dead.
 
 ### Why not Zapier?
@@ -546,7 +580,7 @@ The objection I take most seriously, because it half sounds like Junto. Products
 
 ### Why not the internal tier
 
-This one came from inside the building. Our engineers already ship an internal path for hosting static apps, and it's excellent. It's also front-ends only: no data, no actions. Junto is the tier next to it, data plus action plus Slack, and the two compose the way layers should. Ramp showed the same stack shape in their tooling demo with Deepline. Anyone there can deploy a web app on Ramplify, and a governed data-and-action layer sits underneath. The tiers compose there too.
+This one came from inside the building. Our engineers already ship an internal path for hosting static apps, and it's excellent. It's also front-ends only: no data, no actions. Junto is the tier next to it, data plus action plus Slack, and the two compose the way layers should.
 
 ### The caveat
 
@@ -776,6 +810,10 @@ Those are outputs. Outputs are real, and they matter, because for a year nothing
 Here is what I can't show you yet: the loops closing on their own. No demo can prove that a second rep will build unprompted, or that credit will change anyone's behavior. None can prove that knowledge deposited this quarter will change a deal next quarter. Those are outcomes, and outcomes only exist in other people's behavior, over time.
 
 The outcomes are measurable, just not yet by me. Stripe [measures them on Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), their internal knowledge platform: account executives produce twice the sales activity and close 39% more deals in the weeks they use it than the same sellers do in the weeks they don't, and it has shifted 25,000 hours a year from admin work toward revenue work. I'm citing their numbers for one reason. They're what closed loops look like when a whole company keeps them closed, and they're the thing the bet is actually chasing.
+
+Junto writes down every run as it happens. Who asked, which play ran, which constitution version was in force, whether it finished or failed, and how long it took. Every refusal, every account the filter kept out of an outbound list, every time the answer was that no source covers this.
+
+That record is worth having because it's where the three tests above would first show up.
 
 Could we fake one? Eh. Maybe? But where would the fun in that be? That'd be demo theater, possibly the same thing that eventually buried the vendor tools. Every one of those eight had a demo that worked, and every one died anyway. Here are the outcomes, defined.
 
