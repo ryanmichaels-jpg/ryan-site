@@ -538,7 +538,7 @@ Every early demo of Junto ended the same way. Someone nods, waits a polite beat,
 
 Before the answers, it helps to have something concrete in hand. Here are seven things a rep would type into Slack, and what each one needs underneath it to work.
 
-> @junto a former colleague and an SE met with Contoso about six months ago, before this was my account. What did they ask each other beforehand, what did the customer actually say, and what did they conclude afterward?
+> @junto a former colleague and an SE met with Contoso about six months ago, before this was my account. How did they prep, what did they ask each other beforehand, what did the customer actually say, and what did they conclude afterward?
 
 One question crossing a Slack thread, a call, and a person who doesn't work here anymore. Slack holds half of it. Gong holds the other half. Neither one knows the other exists, and the person who could have connected them for me is gone.
 
@@ -659,7 +659,7 @@ One thing I didn't expect: the truer claim was the harder one to keep. When the 
 
 When a play finishes, Junto posts a diagram into the thread. It shows the run's journey: what was asked, what data was touched, what came back. A rep can glance at it and know what the machine just did on their behalf. That was the goal, anyway.
 
-The lazy way, and the way I did it at first, is to ask the model to draw it. The model was there for the whole run. Why not have it sketch what happened? Because a model redrawing its own work will happily draw what should have happened. It draws the plan, not the run, and the two look identical right up until they matter.[^c10-4]
+The lazy way, and the way I did it at first, is to ask the model to draw it. The model was there for the whole run. Why not have it sketch what happened? Because a model redrawing its own work will happily draw what should have happened. It draws the plan, not the run, and the two look identical right up until they matter.[^c10-3]
 
 
 {/* TK: [NEEDS FACT: a specific early example where the model drew what should have happened instead of what did] */}
@@ -698,7 +698,7 @@ The version that worked for me was a top-down graph where the arrow is the repor
 
 And the chart has an opinion. Functions outside the buying center simply don't render. How does the chart know who the buying center is? The list of functions that count as the buying center is configuration, an allowlist, not a model's guess. The caption says so, with a count,[^c10-2] so nobody mistakes the filter for the whole company. What does render is ranked by relevance, never silently cut. If the chart drops something, it tells you what it dropped, and how much.
 
-As for where the people come from: the chart doesn't discover anyone. Names, titles, and reporting lines are read from the contact records already in the CRM, and the renderer only draws what those records say. If the CRM is missing a person, so is the chart, and the caption's counts make that visible.[^c10-3]
+As for where the people come from: the chart doesn't discover anyone. Names, titles, and reporting lines are read from the contact records already in the CRM, and the renderer only draws what those records say. If the CRM is missing a person, so is the chart, and the caption's counts make that visible.
 
 ### Pictures are tests
 
@@ -721,11 +721,9 @@ So render failures are loud now, the same rule chapter 4 landed on for everythin
 
 [^c10-1]: Deterministic here means the same trace yields the same bytes. If layout depended on anything outside the trace, the snapshot tests below wouldn't hold.
 
-[^c10-3]: In my opinion, this is a gap in functionality, because our CRM doesn't always reflect the most recent records. Currently we list a confidence score for how confident we're that a contact is still at the company, calculated from the last outreach GTM or marketing sent them. The airtight way to be 100% confident they're still there would be running HarvestAPI to scrape their LinkedIn Sales Navigator, which I'm currently weighing whether to implement.
-
 [^c10-2]: The count in the caption matters. A filter that hides things without saying how many it hid is just a lie with good manners.
 
-[^c10-4]: [Turpin et al.](https://arxiv.org/abs/2305.04388) (NeurIPS 2023) named the mechanism: models produce plausible step-by-step explanations that never mention what actually drove the answer. [Anthropic measured a newer version in 2025](https://www.anthropic.com/research/reasoning-models-dont-say-think) and found frontier models mention the hint they actually used in about 25% of the cases where they used it. Both study reasoning traces rather than an agent redrawing its own tool run, so this is evidence for the failure mode and not for my instance of it.
+[^c10-3]: [Turpin et al.](https://arxiv.org/abs/2305.04388) (NeurIPS 2023) named the mechanism: models produce plausible step-by-step explanations that never mention what actually drove the answer. [Anthropic measured a newer version in 2025](https://www.anthropic.com/research/reasoning-models-dont-say-think) and found frontier models mention the hint they actually used in about 25% of the cases where they used it. Both study reasoning traces rather than an agent redrawing its own tool run, so this is evidence for the failure mode and not for my instance of it.
 
 
 ## Files are the memory
