@@ -9,6 +9,11 @@ tags: ['build journal', 'gtm engineering']
 import Diagram from '../../components/Diagram.astro';
 import Lede from '../../components/Lede.astro';
 
+<Diagram
+  src="junto-intro.gif"
+/>
+
+
 ## TL;DR
 
 I built a shared context layer for GTM. Nobody asked me to. I've just watched almost every AI project our team built stop getting used. None of them broke. They quietly stopped mattering, which turned out to be the more interesting problem. The thing I built is called Junto. It lives in Slack, and you build agents on top of it.
@@ -17,12 +22,6 @@ I built a shared context layer for GTM. Nobody asked me to. I've just watched al
 - **The argument.** What all of them were missing was relationships. To the workday, to teammates, to their own failures, and to every other piece of work.
 - **The approach.** A layer. The projects were a place you had to go, and a place we had to go competed with our day until it eventually lost. A layer is what other things get built on, and it carries those four relationships itself, so nothing built on top has to remember them.
 - **The output.** Two surfaces. Slack as the front door, and a composer where a play is editable blocks on a canvas, built from 1,000+ triggers and integrations. Underneath, an open source engine self-hosted, four typed stores and one flat index. A constitution injected at exactly one seam, a deterministic linter that outranks the model, and the rules that must always hold living below the model where there's nothing to persuade. Every answer comes back with a diagram drawn from the run's own trace, and every play carries who built it, so remixing someone's work pays them.
-
-
-<Diagram
-  src="junto-intro.gif"
-/>
-
 
 ## The Systems Thinker
 

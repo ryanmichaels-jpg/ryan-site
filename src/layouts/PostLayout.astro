@@ -17,6 +17,9 @@ const { title, dek, date, draft = false, words, headings } = Astro.props;
 // depth 2 is a chapter. The footnotes heading is injected by GFM and is
 // screen-reader-only, so it never belongs in the rail.
 const chapters = headings.filter((h) => h.depth === 2 && h.slug !== 'footnote-label');
+// A leading TL;DR is not a chapter. When one is present the numbering starts
+// at 00 so the first real chapter is still 01, in the rail and in the margin.
+const hasTldr = chapters.length > 0 && /^tl;?\s*dr$/i.test((chapters[0].text || '').trim());
 const stamp = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
@@ -39,7 +42,7 @@ const stamp = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long',
             {chapters.map((c, i) => (
               <li>
                 <a href={`#${c.slug}`} data-rail={c.slug}>
-                  <span class="rail__n">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="rail__n">{String(hasTldr ? i : i + 1).padStart(2, '0')}</span>
                   <span class="rail__t">{c.text}</span>
                 </a>
               </li>
@@ -49,7 +52,7 @@ const stamp = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long',
       )
     }
 
-    <div class="prose prose--chaptered">
+    <div class={`prose prose--chaptered${hasTldr ? ' prose--zero' : ''}`}>
       <slot />
     </div>
 
@@ -193,6 +196,7 @@ const stamp = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long',
 
   /* Numbered chapters, numeral hung in the left margin when there's room. */
   .prose--chaptered { counter-reset: chapter; }
+  .prose--zero { counter-reset: chapter -1; }
   .prose--chaptered h2 { counter-increment: chapter; position: relative; }
   .prose--chaptered h2::before {
     content: counter(chapter, decimal-leading-zero);
