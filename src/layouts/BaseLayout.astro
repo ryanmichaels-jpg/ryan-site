@@ -9,9 +9,14 @@ interface Props {
   home?: boolean;
   /** Post pages: widen the shell so figures have somewhere to go. */
   wide?: boolean;
+  /** Link-preview image, root-relative (e.g. "/figures/og-junto.png"). Without
+   *  one, iMessage and Slack scrape the page and pick a figure at random. */
+  image?: string;
 }
 
-const { title, description = site.tagline, home = false, wide = false } = Astro.props;
+const { title, description = site.tagline, home = false, wide = false, image = '/og-default.png' } = Astro.props;
+const ogImage = new URL(image, Astro.site);
+const ogUrl = new URL(Astro.url.pathname, Astro.site);
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name}`;
 ---
 
@@ -28,7 +33,10 @@ const pageTitle = title ? `${title} — ${site.name}` : `${site.name}`;
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
+    <meta property="og:url" content={ogUrl} />
+    <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />

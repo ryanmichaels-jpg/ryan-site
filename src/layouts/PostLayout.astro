@@ -13,7 +13,7 @@ interface Props {
   headings: Heading[];
 }
 
-const { title, dek, date, draft = false, words, headings } = Astro.props;
+const { title, dek, date, draft = false, words, headings, image } = Astro.props;
 // depth 2 is a chapter. The footnotes heading is injected by GFM and is
 // screen-reader-only, so it never belongs in the rail.
 const chapters = headings.filter((h) => h.depth === 2 && h.slug !== 'footnote-label');
@@ -23,7 +23,7 @@ const hasTldr = chapters.length > 0 && /^tl;?\s*dr$/i.test((chapters[0].text || 
 const stamp = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<BaseLayout title={title} description={dek} wide>
+<BaseLayout title={title} description={dek} image={image} wide>
   <article class="shell post">
     <header class="post__head">
       <h1>{title}</h1>
