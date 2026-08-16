@@ -1,20 +1,30 @@
 ---
-title: Building a shared memory for GTM
+title: Building a shared context layer for GTM
 dek: A build journal for Junto, the shared layer I built so that go-to-market work would stop dying at demo day.
 date: 2026-07-30
-draft: true
+draft: false
 tags: ['build journal', 'gtm engineering']
 ---
 
 import Diagram from '../../components/Diagram.astro';
 import Lede from '../../components/Lede.astro';
 
+## TL;DR
+
+I built a shared context layer for GTM. Nobody asked me to. I've just watched almost every AI project our team built stop getting used. None of them broke. They quietly stopped mattering, which turned out to be the more interesting problem. The thing I built is called Junto. It lives in Slack, and you build agents on top of it.
+
+- **The problem.** Projects, whether they were Claude projects, dashboards, or platforms we purchased, eventually died. We were all working from different pages. Everyone had their own version of what worked, nobody could see what anyone else had built, and nothing one person figured out made the next person's job easier.
+- **The argument.** What all of them were missing was relationships. To the workday, to teammates, to their own failures, and to every other piece of work.
+- **The approach.** A layer. The projects were a place you had to go, and a place we had to go competed with our day until it eventually lost. A layer is what other things get built on, and it carries those four relationships itself, so nothing built on top has to remember them.
+- **The output.** Two surfaces. Slack as the front door, and a composer where a play is editable blocks on a canvas, built from 1,000+ triggers and integrations. Underneath, an open source engine self-hosted, four typed stores and one flat index. A constitution injected at exactly one seam, a deterministic linter that outranks the model, and the rules that must always hold living below the model where there's nothing to persuade. Every answer comes back with a diagram drawn from the run's own trace, and every play carries who built it, so remixing someone's work pays them.
+
+
 <Diagram
   src="junto-intro.gif"
 />
 
 
-## Nothing broke
+## The Systems Thinker
 
 <Lede>
 Every AI project our GTM team built ended up dying. Off the top of my head I can count eight over the last year, many of them mine, some built by teammates, even some that we bought from vendors. Before building something else, I wanted to know what was killing everything.
@@ -58,7 +68,6 @@ Which led us to our final and best question yet: what did each of the projects l
 <Diagram
   src="junto-death-loop.png"
   label="Fig. 2"
-  caption="Every dead project, one loop. Each turn makes the next one quieter, and the balancing loop that would have forced a decision never fired once."
 />
 
 ### 4 relationships
@@ -100,7 +109,6 @@ Slack was location, Gong was learning, Outreach and GitHub were sharing,[^c1-2] 
 <Diagram
   src="junto-four-relationships.png"
   label="Fig. 3"
-  caption="Between them the survivors cover all four. Not one of the eight covered any."
   width={620}
 />
 
@@ -129,7 +137,7 @@ I had no idea what that would look like, but I knew what world I wanted to live 
 [^c1-4]: Stripe's engineering write-up of Kai, "[Meet Stripe's Knowledge AI Platform](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform)" (stripe.dev, 2026). It's the largest public deployment of the shape this post is about, and the adoption numbers are worth the read on their own: most of Stripe using it within two weeks of launch, and 83% of the company weekly active, including nearly all of GTM.
 
 
-## A layer, not a tool
+## Decentralized, centralized
 
 So our hypothesis was now: the scarce thing is shared memory. Could we just connect the tools together to get one?
 
@@ -150,7 +158,6 @@ Run any combination through the grid and the residue is the same: at least two r
 <Diagram
   src="junto-punnett.png"
   label="Fig. 4"
-  caption="No combination of the survivors reaches a green square. The layer and the social loop are the squares the rest of this post is about."
 />
 
 This led me to believe that the four relationships needed to be properties of the substrate a thing is built on, which is the difference between an integration and a layer. In other words, the survivors were places where work ended up. Everything I had built was a place you had to go.
@@ -252,11 +259,10 @@ So that's where the design came from. Mapping the survivors as a matrix showed w
 <Diagram
   src="junto-structure.png"
   label="Fig. 6"
-  caption="Centralize the data, decentralize the builders. Sources in, one shared layer, and every surface feeding back into it."
 />
 
 
-## Someone else's engine
+## Finding the backend
 
 I didn't want this to just pull information from somewhere and deliver it back to Slack. I needed an engine behind the Slack bot that could take plain-text prompts and build multi-step workflows. The parts I identified as difficult for a non-technical person like me were:
 
@@ -274,7 +280,7 @@ The canvas would be how a rep sees what a play does without reading code. Tables
 <Diagram
   src="junto-sim-browse.gif"
   label="Fig. 7"
-  caption="A workflow is a sequence of steps built from 1,000+ triggers, integrations, and blocks."
+  caption="Five workflows on the canvas, each one built by describing it in a sentence."
   width={816}
 />
 
@@ -310,7 +316,6 @@ The logic behind my rule was this: a deep change would be a loan taken out again
 <Diagram
   src="junto-stay-thin.png"
   label="Fig. 8"
-  caption="Thin changes are paid for once. A deep one is re-merged at every release after it."
 />
 
 ### The setup
@@ -332,13 +337,12 @@ Nobody had asked the bot anything (because there was no bot to ask) and nothing 
 [^c3-1]: [Ray and Kim](https://doi.org/10.1145/2393596.2393659) measured this across eighteen years of the BSD forks (FSE 2012): between 10.7 and 15.5% of all patch lines were edits being re-ported between forks, work that occupied 26 to 59% of active developers in a release, and the porting rate does not necessarily decrease over time. That last clause is the whole point. The interest never tapers. Their setting is peer forks rather than a thin fork tracking an upstream, so what I'm borrowing is the shape and not the number.
 
 
-## The Slack bot
+## Building the Slack bot
 
 
 <Diagram
   src="junto-app-card.png"
   label="Fig. 9"
-  caption="One name in Slack, and one line for what it is."
   width={360}
 />
 
@@ -347,7 +351,7 @@ Junto needed a front door: a bot in Slack, one name you can talk to, that watche
 I built one, and making it survive real users turned out to be a story of its own. The one-bot decision, the ten exits, the rules that get the last word, and the tests that beat on all of it live in their own essay: **[What I learned creating a Slack bot](/slack-bot/)**. From here on, this post assumes the bot exists and behaves. How it earned that is over there.
 
 
-## The shared memory
+## Building the context layer
 
 The layer's first design question was what its atomic unit should be. It's the same question Cerebras answered for their internal knowledge base. And in the talk Chris gave in Modal's session with Deepline, it's the question he answered with one pipeline: Modal's GTM engineering runs everything through one batch pipeline that decides what reaches the CRM, on the principle that everything a rep sees must be accurate enough to inspire trust. What counts as "something happened" in GTM? A deal changes stage. An email goes out. A customer says one sentence on a call that everyone on the deal should hear. A thread argues for a day and lands somewhere. All of that is something happening, and all of it arrives in different forms.
 
@@ -359,7 +363,6 @@ Chapter 1 answers this in reverse. The dead projects all produced outputs that b
 <Diagram
   src="junto-d3-normalization.png"
   label="Fig. 10"
-  caption="Everything is qualified before a model touches it. Four questions, four shapes of row, one projection, and evidence filtered by who is asking."
 />
 
 
@@ -388,7 +391,6 @@ Events are for acting. The index is for asking.
 <Diagram
   src="junto-factory-library.png"
   label="Fig. 12"
-  caption="Events are for acting, the index is for asking. Work orders fire actions. The filing room answers questions."
   width={640}
 />
 
@@ -406,7 +408,6 @@ My 2025 transcript tagging strategy was bad in a way that took a few dozen calls
 <Diagram
   src="junto-d2-call-tagged.png"
   label="Fig. 13"
-  caption="One call becomes many moments, and the seller half never gets tagged at all. Every moment is stamped twice, checked against the transcript, and then sorted. Anything under 0.7 goes to a person."
 />
 
 
@@ -426,7 +427,6 @@ The Junto version is the same method with me removed from the middle and left at
 <Diagram
   src="junto-data-arrives.png"
   label="Fig. 14"
-  caption="Every source is read at the rate it actually changes. Five cadences feeding four typed stores, and current state never written down at all."
 />
 
 
@@ -456,7 +456,6 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 <Diagram
   src="junto-widget-normalize-event.html"
   label="Fig. 16"
-  caption="Pick something that happens at a company. If a connector watches it, you get the row it becomes. If nothing does, you get told so."
   height={900}
 />
 
@@ -488,11 +487,11 @@ Where I diverge from them is as follows: their product answers questions, so eve
 [^c6-5]: [Cho and Garcia-Molina](https://oak.cs.ucla.edu/~cho/papers/cho-tods03.pdf) (ACM TODS 2003) is the foundational result here, and it says something more awkward than "match the rate." Under a fixed budget, reading in proportion to change isn't optimal, and the fastest-changing sources should be read deliberately less often than their churn suggests. [Azar and colleagues](https://erichorvitz.com/Crawl_1801519115.full.pdf) (PNAS 2018) gave it a shape, with optimal frequency rising sublinearly with change rate. The Slack rule above is the clearest case of this: threads change constantly and I wait two quiet hours anyway, because a thread isn't a knowledge unit until it stops moving.
 
 
-## Credit is a feature
+## Thank You as a feature
 
 ### The other lesson
 
-Back in the nothing-broke section I mentioned the thing that ended up shaping this whole project: I never once discovered a teammate's sequence by browsing. Every sequence I ever used was handed to me after a conversation. Someone mentioned a trick in a thread, or over lunch, and I asked for it. The handoff was the whole distribution system, and nobody called it that. The library sat there the whole time, full and mostly unread.
+Back in the first chapter I mentioned the thing that ended up shaping this whole project: I never once discovered a teammate's sequence by browsing. Every sequence I ever used was handed to me after a conversation. Someone mentioned a trick in a thread, or over lunch, and I asked for it. The handoff was the whole distribution system, and nobody called it that. The library sat there the whole time, full and mostly unread.
 
 Why did browsing fail? Probably because a sequence out of context is just a list of email/call/LinkedIn steps. The conversation was the part that told me when to use it and why it worked. So I made Junto deliberately not lead with a library. There's one, but it's not the front door.
 
@@ -506,7 +505,6 @@ Every output a play produces carries its origin with it: who built it, how many 
 <Diagram
   src="junto-thank-builder.png"
   label="Fig. 17"
-  caption="Every output carries who built it and how many times it has run. The counters keep themselves. The button is the only part a person has to do."
   width={520}
 />
 
@@ -526,7 +524,6 @@ Remix is a button on every play. But pressing it opens a conversation, not a for
 <Diagram
   src="junto-remix-button.png"
   label="Fig. 18"
-  caption="Remix sits beside Run. Pressing it opens a conversation, not a form."
   width={500}
 />
 
@@ -548,7 +545,6 @@ Ramp settled any doubt I had about this direction. In their tooling demo with De
 <Diagram
   src="junto-ramp-flywheel.png"
   label="Fig. 19"
-  caption="Ramp's flywheel, as Keyan Sarrafzadeh described it in their tooling demo with Deepline. Their loop, my redraw."
 />
 
 Two small details I thought about more than I probably should have: Recognition thresholds only count runs by other people, so running your own play a hundred times moves nothing. Status has a single source, which is a teammate finding your work useful enough to run it. And plays are ranked only within their own kind, so the small, sharp thing built for three people is never measured against the daily digest the whole team runs. What a second status number does to a GTM team over a year, I don't know yet.
@@ -558,7 +554,7 @@ Two small details I thought about more than I probably should have: Recognition 
 [^c7-2]: The caps are a design choice, not a finding. The study says thanks works. It says nothing about how often a bot should prompt for it.
 
 
-## Why not just
+## Why not just use
 
 Every early demo of Junto ended the same way. Someone nods, waits a polite beat, and asks: why not just use X? It's a fair question, and it deserves a structural answer instead of a feature war, because feature grids are where these arguments go to die. Every tool wins some row.
 
@@ -615,7 +611,7 @@ Behind every why-not-just is build versus buy, and I have to answer it against m
 [^c8-1]: Junto is built on Sim, self-hosted as the execution engine. Standing on an engine that already worked is most of why the four loops, and not the plumbing, got the build effort.
 
 
-## Edits that stick
+## Wiring Slack to the backend
 
 ### The mirror
 
@@ -623,7 +619,7 @@ Behind every why-not-just is build versus buy, and I have to answer it against m
 <Diagram
   src="junto-sim-composer.gif"
   label="Fig. 20"
-  caption="The composer, cut together from one sitting: the workspace tabs, the integrations, and a Google Calendar and Notion node added to a live play."
+  caption="The composer. Tables hold the rows, files hold the documents, and knowledge bases hold what a play can search."
 />
 
 
@@ -677,7 +673,7 @@ One thing I didn't expect: the truer claim was the harder one to keep. When the 
 [^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
 
-## Drawn from the trace
+## Making Junto draw
 
 ### The temptation
 
@@ -750,7 +746,7 @@ So render failures are loud now, the same rule chapter 4 landed on for everythin
 [^c10-3]: [Turpin et al.](https://arxiv.org/abs/2305.04388) (NeurIPS 2023) named the mechanism: models produce plausible step-by-step explanations that never mention what actually drove the answer. [Anthropic measured a newer version in 2025](https://www.anthropic.com/research/reasoning-models-dont-say-think) and found frontier models mention the hint they actually used in about 25% of the cases where they used it. Both study reasoning traces rather than an agent redrawing its own tool run, so this is evidence for the failure mode and not for my instance of it.
 
 
-## Files are the memory
+## Files as memory
 
 ### The notebook for building Junto
 
@@ -808,7 +804,7 @@ I didn't reconstruct this story from old messages and hindsight. I opened the fo
 [^c11-1]: 417 is where the count stood the morning the merge froze. The suite has grown since. The two bugs turned up in ordinary live use, not in any clever hunt.
 
 
-## A play outlives its builder
+## A working demo
 
 Every chapter so far reported something that happened. This closing one has to report what hasn't happened yet. Chapter 1 opened with eight projects that died quietly in a year: nothing broke, nobody complained, and nobody decided anything. This chapter says what would count as the opposite.
 

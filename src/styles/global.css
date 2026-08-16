@@ -144,8 +144,8 @@ a:focus-visible { outline: 2px solid var(--ink-mute); outline-offset: 3px; borde
   margin: 1.8em auto;
   padding-left: 1.2rem;
   border-left: 2px solid var(--rule);
-  font-style: italic;
-  font-variation-settings: 'opsz' 20;
+  font-style: normal;
+  font-variation-settings: 'opsz' 32;
   color: var(--ink-soft);
 }
 .prose blockquote p { margin: 0; }
