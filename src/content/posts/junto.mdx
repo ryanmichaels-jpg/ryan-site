@@ -242,7 +242,7 @@ The short version is that each alternative satisfies some of the four requiremen
 
 So that's where the design came from. Mapping the survivors as a matrix showed which tool owned which relationship, a clean diagonal with no tool owning a second square. Trying to union the diagonal showed that a tool's relationships stay with its own content and never transfer to the things bolted onto it. Together those two findings fixed the schema this chapter ends on, a layer that things are built on rather than connected to, carrying the four guarantees itself and wearing Slack as its front door.
 
-[^c2-1]: Worth naming, because it cuts against this chapter: what her team built is a set of customer hubs you open inside Notion, and that's a place you go, which is one of the reasons I said tools die. But they work at Notion and they sell Notion, so I'd guess that's where most of their workday already happens.
+[^c2-1]: Worth naming, because it cuts against this chapter: what her team built is a set of customer hubs you open inside Notion, and that's a place you go, which is one of the reasons I said tools die. But they work at Notion and they're selling Notion, so I'd guess Notion is where most of their workday is already happening.
 
 [^c2-2]: Proving it needs a second person to build something unprompted, and then a third person to use what the second person built. Neither of those is something you can make happen by working harder, which is what makes it a bet rather than a task.
 
@@ -270,9 +270,17 @@ So I looked for an engine on GitHub instead of writing one. What I found was an 
 
 The canvas would be how a rep sees what a play does without reading code. Tables would be where the shared memory lives. Scheduled runs would be how a play fires on a clock instead of waiting to be remembered. And the execution API would be how a bot runs something without a person clicking a button.
 
-Sim is an open source AI workspace, which means a place to build, deploy and run agents and workflows, visually on a canvas or in code. Waleed Latif and Emir Karabeg started it, it went through Y Combinator, and it raised a $7M Series A in November 2025.[^c3-1] In an interview, Emir described the aim as democratizing how agents get built, so that "anyone can build agents, not just developers."[^c3-4]
 
-Junto is built on it, self-hosted as the execution engine, with attribution kept and the license respected.[^c3-2]
+<Diagram
+  src="junto-sim-browse.gif"
+  label="Fig. 7"
+  caption="The engine's canvas. A workflow is a row of blocks you can build from 1,000+ triggers, integrations, and blocks without writing any code."
+  width={816}
+/>
+
+Sim is an open source AI workspace, which means a place to build, deploy and run agents and workflows, visually on a canvas or in code. Waleed Latif and Emir Karabeg started it, it went through Y Combinator, and it raised a $7M Series A in November 2025. In an interview, Emir described the aim as democratizing how agents get built, so that "anyone can build agents, not just developers."
+
+Junto is built on it, self-hosted as the execution engine, with attribution kept and the license respected.
 
 ### The constraint
 
@@ -296,12 +304,12 @@ The deepest change I've made to Sim's code is a 43-line edit to the component th
 
 Everything that makes Junto Junto, the Slack layer, the behavior rules, the credit system, the play contract, lives outside the engine, in services of mine that talk to it over its APIs.
 
-The logic behind my rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges that I'd have to do.[^c3-3] Thin changes can keep the upgrade path cheap.
+The logic behind my rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges that I'd have to do.[^c3-1] Thin changes can keep the upgrade path cheap.
 
 
 <Diagram
   src="junto-stay-thin.png"
-  label="Fig. 7"
+  label="Fig. 8"
   caption="Thin changes are paid for once. A deep one is re-merged at every release after it."
 />
 
@@ -321,16 +329,13 @@ By the end of the first day: all services were healthy on the server, the admin 
 
 Nobody had asked the bot anything (because there was no bot to ask) and nothing impressive had happened yet either, but the ground under everything after this was real. Small wins, but accomplishing this was huge, and made me believe that I could in fact ship this.
 
-[^c3-1]: Series A led by Standard Capital, with Perplexity Fund, SV Angel and Y Combinator participating. I'm naming the round because "open source project" and "venture-funded company whose open source project this is" are different things to build on, and the reader deserves to know which one this is.
-
-[^c3-2]: Two bugs are worth naming, as feedback rather than complaint. The engine's live-update channel assumes a websocket it can reach directly, so behind a plain HTTP port it needs a reverse proxy in front before the canvas comes alive. And when self-hosting, the knowledge base's embedding key has to be set in two places, once in the container's environment and once in the engine's own settings store. Neither is really a defect. They're what happens when software runs somewhere it has never run, and finding them is part of what a self-hoster is for.
-
-[^c3-4]: ["Sim: The Visual, End-to-End Agent Builder"](https://www.youtube.com/watch?v=mJO10CL-FGI), on YouTube, at 19:26. He self-corrects mid-sentence, from "the way that developers build agents" to "anyone can build agents not just developers," so the quoted fragment is his words in his order with the stumble left out and nothing added.
-
-[^c3-3]: [Ray and Kim](https://doi.org/10.1145/2393596.2393659) measured this across eighteen years of the BSD forks (FSE 2012): between 10.7 and 15.5% of all patch lines were edits being re-ported between forks, work that occupied 26 to 59% of active developers in a release, and the porting rate does not necessarily decrease over time. That last clause is the whole point. The interest never tapers. Their setting is peer forks rather than a thin fork tracking an upstream, so what I'm borrowing is the shape and not the number.
+[^c3-1]: [Ray and Kim](https://doi.org/10.1145/2393596.2393659) measured this across eighteen years of the BSD forks (FSE 2012): between 10.7 and 15.5% of all patch lines were edits being re-ported between forks, work that occupied 26 to 59% of active developers in a release, and the porting rate does not necessarily decrease over time. That last clause is the whole point. The interest never tapers. Their setting is peer forks rather than a thin fork tracking an upstream, so what I'm borrowing is the shape and not the number.
 
 
 ## The Slack bot
+
+
+{/* TK: [SCREENSHOT: the Junto app card in Slack, icon plus name plus the one-line description] */}
 
 Junto needed a front door: a bot in Slack, one name you can talk to, that watches channels, answers when spoken to, and does work behind the scenes.
 
@@ -348,7 +353,7 @@ Chapter 1 answers this in reverse. The dead projects all produced outputs that b
 
 <Diagram
   src="junto-d3-normalization.png"
-  label="Fig. 8"
+  label="Fig. 9"
   caption="Everything is qualified before a model touches it. Four questions, four shapes of row, one projection, and evidence filtered by who is asking."
 />
 
@@ -363,7 +368,7 @@ Everything arriving from every source gets qualified first: deduped, thresholded
 
 <Diagram
   src="junto-d4-row-anatomy.png"
-  label="Fig. 9"
+  label="Fig. 10"
   caption="Every field in all four stores, and who writes each one. Underneath them, the single comparable shape they all project into before a question ever reaches them."
 />
 
@@ -377,7 +382,7 @@ Events are for acting. The index is for asking.
 
 <Diagram
   src="junto-factory-library.png"
-  label="Fig. 10"
+  label="Fig. 11"
   caption="Events are for acting, the index is for asking. Work orders fire actions. The filing room answers questions."
   width={640}
 />
@@ -390,12 +395,12 @@ Questions work differently. A question here is a rep asking Junto something in p
 
 One of the four shapes has a longer story than the others, and it's kinda the one the whole layer learned its discipline from. Before any of this was a pipeline, before I had subjected myself to the power of Claude Code, it was me, in 2025, pasting transcripts into a chat window, one call at a time.
 
-My 2025 transcript tagging strategy was bad in a way that took a few dozen calls to see, unfortunately. I'd paste a transcript, ask for the pains, and get back a list that was plausible and quietly useless, because about half of it was my own side of the call. Reps voice pain on the buyer's behalf constantly. I had built a machine that read my own pitch back to me, with a citation. I learned from the 2025 mistakes. Step zero of the revised plan became simple speaker hygiene: label every speaker buyer or seller, and throw the seller's speech away before tagging a word of it. With the revised plan I tagged every new-business call from 2026, about 400 of them.
+My 2025 transcript tagging strategy was bad in a way that took a few dozen calls to see, unfortunately. I'd paste a transcript, ask for the pains, and get back a list that was plausible and quietly useless, because about half of it was my own side of the call. Reps voice pain on the buyer's behalf constantly. I had built a machine that read my own pitch back to me, with a citation. I learned from the 2025 mistakes. Step zero of the revised plan became simple speaker hygiene: label every speaker buyer or seller, and throw the seller's speech away before tagging a word of it. With the revised plan I tagged every new-business call from 2026, more than 1,000 of them at the time of writing this.
 
 
 <Diagram
   src="junto-d2-call-tagged.png"
-  label="Fig. 11"
+  label="Fig. 12"
   caption="One call becomes many moments, and the seller half never gets tagged at all. Every moment is stamped twice, checked against the transcript, and then sorted. Anything under 0.7 goes to a person."
 />
 
@@ -415,7 +420,7 @@ The Junto version is the same method with me removed from the middle and left at
 
 <Diagram
   src="junto-data-arrives.png"
-  label="Fig. 12"
+  label="Fig. 13"
   caption="Every source is read at the rate it actually changes. Five cadences feeding four typed stores, and current state never written down at all."
 />
 
@@ -437,7 +442,7 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 
 <Diagram
   src="junto-d8-road.png"
-  label="Fig. 13"
+  label="Fig. 14"
   caption="Four stages, and the only one that involves a model is the answer at the end. Everything before it is deterministic, and most of what arrives never gets past the second box."
 />
 
@@ -445,7 +450,7 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 
 <Diagram
   src="junto-widget-normalize-event.html"
-  label="Fig. 14"
+  label="Fig. 15"
   caption="Pick something that happens at a company. If a connector watches it, you get the row it becomes. If nothing does, you get told so."
   height={900}
 />
@@ -461,7 +466,9 @@ I already said in the layer section that I read how Cerebras built their interna
 
 Their write-up gave me direction.
 
-[A thread by Drew Bredvick](https://x.com/DBredvick/status/2078150905078206789) restating their architecture pulled six figures of views, and I thought his compression of it was beautiful: normalize your business into a set of events.
+[A thread by Drew Bredvick](https://x.com/DBredvick/status/2078150905078206789) restating their architecture pulled six figures of views, and I thought his compression of it was beautiful:
+
+> Normalize your business into a set of events.
 
 Where I diverge from them is as follows: their product answers questions, so everything can be one shape: evidence for an answer. Junto acts, and acting needs types, which is why there are four stores for acting and one index for asking. And nothing in their write-up touches provenance, credit, or feedback, because a Q&A system doesn't need them. The part that I was determined to build was everything on top of it.
 
@@ -482,7 +489,7 @@ Where I diverge from them is as follows: their product answers questions, so eve
 
 Back in the nothing-broke section I mentioned the thing that ended up shaping this whole project: I never once discovered a teammate's sequence by browsing. Every sequence I ever used was handed to me after a conversation. Someone mentioned a trick in a thread, or over lunch, and I asked for it. The handoff was the whole distribution system, and nobody called it that. The library sat there the whole time, full and mostly unread.
 
-Why did browsing fail? Because a sequence out of context is just a list of steps. The conversation was the part that told me when to use it and why it worked. So I made Junto deliberately not lead with a library. There's one, but it's not the front door.
+Why did browsing fail? Probably because a sequence out of context is just a list of email/call/LinkedIn steps. The conversation was the part that told me when to use it and why it worked. So I made Junto deliberately not lead with a library. There's one, but it's not the front door.
 
 Plays are able to be run in a channel, in public, where the team already lives. When someone prompts Junto to run a play in a channel, everyone sees its steps and what came out. That moment is the discovery surface I was chasing. Watching a teammate get value from a play beats any catalog entry, because the demo is live and the results are right there to inspect. Usage is the advertising.
 
@@ -490,17 +497,23 @@ Plays are able to be run in a channel, in public, where the team already lives. 
 
 Every output a play produces carries its origin with it: who built it, how many times it has run, how many times it has been remixed. The numbers update themselves. The builder's name travels with the work, forever, and the builder never has to ask.
 
+
+{/* TK: [SCREENSHOT: the Slack provenance block, built by Ryan with the run count] */}
+
 I think that last part will end up mattering more than it sounds. Asking for credit is socially expensive. I'd rather forfeit the credit than ask for it, and I doubt I'm unusual.
 
 ### The ritual
 
-I assumed the counters would be the motivating part. Then I read the research on gratitude and credit, and one finding stuck with me. The automatic half of credit, the counters and the attached names, does almost nothing for motivation on its own. A human saying thanks roughly doubles the rate at which people help again.[^c7-1] The machine can prove who built a thing, but it can't make anyone feel appreciated for building it.
+I assumed the counters would be the motivating part. Then I read the research on gratitude and credit. The part that stuck with me was: The automatic half of credit, the counters and the attached names, does almost nothing for motivation on its own. A human saying thanks roughly doubles the rate at which people help again.[^c7-1] The machine can prove who built a thing, but it can't make anyone feel appreciated for building it.
 
 So the system splits the job in two. Provenance is automatic, and gratitude is a ritual that Junto prompts for. When a rep uses your play for the first time, and again at milestones, the bot nudges them to say thanks in public, and the thanks stays scarce enough to mean something. The nudge is capped, once per play per thread, three per play per week.[^c7-2]
 
 ### Remix
 
 Remix is a button on every play. But pressing it opens a conversation, not a form. Junto already has the play's context: what it watches, what it produces, how it decides. So the rep just says what they would change, in plain words, and the bot builds the variant. There's no blank page to face.
+
+
+{/* TK: [SCREENSHOT: the remix button as it appears in the Slack channel] */}
 
 The part I care most about is the lineage. A remix keeps its parent, and the parent's credit goes up every time the remix runs. That flips the usual instinct: building on someone's work pays them, automatically, forever.
 
@@ -519,7 +532,7 @@ Ramp settled any doubt I had about this direction. In their tooling demo with De
 
 <Diagram
   src="junto-ramp-flywheel.png"
-  label="Fig. 15"
+  label="Fig. 16"
   caption="Ramp's flywheel, as Keyan Sarrafzadeh described it in their tooling demo with Deepline. Their loop, my redraw."
 />
 
@@ -562,8 +575,6 @@ Today there's one detector that reads two sources at once, usage falling inside 
 
 > @junto a teammate has been prioritizing off his own signal scanner. Take the accounts it ranked hottest last quarter and line them up against what actually became pipeline. I want to know which signals are worth anything.
 
-That last one is the learning loop closing on itself, and it's harder than it looks for a reason worth saying out loud. Reading a teammate's results means reading data that was pulled with his permissions and not mine. So the honest version of that play needs a door built for it rather than a gap left open. Nothing else in this chapter has that problem, because nothing else lets one person's work become another person's input.
-
 So I run one test on every X. This journal named four deaths: location, sharing, learning, compounding. For each alternative I ask which of the four it closes, and which it leaves dead.
 
 ### Why not Zapier?
@@ -596,7 +607,7 @@ Behind every why-not-just is build versus buy, and I have to answer it against m
 
 <Diagram
   src="junto-sim-composer.gif"
-  label="Fig. 16"
+  label="Fig. 17"
   caption="The composer, cut together from one sitting: the workspace tabs, the integrations, and a Google Calendar and Notion node added to a live play."
 />
 
@@ -608,7 +619,7 @@ Four words need pinning down before this section works:
 - Composer = our web view built around that canvas. A rep who wants to remix a play, or draft one from scratch outside Slack, clicks into it here.
 - Mirror = what our setup was for a long stretch. The engine displayed our plays without running them.
 
-Every play we wrote compiled onto the canvas, node by node, and every one of those nodes was a display block. The real work still ran in my gateway. The engine was our system of record and our canvas, not our executor.[^c9-2] It was an architect's scale model of the building: accurate down to the window frames, and nobody lives in it.
+Every play we wrote compiled onto the canvas, node by node, and every one of those nodes was a display block. The real work still ran in my gateway. The engine was our system of record and our canvas, not our executor. It was an architect's scale model of the building: accurate down to the window frames, and nobody lives in it.
 
 I was careful with the words, because the words were the claim. "Compiles to" isn't "runs on," and the gap between them is exactly the gap between a demo and a product. Writing this, eight chapters in, I keep the same discipline for exactly the same reason.
 
@@ -650,8 +661,6 @@ One thing I didn't expect: the truer claim was the harder one to keep. When the 
 
 [^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
-[^c9-2]: The engine is Sim, an open source engine, self-hosted as the execution engine. The canvas in this chapter is its canvas.
-
 
 ## Drawn from the trace
 
@@ -689,7 +698,7 @@ When the renderer is deterministic,[^c10-1] a bad spec is cheap, because redoing
 
 <Diagram
   src="junto-org-chart.png"
-  label="Fig. 17"
+  label="Fig. 18"
   caption="The org chart the demo drew for CoreFlow, rendered from the fetched rows. Color is state: engaged, champion, open role. No model in this path."
 />
 
@@ -705,7 +714,7 @@ As for where the people come from: the chart doesn't discover anyone. Names, tit
 
 <Diagram
   src="junto-run-journey.png"
-  label="Fig. 18"
+  label="Fig. 19"
   caption="A run journey card, rendered deterministically from the run's own trace. This one is the account pov: 12 signals in, 6 sourced claims out."
 />
 
@@ -795,7 +804,7 @@ Here is what I can show you today, live, with no cuts anywhere in the demo. A se
 
 <Diagram
   src="junto-slack.html"
-  label="Fig. 19"
+  label="Fig. 20"
   caption="The demo, wearing the surface it was built for. The seeded thread is a recording and says so, with its date. The pre-set messages run live against the real service when it is up, and the badge tells you which one you are getting."
   height={800}
 />
