@@ -16,52 +16,60 @@ import Lede from '../../components/Lede.astro';
 
 ## TL;DR
 
-I built a shared context layer for GTM. Nobody asked me to. I've just watched almost every AI project our team built stop getting used. None of them broke. They quietly stopped mattering, which turned out to be the more interesting problem. The thing I built is called Junto. It lives in Slack, and you build agents on top of it.
+I built a shared, GTM context layer, after watching countless AI projects/tools die. It's addressed in Slack by @Junto, has a visual graph composer as the backend, and is built on top of a set of events that the business is normalized into.
 
-- **The problem.** Projects, whether they were Claude projects, dashboards, or platforms we purchased, eventually died. We were all working from different pages. Everyone had their own version of what worked, nobody could see what anyone else had built, and nothing one person figured out made the next person's job easier.
-- **The argument.** What all of them were missing was relationships. To the workday, to teammates, to their own failures, and to every other piece of work.
-- **The approach.** A layer. The projects were a place you had to go, and a place we had to go competed with our day until it eventually lost. A layer is what other things get built on, and it carries those four relationships itself, so nothing built on top has to remember them.
-- **The output.** Two surfaces. Slack as the front door, and a composer where a play is editable blocks on a canvas, built from 1,000+ triggers and integrations. Underneath, an open source engine self-hosted, four typed stores and one flat index. A constitution injected at exactly one seam, a deterministic linter that outranks the model, and the rules that must always hold living below the model where there's nothing to persuade. Every answer comes back with a diagram drawn from the run's own trace, and every play carries who built it, so remixing someone's work pays them.
+- The problem: Projects, whether they were Claude projects, dashboards, or purchased platforms, all eventually died. The result was that everyone had their own version of what worked, minimal visibility into what others were building, and no compounding knowledge.
+- The argument: I believe that what all of the projects were missing were 'relationships'. Relationships to the workday, to teammates, to the tool's own failures, and to every other piece of GTM work.
+- The fix: A shared, compounding knowledge layer. The aforementioned dead projects were places you had to go to, and they competed with your day for time. We built Junto as the layer for what any project could be built on, native to the one place that GTM was already in.
+- The output: 2 surfaces, Slack as the front door, and a backend where plays are editable blocks on a canvas, built from 1,000+ triggers and integrations. Underneath, an open source engine, a constitution injected at exactly one seam, a deterministic linter that outranks the model, and a set of rules living below the model that must always hold. Every answer comes back with a diagram drawn from the run's own trace, and every play carries who built it.
+
+Five examples of prompts that could only be answered from a system like Junto:
+
+1. @junto a former colleague and an SE met with Contoso about six months ago, before this was my account. How did they prep, what did they ask each other beforehand, what did the customer actually say, and what did they conclude afterward?
+2. @junto someone at Fabrikam raised this pain on a disco call today. Is that specific to their industry, or is everyone saying it?
+3. @junto before I build a sequence around this pain, check it's come up on calls with at least three different companies in at least two industries. If it hasn't, say so and I'll drop it.
+4. @junto run signal scanner on my book, and if Contoso turned up anything, fold it into my call prep for them.
+5. @junto we lost Northwind to Acme. Every Monday, check my open opps for two things. Are they hiring for roles that name Acme's tooling, and is anyone there engaging with Acme on LinkedIn.
 
 ## The Systems Thinker
 
 <Lede>
-Every AI project our GTM team built ended up dying. Off the top of my head I can count eight over the last year, many of them mine, some built by teammates, even some that we bought from vendors. Before building something else, I wanted to know what was killing everything.
+All of the AI projects I saw our GTM team built ended up dying. Off the top of my head I can count eight over the last year, many of them mine, some built by teammates, even some that we bought from vendors. Before building something else, I wanted to know what was killing everything.
 </Lede>
-
-I should say where I sit, because it changes what this initiative means. I'm an SDR, so this isn't something I read about in a newsletter. It shows up at eight in the morning, when I open something to work out who I should be talking to today. Everything that we built to answer that question is either gone, or was never worth trusting.
 
 ### The specimens
 
-In my mind there were 3 kinds of dead projects. First, the scattered ones: Claude projects, spreadsheets, dashboards. Most of them are still running right now, pulling a fresh list of accounts every morning that nobody ever looks at. Many of them have never failed once.
+In my mind there were 3 kinds of dead projects.
+
+First, the scattered ones: Claude projects, spreadsheets, dashboards. Most of them are still running right now, pulling fresh lists of accounts every morning that nobody ever looks at.
 
 Second, my projects. A teammate and I built a dashboard that read our accounts out of Salesforce, showed which ones had been outbounded, and laid the week's work out in a single view. It did exactly what we had asked it to do and it lived three weeks. The last time either of us opened it was August 6th, 2025.
 
 Third, paid platforms. Actual products, from actual vendors, bought with actual money.
 
-The part that took me a while to notice was that none of the projects had exploded. There was no incident, no postmortem, no angry thread in Slack, and nobody ever wrote "we're sunsetting this." One quiet week nobody opens the tab, then another, and eventually it's a bookmark.
+The part that took me a while to realize was that none of the projects had 'exploded'. There was no incident, postmortem, or angry thread in Slack.
 
 ### The wrong question
 
-My first question was: well what were they not doing correctly? That went nowhere. Dashboards displayed, Claude projects produced output (and the outputs are usually great!), and the vendor platforms showed us our data. Every one of them did the job it was built to do, right up until the day they stopped mattering.
+My first question was: what were they not doing correctly? That went nowhere.
 
-The vendor platforms are what really convinced me to dig into this. Those things had design teams, roadmaps, support addresses and onboarding calls, and they died the same death as a dashboard two of us threw together in a week. If craft were the variable, meaning that the projects we made ourselves just weren't good enough to be adopted, then the expert-built versions should've survived. They didn't. And when very different parts keep producing the identical outcome, the interesting place to look stops being the parts and becomes the system around them.
+Dashboards displayed, Claude projects produced output (the outputs are usually great!), and the vendor platforms showed us data. Every one of them did the job it was built to do.
 
-What did all of these projects have in common? Not quality, not budget or polish.
+The vendor platforms were what convinced me to dig into this. Those things had design teams, roadmaps, support addresses and onboarding calls, and they died the same death as a dashboard that a couple of us threw together.
 
-I took a couple of days away from my laptop after not getting very far by trying to understand what the projects weren't doing correctly. I knew that a problem couldn't be solved in the same situation that it arose from, but I still didn't know the questions that I should've been asking to solve this.
+If craft were the variable, meaning that the projects that we made ourselves just weren't good enough to be fully adopted, then the expert-built versions should've survived.
 
-As I do for most of the problems I face, I read. Albert Rutherford's The Systems Thinker sat on the floor of my apartment, making a home for itself there since I finished it in April, and with the attitude of "well, this was pretty good, maybe it could show me something I forgot" I re-read it that night.
+I took a couple of days away from my laptop after not getting very far by trying to understand what the projects weren't doing correctly.
 
-The next day, still without much motivation to solve this problem, I sat down and started writing down everything that I could remember from the book. I scribbled for an hour or so and it was apparent that the book was intended to teach the reader to look at the systems around things.
+As I do for most of the problems I face nowadays, I started reading. Albert Rutherford's The Systems Thinker sat on the floor of my apartment, making a home for itself there since I finished it in April. I re-read it over the course of a couple of nights. The following days, still without much motivation to think about this problem, I sat down and started writing down everything from the book that I could remember.
 
-A systems thinker asks about connections instead of features. Trying to be a systems thinker myself, I thought about what inputs fed these projects and what their outputs fed. This reframing might seem abstract or vague now but it is arguably the most important pivot of this project and is the basis for everything I did after.
+A 'systems thinker' asks about connections instead of features. Neat, I guessed. So in an attempt to be one of these profound 'systems thinkers' myself, I started to ask about the 'inputs' that fed the projects and what their eventual 'outputs' fed. This inputs/outputs reframing might seem abstract or vague right now, but I think it's arguably the most important pivot of this project and it will be the basis for everything that's written below.
 
-Every dead project consumed inputs and produced outputs, and that part worked fine. The problem was that the outputs weren't anybody's inputs.
+The realization: Every dead project consumed inputs and produced outputs, and that part worked just fine. The problem was that the outputs weren't anybody's inputs.
 
-My hypothesis was: the failures are structural, meaning the failure lived in how the projects were situated, not in what they were made of. It wouldn't have mattered how good the projects were, two projects with the same structure get the same outcome regardless of craft.
+My hypothesis was: the failures were structural, stemming from how the projects were situated, not from what they were made of.
 
-Which led us to our final and best question yet: what did each of the projects lack a relationship to?
+Which led us to our final (and I think best) question: What did each of the projects lack a relationship to?
 
 
 <Diagram
@@ -71,38 +79,36 @@ Which led us to our final and best question yet: what did each of the projects l
 
 ### 4 relationships
 
-When I thought about it this way, the causes of death sorted themselves into four categories, and each one was a relationship the project didn't have. Here are the relationships that I landed on:
+When I thought about it this way, the causes of death sorted themselves into four categories, and each one was a 'relationship' that the project didn't have. Here are the four relationships that I boiled everything down to:
 
-Location is a relationship to the workday. Most of the projects lived somewhere you had to go on purpose.
+Location. Location is a relationship to the workday. Most of the projects lived somewhere you had to go on purpose.
 
-Sharing is a relationship to teammates. Nobody could see the majority of projects, so nobody built on top of them.
+Sharing. Sharing is a relationship to teammates. Nobody could see the majority of projects, so nobody could build on top of the projects or see what outputs others were getting.
 
-Learning is a relationship to your own failures. For most of the projects, if they answered wrong on Tuesday, they answered exactly as wrong on Wednesday.
+Learning. Learning is a relationship to your own failures. For most of the projects, if they answered wrong on Tuesday, they answered exactly as wrong on Wednesday.
 
-Compounding is a relationship to every other piece of work. Nothing anyone built made the next thing easier to build.
+Compounding. Compounding is a relationship to every other piece of work. Nothing anyone built made the next thing easier to build.
 
 Location, sharing, learning, compounding.
 
 ### The survivors
 
-Holding the 4 relationships in my mind, I wanted to take inventory of the tools that hadn't died. The ones that stood out were: Slack, Gong, and Salesforce. With our belief from above that craftsmanship wasn't a factor in the death or survival of tools, whether you also believe that to be true or not, I asked: what'd the survivors have that internal AI projects didn't? And landed on this explanation: work flowed through each of those tools and left something behind.
+Holding the 4 relationships in my mind, I wanted to take inventory of the tools that we use that hadn't died. The ones that stood out were: Slack, Gong, and Salesforce.
 
-Nobody sits down to use Slack. They communicate, and their words are held there.
+With the belief from above that 'craftsmanship wasn't a factor in the death or survival of tools', whether you also believe that to be true or not, I asked: what'd the survivors have that internal AI projects didn't? And landed on this explanation: work flowed through each of those tools and left something behind.
 
-Nobody sits down to use Gong. A call happens, and Gong is where the call becomes an asset.
+Nobody 'sits down' to use Slack. They communicate, and their words are held there.
 
-Nobody sits down to use Salesforce. An opportunity moves, Salesforce is updated, and it becomes the source of record.
+Nobody 'sits down' to use Gong. A call happens, and Gong is where the call becomes an asset.
 
-And nobody sits down to use GitHub or Outreach. Code is written and pushed, and the repo grows, or an email sequence is written and used.
+Nobody 'sits down' to use Salesforce. An opportunity moves, Salesforce is updated, and it becomes the source of record.
 
-The survivors were the things work deposits into, and by using them we were producing the thing that makes them more valuable tomorrow.
+And nobody 'sits down' to use GitHub or Outreach. Code is written and pushed, and the repo grows, or an email sequence is written and used.
+
+The survivors were all things that work (inputs) deposited into, and by using them we were producing the thing (outputs) that made them more valuable tomorrow.
 
 
 {/* TK: [NEEDS REF: 2025/2026 research backing the deposit/accumulation idea. Nearest candidates logged in doc 60] */}
-
-The map was almost too neat: four relationships our projects never had.
-
-Slack was location, Gong was learning, Outreach and GitHub were sharing,[^c1-2] and Salesforce was the record everything else deposited into.
 
 
 <Diagram
@@ -113,23 +119,33 @@ Slack was location, Gong was learning, Outreach and GitHub were sharing,[^c1-2] 
 
 ### Cheap creation
 
-There's a second-order effect here that I missed at first.
+There's a second-order effect here that I almost missed at first: creation.
 
-Creation used to be expensive, so not many people did it. Now it's cheap, so everyone (including myself) does, which sounds like progress and mostly is.
+Creation used to be expensive, so not many people did it. Now it's cheap, so everyone (including myself x1000) does, which sounds like progress and mostly is.
 
-But in the context of GTM tools, every creation carries its own private copy of the context it needs: its own definition of who we sell to, its own instructions, its own lessons about what works. And the copies diverge.
+This is progress, and I'm so thankful to be living in a time where this is a possibility, but in the context of these GTM tools, every creation carried its own copy of the context it needed: its own definition of who we sell to, its own instructions, its own lessons about what works, and copies diverge.
 
-The current push to give coding agents one canonical instructions file exists precisely because agents reading different copies of the truth act on different truths.[^c1-3] Two reps' definitions of their company's ICP drift apart quietly, and nobody can tell which one is right, because no version is the version. Then the creation dies, and its copy dies with it.
+The current push to give coding agents one canonical instruction file exists precisely because agents reading different copies of the truth act on different truths.[^c1-3] Two reps' definitions of their company's ICP drift apart quietly, and nobody can tell which one is right, because no version is the version. Then the creation dies, and its copy dies with it.
 
-Stripe recently published what this looks like at enterprise scale. Before they consolidated onto Kai, their internal knowledge platform, anyone at the company could build and deploy workflow agents, and over 4,000 got built. Their write-up says teams were writing conceptually similar prompts with varying levels of quality, and that the proliferation became increasingly hard to monitor and maintain.[^c1-4] Four thousand agents is four thousand private copies of the context, drifting.
+This isn't my own personal revelation, Stripe published a blog for what this looks like at their scale a few weeks ago. Before they consolidated their employees onto Kai, Stripe's internal knowledge platform, anyone at the company could build and deploy workflow agents, and over 4,000 got built. Their write-up says teams were writing conceptually similar prompts with varying levels of quality, and that the proliferation became increasingly hard to monitor and maintain.[^c1-4] 4,000 agents is 4,000 private copies of the context, drifting.
 
 ### The question
 
-So could one tool hold all four relationships at once? I didn't know, and it seemed like a great deal to ask of a tool. Or was that still the wrong shape for the question? Maybe the answer wasn't another project at all, but "the thing that every other project runs on."
+So could 1 tool hold all 4 relationships at once? I didn't know, and it seemed like a great deal to ask of a tool. Or was that still the wrong shape for the question? Maybe the answer wasn't another project at all, but "the thing that every other project runs on."
 
-I had no idea what that would look like, but I knew what world I wanted to live in. One where what GTM writes in emails to prospects comes from what customers actually say, where nobody ever discovers the same thing twice, and where a GTM team knows the expiration date of everything it believes.
+I had little idea what that would look like, but the kind of world that I wanted to live in was a world where:
 
-[^c1-2]: This is the weakest of the four mappings and worth saying so. A deposit does happen in both tools: a sequence you write is visible to the team, a commit is visible to the repo. But discovery barely happens, and nobody browses Outreach to learn what worked. The sharing relationship needs both halves, and these two tools have one.
+You wrote cold emails using the exact verbiage that customers or prospects used.
+
+You had visibility into successful workflows/plays and could make them your own.
+
+You knew the expiration date of everything you believe.
+
+You understood why something generated pipeline.
+
+You didn't have to leave Slack to spawn an agent.
+
+You never discovered the same thing twice.
 
 [^c1-3]: The older evidence is [a 2007 study of copied code](https://doi.org/10.1109/WCRE.2007.7) (Jens Krinke) finding roughly half of later changes landed in one copy and not the other, and [a 2009 study across five industrial systems](https://doi.org/10.1109/ICSE.2009.5070547) (Juergens et al.) where inconsistent changes to clones were frequent enough to cause real faults. The newer version is the AGENTS.md movement: one canonical instruction file per repo. [A 2025 study of 2,303 of those files](https://arxiv.org/abs/2511.12884) (NAIST and Queen's) found they aren't static documentation but artifacts that evolve like configuration code, which is the same drift in a new costume. Neither paper proves why the convention caught on, and [one 2026 ablation](https://arxiv.org/abs/2602.11988) found context files can slightly reduce agent success, so take this as a pattern rhyming rather than a question settled.
 
@@ -138,20 +154,16 @@ I had no idea what that would look like, but I knew what world I wanted to live 
 
 ## Decentralized, centralized
 
-So our hypothesis was now: the scarce thing is shared memory. Could we just connect the tools together to get one?
-
-Lay chapter 1's map out as a matrix, tools down one side and the four relationships across the top, and the survivors make a clean diagonal. Slack has location. Gong has learning. Outreach and GitHub have sharing. Salesforce has compounding. A clean diagonal invited a thought: wire the survivors together and collect the shared memory at the seams.
-
-After investigating the possibilities of wiring the tools together and collecting the shared memory, it became clear that the four relationships belonged to a tool's own content. What I mean by this is: a relationship cannot transfer from one tool to another.
+After investigating the possibilities of wiring the 'surviving' tools together and collecting the shared memory, it became clear that the 4 relationships 'belonged' to a tool's own content. What I mean by this is: a relationship couldn't transfer from one tool to another.
 
 For example:
 
-- Post your dashboard's output to Slack and the message gets location but the dashboard doesn't.
-- Write your results to Salesforce and the rows compound, but the outreach your team does the next day doesn't, because it's not a tool system that was built for discovery.
-- Read call data out of Gong and you get the benefit of everything Gong learned, but your own tool never learns a thing, because nobody can grade it.
-- Create an email sequence in Outreach and the sequence is shared, but the learning isn't. Integration isn't inheritance.
+- Post your dashboard's output to Slack and the message gets location, but the dashboard didn't.
+- Write your results to Salesforce and the rows compound, but the outreach your team does the next day didn't compile, because it's not a system that was built for discovery.
+- Read call data out of Gong and you get the benefit of everything Gong learned, but your own tool didn't learn a thing, because nobody could grade it.
+- Create an email sequence in Outreach and the sequence is shared, but the learning didn't, because integration isn't inheritance.
 
-Run any combination through the grid and the residue is the same: at least two relationships are left unowned. And even the version where you wire all four in properly hands every builder four connections, four auth stories, and their own private copy of the context, which is the private-copy problem.
+Run any combination through the grid and the residue is the same: at least 2 relationships are left unowned. And even the version where you wire all 4 in properly would hand every builder 4 different connections, 4 auth stories, and their own private copy of the context, which is the private-copy problem from before.
 
 
 <Diagram
@@ -159,65 +171,71 @@ Run any combination through the grid and the residue is the same: at least two r
   label="Fig. 4"
 />
 
-This led me to believe that the four relationships needed to be properties of the substrate a thing is built on, which is the difference between an integration and a layer. In other words, the survivors were places where work ended up. Everything I had built was a place you had to go.
+This led me to believe that the 4 relationships needed to be 'properties of the substrate a thing is built on.'
 
-So could one tool hold all four relationships at once? The answer is probably no, and asking for one was the wrong request in the first place.
+In other words, the survivors were places where work ended up. Everything we had previously built was a place you had to go. IMO, this is the difference between an 'integration' and a shared, compounding knowledge layer.
+
+So could 1 tool hold all 4 relationships at once? And could we buy that tool? The answer was probably no, and asking for 1 tool to do this was probably the wrong request in the first place.
 
 Every corpse on that list was a destination: a thing you opened on purpose, that showed you something, that you may or may not have taken actions within, that you then closed. And a destination competes for attention every single morning, and it loses that competition eventually, because attention is the one budget nobody can grow.
 
-Stripe's team wrote down the same conclusion while building Kai: a standalone agent product wouldn't work, because it would force users out of their natural workflows and into a new app. The platform has to meet the user where they are. Their sentence, my corpses.
+Stripe's team wrote down the same conclusion while building Kai: a standalone agent product wouldn't work, because it would force users out of their natural workflows and into a new app.
 
-It was at this point that I firmly believed that the fix was a growing, actionable layer underneath the destinations.
+The platform had to meet the user where they were. At this point I firmly believed that the fix was a growing, actionable layer underneath the destinations.
 
 ### The principle
 
-> Centralize the data. Decentralize the builders.
+Centralize the data. Decentralize the builders.
 
 One shared memory underneath, and many hands building on top.
 
-The phrasing comes from a talk Chris Prinz, a former colleague, now a GTM Engineer at Modal, gave in [Modal's session with Deepline](https://www.youtube.com/watch?v=C-7NljdnSR0), where he put his team's core philosophy on a slide: centralize the data, decentralize the agents. Consolidate the data and the business logic into one warehouse, then give everyone access to it through their agents.
+The phrasing comes from a talk Chris Prinz, a former colleague, now a GTM Engineer at Modal, gave in [Modal's session with Deepline](https://www.youtube.com/watch?v=C-7NljdnSR0), where he put his team's core philosophy on a slide:
 
-He presented it as the philosophy that lets a small team iterate fast without getting blindsided. Every decision in the rest of this post is that sentence applied to something.
+centralize the data, decentralize the agents.
 
-Stripe reached the same principle from the other direction. [Their write-up of Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform) says building it required getting 3 things right:
+Consolidate the data and the business logic into one warehouse, then give everyone access to it through their agents.
+
+He presented it as the philosophy that let a small team iterate fast without getting blindsided. Stripe reached the same principle from the other direction. [Their write-up of Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform) said building it required getting 3 things right:
 
 - scaling expertise without centralizing it
 - meeting users wherever they work
 - enforcing guardrails that don't exist in code
 
-One thing to clarify. Centralizing the data doesn't mean centralizing the interface. "One place to go for everything" is a destination, and destinations were a factor in other tools failing. So the data is what gets pooled. Where you stand when you ask for it should stay wherever you already were.
+One thing to clarify - centralizing the data doesn't mean centralizing the interface. "One place to go for everything" is a destination, and destinations were a factor in tools failing. So the data is what gets pooled. Where you stand when you ask for it should stay wherever you already were.
 
-### Four requirements
+### 4 requirements
 
-The four deaths flipped cleanly into a spec. Each relationship becomes something the layer has to guarantee, rather than something every project has to remember on its own. My first blueprint for Junto became:
+The 4 deaths flipped cleanly into a spec. Each relationship became something the layer has to guarantee, rather than something every project has to remember on its own. My first blueprint for Junto became:
 
-Location. It lives where the workday already is, which for a GTM team means Slack. If someone has to decide to go somewhere, you have already lost the argument with their morning.
+Location. It lives where the workday already is, which for a GTM team means Slack. If someone has to decide to go somewhere, you've already lost the argument with their morning.
 
-Sharing. Usage is visible by default. Discovery can't be a favor that one person does another, because favors don't scale and the people who most need to find your work are the ones least likely to ask you for it.
+Sharing. Usage is visible by default. Discovery couldn't be a favor, because favors don't scale and the people who most need to find your work are typically the ones least likely to ask you for it.
 
-Learning. Every run can be graded, and the grades reach whoever built the thing. A tool that can't be told it was wrong will be wrong the same way forever.
+Learning. Every run should be graded, and the grades need to reach whoever built the thing. A tool that can't be told it was wrong will be wrong the same way forever.
 
-Compounding. Every output is stored somewhere it can become someone else's input. This is the one that sounds like a storage detail and is actually the whole argument.
+Compounding. Every output is stored somewhere it can become someone else's input.
 
 The difference between a tool and a layer is that a layer has to hold for work that nobody has built yet.
 
 ### A very big bet
 
-Here is why I think this gap exists at all, which is to nobody's fault. The engineers who could build this don't feel the problem. And the reps who do feel it at eight in the morning don't get infrastructure handed to them, because that's not what a rep is for. So the people with the need and the people with the means are different people.
+Here is why I think this gap exists at all, which is nobody's fault: The engineers who could build this don't feel the problem. And the reps who do feel it at 8:00 AM don't get infrastructure handed to them, because that's not what a rep is for. So the people with the need and the people with the means were different people.
 
-The risky part was the bet that reps would build things if the substrate carries the hard parts.
+The risky part is the bet that reps would build things if the substrate carried the hard parts.
 
-Notion's experience says the ideas are already there. As Julia Biedry Gonzalez, head of go-to-market innovation at Notion, put it in [her talk with Deepline](https://www.youtube.com/watch?v=4fCKzPW0Gqg): "the constraint isn't really the creativity of our reps, or the ideas that they have about their workflows... it's more about how we bring them together again on that shared context and make sure that they and their agents are working off of that."[^c2-1] Her reps were already building. Her team's job was getting the systems out of their way.
+Notion's experience says the ideas are already there. As Julia Biedry Gonzalez, head of GTM innovation at Notion, put it in [her talk with Deepline](https://www.youtube.com/watch?v=4fCKzPW0Gqg): "the constraint isn't really the creativity of our reps, or the ideas that they have about their workflows... it's more about how we bring them together again on that shared context and make sure that they and their agents are working off of that."[^c2-1] What I took away from this was that their reps were already building, so it was her team's job to get the systems out of their way.
 
-The reason I believed reps would build anyway is the same one Keyan Sarrafzadeh at Ramp gave in [their tooling demo with Deepline](https://www.youtube.com/watch?v=LfrzaAr69d4): "salespeople are the most rational users on earth" because "there's a direct correlation between the output of their work and their paycheck," and they're "really not going to waste time on building things that just look cool."
+The reason I believed reps would build is the same one Keyan Sarrafzadeh at Ramp gave in [their tooling demo with Deepline](https://www.youtube.com/watch?v=LfrzaAr69d4): "salespeople are the most rational users on earth" because "there's a direct correlation between the output of their work and their paycheck," and they're "really not going to waste time on building things that just look cool."
 
-If the tooling helps them hit the number, they will use it and extend it. Ramp made that bet before knowing it would pay, and it paid off handsomely.
+If the tooling helps them hit the number, they will use it and extend it.
 
-Being the curious person I am, I wanted to close that gap. If a tool could give reps the foundation to build on top of, then the reps would just have to describe their goals to build. If that bet is wrong, everything after this chapter is wasted motion. I come back to it at the end, because it's the one claim that's still unproven.[^c2-2]
+And if a tool could give reps the foundation to build on top of, then reps would just have to describe their goals to build.
+
+Ramp made that bet before knowing if it would pay off, and in the year 2026 I think it's fair to say that it did, in fact, pay off.
 
 ### The shape
 
-So we knew what our surviving tools were and what each was good at. The design in my head at this point was:
+So we knew what our surviving tools were, and what each was good at. The design in my head at this point was:
 
 - Somewhere to see what others are doing and put your own spin on it, like Outreach or GitHub.
 - The ability to connect the relevant integrations for your role, and creative freedom to build agents that align to how you personally work, like n8n or Cowork.
@@ -236,21 +254,25 @@ It was answering 15,000 questions a day within three months. I read it before de
   width={400}
 />
 
-What their list doesn't contain is a single social word. No credit, no remix, no grading.
+I named the Slack bot, the thing that reps would actually interact with/use to create their agents, Junto, after a club that Ben Franklin started for mutual improvement.[^c2-3] Junto members would meet and pooled what each of them knew, which was a fair description of what I wanted.
 
-I named it Junto, after a club Ben Franklin started for mutual improvement.[^c2-3] Junto members would meet and pool what each of them knew, which was a fair description of what I wanted from a GTM team.
+One line explanation of Junto: a shared, compounding knowledge layer.
 
-One line for what Junto is: a shared, compounding knowledge layer.
+If you've spent any time on a GTM team you might already have an objection ready. Isn't this just a data warehouse? Isn't this enterprise search with extra steps? Why not hand every rep a chatbot and let them get on with it?
 
-If you've spent any time in a GTM org you might already have an objection ready. Isn't this just a warehouse? Isn't this enterprise search with extra steps? Why not hand every rep a chatbot and let them get on with it?
+The short version is that each of those alternatives satisfies some of the 4 requirements and fails at least one, and the one it usually failed was the element of 'compounding'.
 
-The short version is that each alternative satisfies some of the four requirements and fails at least one, and the one it usually fails is compounding. Those are the right questions, and they deserve real answers rather than competitive ones, so they get their own section later on.
+They are the right questions, and they deserve real answers rather than competitive ones, so they get their own section later on.
 
-So that's where the design came from. Mapping the survivors as a matrix showed which tool owned which relationship, a clean diagonal with no tool owning a second square. Trying to union the diagonal showed that a tool's relationships stay with its own content and never transfer to the things bolted onto it. Together those two findings fixed the schema this chapter ends on, a layer that things are built on rather than connected to, carrying the four guarantees itself and wearing Slack as its front door.
+So this is where the design came from:
+
+Mapping the survivors as a matrix showed which tool owned which relationship
+
+Trying to union the diagonal showed that a tool's relationships stay with its own content and never transfer to the things bolted onto it.
+
+Together those two findings configured a schema like this: A layer that things are built on rather than connected to, carrying the 4 guarantees itself and wearing Slack as its front door.
 
 [^c2-1]: Worth naming, because it cuts against this chapter: what her team built is a set of customer hubs you open inside Notion, and that's a place you go, which is one of the reasons I said tools die. But they work at Notion and they're selling Notion, so I'd guess Notion is where most of their workday is already happening.
-
-[^c2-2]: Proving it needs a second person to build something unprompted, and then a third person to use what the second person built. Neither of those is something you can make happen by working harder, which is what makes it a bet rather than a task.
 
 [^c2-3]: Its members shared a spirit of inquiry and a wish to improve themselves, their community, and the people around them. Mutual improvement was the stated point, and pooling what they knew was the mechanism.
 
@@ -263,17 +285,23 @@ So that's where the design came from. Mapping the survivors as a matrix showed w
 
 ## Finding the backend
 
-I didn't want this to just pull information from somewhere and deliver it back to Slack. I needed an engine behind the Slack bot that could take plain-text prompts and build multi-step workflows. The parts I identified as difficult for a non-technical person like me were:
+I didn't want this to just pull information from somewhere and deliver it back to Slack. I needed an engine behind the Slack bot that could take plain-text prompts and build multi-step workflows. The parts that I identified as 'difficult' to build (at least for a non-technical person like myself) were:
 
-- giving every tool an integration for the different tasks that each GTM team has
-- giving reps a visual composer to see and edit workflows on a granular level
+- creating integrations for every tool that different GTM teams use
+- giving reps a visual graph composer to see and edit agent steps
 - ensuring that whatever was typed in Slack would actually happen and be created in the visual composer
 
-But if my thesis was that people should stop rebuilding plumbing from zero, then I figured I shouldn't either.
+My thesis was that people should stop rebuilding plumbing from zero, so I figured I shouldn't either.
 
-So I looked for an engine on GitHub instead of writing one. What I found was an open source workflow engine under an Apache license, a YC company named [Sim](https://sim.ai/). It had a visual canvas, tables, a knowledge base, scheduled runs, and an API for executing workflows from outside.
+I looked for an engine on GitHub instead of writing one. What I found was an open source workflow engine under an Apache license, a YC company named [Sim](https://sim.ai/). They have a visual canvas, tables, a knowledge base, scheduled runs, and an API for executing workflows from outside.
 
-The canvas would be how a rep sees what a play does without reading code. Tables would be where the shared memory lives. Scheduled runs would be how a play fires on a clock instead of waiting to be remembered. And the execution API would be how a bot runs something without a person clicking a button.
+The canvas would be how a rep sees what a play does without reading code.
+
+Tables would be where the shared memory lives.
+
+Scheduled runs would be how a play fires on a clock instead of waiting to be remembered.
+
+And the execution API would be how a bot runs something without a person clicking a button.
 
 
 <Diagram
@@ -287,29 +315,15 @@ Sim is an open source AI workspace, which means a place to build, deploy and run
 
 Junto is built on it, self-hosted as the execution engine, with attribution kept and the license respected.
 
-### The constraint
-
-My laptop only has 8GB of RAM. Docker capped out almost immediately and that settled where any of this was going to run.
-
-So the engine is on a rented server instead. Eight virtual CPUs, 16GB of memory, about €25 a month, billed by the hour.
-
-The constraint then made the right choice for me. Server-first from day one, with nothing on my machine but a terminal. Everything built since runs somewhere I could hand to another person.
-
 ### Stay thin
 
-One rule governed every change I made to the engine: stay thin.
+One rule governed every change we made to the engine: stay thin.
 
-Every change I made to the engine itself fit in one patch file, and the patch is small enough to describe completely.
+Everything that makes Junto Junto (the Slack layer, behavior rules, credit system, play contract) lives outside the engine, in services that talk to each other over APIs.
 
-19 files changed, 107 lines added. 13/19 files are logos and icons, and image bytes are 97% of the patch.
+The logic behind the rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges that I'd have to do.[^c3-1] Thin changes can keep the upgrade path cheap.
 
-The code that changed comes to about 45 lines. 18 more lines of Docker configuration pass brand settings through hooks the engine ships for exactly this purpose. And the executor, the scheduler, the database schema, the API handlers: zero files, zero lines.
-
-The deepest change I've made to Sim's code is a 43-line edit to the component that draws the logo and about half of those lines are vibe coded comments explaining the change.
-
-Everything that makes Junto Junto, the Slack layer, the behavior rules, the credit system, the play contract, lives outside the engine, in services of mine that talk to it over its APIs.
-
-The logic behind my rule was this: a deep change would be a loan taken out against every future release of the project, and the interest would get paid in merges that I'd have to do.[^c3-1] Thin changes can keep the upgrade path cheap.
+The code that changed came to ~45 lines. The executor, scheduler, database schema, and API handlers: 0 files, 0 lines.
 
 
 <Diagram
@@ -319,19 +333,17 @@ The logic behind my rule was this: a deep change would be a loan taken out again
 
 ### The setup
 
-The mechanics of standing it up were plainer than I expected.
+The mechanics of standing it up were easier than I expected:
 
-1. I copied Sim's repository down to the rented server
-2. pointed Docker at its compose file
-3. put a reverse proxy in front so the canvas would load over a plain HTTP port.
-
-The brand settings ride in environment variables the engine ships, and every change I made to the code itself is the one small patch from earlier.
+1. I copied Sim's repository to the rented server
+2. I pointed Docker at its compose file
+3. I put a reverse proxy in front so the canvas would load over a plain HTTP port.
 
 ### First receipts
 
-By the end of the first day: all services were healthy on the server, the admin UI was reachable, seed data loaded into tables, and the first workflow I created in the composer had saved.
+By the end of the first day all of the services were healthy on the server, the admin UI was reachable, seed data had loaded into the tables properly, and the first workflow I created could be saved and used again.
 
-Nobody had asked the bot anything (because there was no bot to ask) and nothing impressive had happened yet either, but the ground under everything after this was real. Small wins, but accomplishing this was huge, and made me believe that I could in fact ship this.
+Nobody had asked the Slack bot anything and nothing impressive had happened yet either, but the ground underneath it all was real and it started to feel like I had some momentum.
 
 [^c3-1]: [Ray and Kim](https://doi.org/10.1145/2393596.2393659) measured this across eighteen years of the BSD forks (FSE 2012): between 10.7 and 15.5% of all patch lines were edits being re-ported between forks, work that occupied 26 to 59% of active developers in a release, and the porting rate does not necessarily decrease over time. That last clause is the whole point. The interest never tapers. Their setting is peer forks rather than a thin fork tracking an upstream, so what I'm borrowing is the shape and not the number.
 
@@ -345,16 +357,36 @@ Nobody had asked the bot anything (because there was no bot to ask) and nothing 
   width={360}
 />
 
-Junto needed a front door: a bot in Slack, one name you can talk to, that watches channels, answers when spoken to, and does work behind the scenes.
+The context layer needed a front door: a bot (in Slack). One name that you could talk to, that watched channels, answered when spoken to, and spawned agents behind the scenes.
 
-I built one, and making it survive real users turned out to be a story of its own. The one-bot decision, the ten exits, the rules that get the last word, and the tests that beat on all of it live in their own essay: **[What I learned creating a Slack bot](/slack-bot/)**. From here on, this post assumes the bot exists and behaves. How it earned that is over there.
+I built one, and making it turned out to be a story of its own. The one-bot and 10 exit decision, the rules that get the last word, and the tests that beat on all of it have their own essay: [What I learned creating a Slack bot](/slack-bot/). From here on out this post assumes the bot exists and behaves.
 
 
 ## Building the context layer
 
-The layer's first design question was what its atomic unit should be. It's the same question Cerebras answered for their internal knowledge base. And in the talk Chris gave in Modal's session with Deepline, it's the question he answered with one pipeline: Modal's GTM engineering runs everything through one batch pipeline that decides what reaches the CRM, on the principle that everything a rep sees must be accurate enough to inspire trust. What counts as "something happened" in GTM? A deal changes stage. An email goes out. A customer says one sentence on a call that everyone on the deal should hear. A thread argues for a day and lands somewhere. All of that is something happening, and all of it arrives in different forms.
+The layer's first design question was what its atomic unit should be. It's the same question Cerebras answered for their internal knowledge base, and in the demo Chris gave at Deepline, it's the question he answered with one pipeline:
 
-Chapter 1 answers this in reverse. The dead projects all produced outputs that became nobody's inputs. So whatever shape the memory holds, there's one property it can't give up: anything written into it must be usable by work that doesn't exist yet. The shape question is really the compounding question, asked at the level of a row.
+Modal's GTM engineering runs everything through one batch pipeline that decides what reaches the CRM, on the principle that everything a rep sees must be accurate enough to inspire trust.
+
+But what counts as "something happened" in GTM? It's arguably the most important question of this essay and the one I spent the most time thinking about. For example, here are a few examples of "something happened":
+
+A Slack thread reaches a conclusion.
+
+A customer says something on a call.
+
+A prospect visits the website.
+
+A deal changes stages.
+
+A new role is posted.
+
+An email is sent.
+
+A call is made.
+
+All of those arrive in different forms, so the hard part was standardizing each of them. Inadvertently, I think Chapter 1 addresses this in reverse: "The dead projects produced outputs that became nobody's inputs."
+
+So whatever shape the memory held, there was one property we couldn't give up: anything added into the context layer had to be usable by work that didn't exist yet. The shape question was really just the 'compounding' question, asked at the level of a row!
 
 ### Four shapes
 
@@ -365,12 +397,12 @@ Chapter 1 answers this in reverse. The dead projects all produced outputs that b
 />
 
 
-Everything arriving from every source gets qualified first: deduped, thresholded, the noise thrown out. That stage is deterministic, with no model and no judgment anywhere in it. What survives gets asked four questions:
+First, every 'event' that makes its way into the context layer is qualified: deduped, thresholded, the noise is thrown out. That stage is deterministic, with no model and no judgment anywhere in it. The events that survive get asked four questions:
 
-1. Did something happen that deserves attention? That becomes a signal: a leader hired into a role we sell to, usage spiking on an account.
-2. Did something happen at all? That becomes an activity: an email sent, a stage change, uncurated and complete.
-3. Did someone say something that matters? That becomes a call insight, tagged and carrying the speaker's own words.
-4. Did a conversation conclude something? That becomes a knowledge artifact, linked back to where it happened. A knowledge artifact is like the minutes of a meeting stapled to the recording: the conclusion in one line, with the way back if anyone doubts the line.
+1. Did something happen that deserves attention? That becomes a signal (i.e. a leader is hired into a role we sell to, usage spiking on an account.)
+2. Did something happen at all? That becomes an activity (i.e. an email is sent, a stage change.).
+3. Did someone say something that matters (i.e. a pain point, trigger, or objection)? That becomes a call insight, tagged and carrying the speaker's own words.
+4. Did a conversation conclude something (i.e. a Slack thread)? That becomes a knowledge artifact, linked back to where it happened. A knowledge artifact is like the minutes of a meeting stapled to the recording: the conclusion in one line, with receipts if anyone doubts it.
 
 
 <Diagram
@@ -380,7 +412,9 @@ Everything arriving from every source gets qualified first: deduped, thresholded
 />
 
 
-So: four questions, four shapes of row. And every row carries the same spine: what it's about, when it happened, where it came from, who's allowed to see it. Two of those fields do more work than they look like they should. Visibility is stamped when the row is written, inherited from wherever the data was born, so a thread from a private channel stays private without anyone remembering to make it so.[^c6-3] And the link back to the source is required.
+So: four questions, four shapes of row. And every row carries the same spine: what it's about, when it happened, where it came from, who's allowed to see it.
+
+Two of those fields do more work than they look like they should. Visibility is stamped when the row is written, inherited from wherever the data was born, so a thread from a private channel stays private without anyone remembering to make it so.[^c6-3] And the link back to the source is required.
 
 ### Acting and asking
 
@@ -393,15 +427,25 @@ Events are for acting. The index is for asking.
   width={640}
 />
 
-A play is a small workflow a rep builds and runs: watch for something, fetch something, produce something. A typed row is a database row whose kind is declared up front, a signal row or an activity row, so code can rely on its fields. Plays act on typed rows, and that path is deterministic end to end. A detector reads usage and emits signals. A play consumes the signals and does its work, and no model decides any of it. Acting needs types, because a play that fires on a signal can't fire on a vague blob of relevance. The rows are the API.[^c6-1]
+A play is a workflow that a rep builds and runs. AKA - watch for something, fetch something, or produce something.
 
-Questions work differently. A question here is a rep asking Junto something in plain language in Slack: "what did Northwind say about pricing?" Every row, whatever its shape, projects into one flat index, so a single search can rank a quote from a call against a Slack thread against a signal.[^c6-4] It works like a library catalog: the books stay shelved by type, but one catalog lets a single search sweep across all of them. The index stays current so a search is fast. What gets assembled only at the asking boundary is the evidence itself. The stores stay typed underneath, and the evidence is filtered by who's asking before any model sees a word of it.
+A typed row is a database row whose kind (signal row or activity row) is declared up front, so code can rely on its fields.
+
+Plays act on typed rows, and that path is deterministic end to end. A detector reads usage and emits signals. A play consumes the signals and does its work, and no model decides any of it.
+
+Acting needs 'types', because a play that fires on a signal can't fire on a blob of relevance. Here, the rows are the API.[^c6-1]
+
+Questions work a little differently. In this context, a question is someone asking Junto something in plain language in Slack. For example, "What did Northwind say about pricing?"
+
+Every row, whatever its shape, projects into one flat index, so a single search can rank a quote from a call against a Slack thread against a signal.[^c6-4] It works like a library catalog: the books stay shelved by type, but one catalog lets a single search sweep across all of them. The index stays current so a search is fast. What gets assembled only at the asking boundary is the evidence itself. The stores stay typed underneath, and the evidence is filtered by who's asking before any model sees a word of it.
 
 ### The corpus came first
 
-One of the four shapes has a longer story than the others, and it's kinda the one the whole layer learned its discipline from. Before any of this was a pipeline, before I had subjected myself to the power of Claude Code, it was me, in 2025, pasting transcripts into a chat window, one call at a time.
+One of the four shapes has a longer story than the others, and it's kinda the one the whole layer learned its discipline from. Before any of this was a pipeline, before I had subjected myself to the power of Claude Code, it was me, early 2025, copy and pasting transcripts into a chat window, one call at a time.
 
-My 2025 transcript tagging strategy was bad in a way that took a few dozen calls to see, unfortunately. I'd paste a transcript, ask for the pains, and get back a list that was plausible and quietly useless, because about half of it was my own side of the call. Reps voice pain on the buyer's behalf constantly. I had built a machine that read my own pitch back to me, with a citation. I learned from the 2025 mistakes. Step zero of the revised plan became simple speaker hygiene: label every speaker buyer or seller, and throw the seller's speech away before tagging a word of it. With the revised plan I tagged every new-business call from 2026, more than 1,000 of them at the time of writing this.
+My 2025 transcript tagging strategy was bad in a way that took a few dozen calls to see, unfortunately. I'd paste a transcript, ask for the pains, and get back a list that was plausible and quietly useless, because about half of it was probably from my own side of the call.
+
+Reps voice pain on the buyer's behalf constantly, and I had built a machine that read my own pitch back to me, with a citation. Learning from that era, step 0 of the revised plan became speaker hygiene: label every speaker buyer or seller, and throw the seller's speech away before tagging a word of it. With this revised plan we were able to successfully tag every new-business call from 2026, more than 1,000 at the time of writing this.
 
 
 <Diagram
@@ -410,17 +454,21 @@ My 2025 transcript tagging strategy was bad in a way that took a few dozen calls
 />
 
 
-Every record gets tagged twice. A closed tag comes from a locked vocabulary, and a script enforces it. The model can't free-type a tag. An open label is free text, in the buyer's own words. The closed tag makes the corpus countable. The open label keeps it honest, because sooner or later a customer says something true that the vocabulary has no word for, and the open label is where that truth survives until the vocabulary catches up. When a theme in the open labels recurred across five distinct companies, it earned a real tag, and every affected historical record was moved onto it so the past stayed consistent with the present.
+Every record gets tagged twice. A closed tag comes from a locked vocabulary, a script enforces it, and the model is unable to free-type a tag. The closed tag makes the corpus countable.
 
-For example, a prospect says "our newsletters keep landing in spam and nobody notices for a week." The vocabulary has no tag for monitoring gaps, so the record lands in /other with that sentence as the open label. When the fifth company says some version of the same thing, monitoring/blind-spots becomes a real tag, and all five records move onto it. That fired ten times over the corpus.
+An open label is free text, in the buyer's own words. The open label keeps it honest, because sooner or later a customer says something true that the vocabulary has no word for, and the open label is where that truth survives until the vocabulary catches up.
+
+When a theme in the open labels recurred across 5 distinct companies, it earns a real tag, and every affected historical record was moved onto it so the past stayed consistent with the present.
+
+For example, let's say we're selling an email deliverability tool, and a prospect says on a call that "Our newsletters keep landing in spam, and nobody notices for a week!"
+
+If the vocabulary didn't have a tag for 'monitoring gaps', the record would land in /other, with that sentence as the open label. When the 5th company says some version of "Our newspapers keep landing in spam, and nobody notices for a week!", "monitoring/blind-spots" becomes a real tag, and all 5 records move onto it.
 
 Every record also has to cite a verbatim quote. A model can assert a pain that's not there, but it has a much harder time producing a quote that's not there, and a script can check the quote against the transcript. No quote, no tag.
 
-Then the gate. Every record carries a confidence score, the model's own zero-to-one rating of how sure it is that the tag fits, reported alongside the tag. Anything under 0.7, or anything the vocabulary couldn't place, goes to a review queue instead of being committed silently. The 0.7 was picked early and kept, and it has held up. About 35% of records hit that queue.
+Then the gate. Every record carries a confidence score, the model's own 0-1 rating of how sure it is that the tag fits, reported alongside the tag. Anything under 0.7, or anything the vocabulary couldn't place, goes to a review queue instead of being committed silently. About 35% of records hit the <0.7 queue.
 
-The Junto version is the same method with me removed from the middle and left at the edges. A connector polls for new calls, routes each one by lane, runs the extractor, validates every row against the contract, and applies the same gate into the same queue.[^c6-2] What survived the automation unchanged: the two channels, the quote requirement, the gate, the promotion rule, and the division of labor everything rests on. The model judges. The script enforces. That rule was learned here, and it turned out to be the design rule for the whole system: there's no model in any write path anywhere in Junto.
-
-### The clock
+The shared knowledge layer version is the same method, with me removed from the middle and left at the edges. A connector polls for new calls, routes each one by lane, runs the extractor, validates every row against the contract, and applies the same gate into the same queue.[^c6-2]
 
 
 <Diagram
@@ -429,19 +477,23 @@ The Junto version is the same method with me removed from the middle and left at
 />
 
 
-How often should a source be read? The wrong answer is one schedule for everything, and the right answer is sorta boring: let how fast a source changes set how often you read it, which is different than trying to keep up with it.[^c6-5]
+How often should a source be read? The wrong answer is one schedule for everything, and the right answer, as far as I can conclude, is some version of: let how fast a source changes set how often you read it.[^c6-5]
 
-Calls land hourly, so a morning call is queryable by lunch. That's the cadence I'd argue hardest for, because it's what makes call data feel alive rather than archival. CRM history diffs daily. Field churn is constant and mostly meaningless, and the changes that matter resolve on a day boundary. Product usage lands daily too, because the detectors compare day over day.
+Calls land hourly, so a morning call is queryable by lunch. CRM history diffs daily. Field churn is constant and mostly meaningless, and the changes that matter resolve on a day boundary. Product usage lands daily too, because the detectors compare day over day.
 
-The rest follow the same logic. Marketing engagement lands hourly. A daily batch turns "they visited the website an hour ago" into "they were on the website sometime this week," which is a different and much weaker sentence. Job postings are read weekly. And Slack threads are captured as they happen but distilled only after two quiet hours, and only if the team's reactions say they're worth keeping, because a thread isn't a knowledge unit until it stops moving. The whole-thread treatment comes from Cerebras, who re-fetch the entire thread on every reply and distill it into an artifact. The wait-for-quiet timing was our own addition.
+The rest follow the same logic. Marketing engagement lands hourly. A daily batch turns "they visited the website an hour ago" into "they were on the website sometime this week," which is a different and much weaker sentence.
+
+Job postings are read weekly. And Slack threads are captured as they happen but distilled only after 2 hours from the last message. The whole-thread treatment comes from Cerebras, who re-fetch the entire thread on every reply and distill it into an artifact. The wait-for-quiet timing was our own addition.
 
 Each connector declares its cadence in its own manifest, and none of those rates live in code.
 
 ### Live and stored
 
-Something I held the line on: current state is never stored. Things like "what stage is the deal in?" and "what is on the calendar today?" are queried live, at the moment of asking, every time. Storing state, for stuff like this, is how a system becomes confidently wrong, and confidently wrong is the failure that kills trust fastest, because the answer looks exactly like a right one. That one was learned first-hand.
+Something I held the line on: current state is never stored. Things like "what stage is the deal in?" and "what is on the calendar today?" are queried live, at the moment of asking, every time.
 
-So state stays federated, and knowledge gets materialized. The memory holds what happened and what was learned. What is true right now, it goes and asks for.
+Storing states, for questions like those, are how systems become confidently wrong, and confidently wrong is the failure that I've seen kill trust the fastest.
+
+All in all: state stays federated, knowledge gets materialized. The memory holds what happened and what was learned. What's true *right now*, are things that it goes and asks for.
 
 
 <Diagram
@@ -461,19 +513,17 @@ So state stays federated, and knowledge gets materialized. The memory holds what
 
 ### The name
 
-I already said in the layer section that I read how Cerebras built their internal knowledge base before I designed a thing. This section is where their shape and mine actually meet, so the details belong here:
+I already said in the layer section that I read about how Cerebras built their internal knowledge base before I designed a thing, and this section is where their shape and mine actually meet. Here are my takeaways from their blog:
 
 - one shared schema
 - a connector per source
 - threads distilled, with the summary embedded rather than the raw transcript
 
-Their write-up gave me direction.
-
 [A thread by Drew Bredvick](https://x.com/DBredvick/status/2078150905078206789) restating their architecture pulled six figures of views, and I thought his compression of it was beautiful:
 
-> Normalize your business into a set of events.
+Normalize your business into a set of events.
 
-Where I diverge from them is as follows: their product answers questions, so everything can be one shape: evidence for an answer. Junto acts, and acting needs types, which is why there are four stores for acting and one index for asking. And nothing in their write-up touches provenance, credit, or feedback, because a Q&A system doesn't need them. The part that I was determined to build was everything on top of it.
+Where I diverge from them is: their system answers questions, so everything can be one shape. Junto acts, and acting needs types, which is why there are four stores for acting and one index for asking. And nothing in their write-up touches provenance, credit, or feedback, because a Q&A system doesn't need them.
 
 [^c6-1]: One divergence is better named than hidden: there's no event bus. Plays and distillers pull rows newer than a watermark instead of subscribing to a stream. At today's volumes a bus is machinery without a customer, and every write already passes through one validated funnel, so the seam is clean if that day comes. But a queue at the edges isn't an event-driven architecture, and I'd rather say so than imply otherwise.
 
@@ -490,15 +540,17 @@ Where I diverge from them is as follows: their product answers questions, so eve
 
 ### The other lesson
 
-Back in the first chapter I mentioned the thing that ended up shaping this whole project: I never once discovered a teammate's sequence by browsing. Every sequence I ever used was handed to me after a conversation. Someone mentioned a trick in a thread, or over lunch, and I asked for it. The handoff was the whole distribution system, and nobody called it that. The library sat there the whole time, full and mostly unread.
+Back in the first chapter I mentioned the thing that ended up shaping this whole project: I never once discovered a teammate's Outreach sequence by browsing Outreach. Every sequence I've ever used was handed to me after a conversation.
 
-Why did browsing fail? Probably because a sequence out of context is just a list of email/call/LinkedIn steps. The conversation was the part that told me when to use it and why it worked. So I made Junto deliberately not lead with a library. There's one, but it's not the front door.
+Someone mentioned a trick in a thread, or over lunch, and I asked for it. The handoff was the whole distribution system, and nobody called it that. The library sat there the whole time, full and mostly unread.
 
-Plays are able to be run in a channel, in public, where the team already lives. When someone prompts Junto to run a play in a channel, everyone sees its steps and what came out. That moment is the discovery surface I was chasing. Watching a teammate get value from a play beats any catalog entry, because the demo is live and the results are right there to inspect. Usage is the advertising.
+Why did browsing fail? Probably because a sequence out of context is just a list of email/call/LinkedIn steps. The conversation I had with the person was the part that told me when to use it and why it worked. So I made Junto deliberately not lead with a library. There's one, but it's not the front door.
+
+Plays are able to be run in a DM or a channel, where the team already lives. When someone prompts Junto to run a play in a channel, everyone can see its steps and the output. That moment is the discovery surface high that I'm chasing. Watching a teammate get value from a play beats any catalog entry, because the demo is live and the results are right there to inspect.
 
 ### Provenance
 
-Every output a play produces carries its origin with it: who built it, how many times it has run, how many times it has been remixed. The numbers update themselves. The builder's name travels with the work, forever, and the builder never has to ask.
+Every output a play produces carries its origin with it: who built it, how many times it has been run, and how many times it has been remixed. The numbers update themselves and the original builder's name travels with the work.
 
 
 <Diagram
@@ -507,17 +559,17 @@ Every output a play produces carries its origin with it: who built it, how many 
   width={520}
 />
 
-I think that last part will end up mattering more than it sounds. Asking for credit is socially expensive. I'd rather forfeit the credit than ask for it, and I doubt I'm unusual.
+I think that this part will end up mattering more than it sounds. Asking for credit is socially expensive, but getting credit can quietly distribute confidence. I'd rather forfeit credit than ask for it, and I doubt I'm unusual.
 
 ### The ritual
 
-I assumed the counters would be the motivating part. Then I read the research on gratitude and credit. The part that stuck with me was: The automatic half of credit, the counters and the attached names, does almost nothing for motivation on its own. A human saying thanks roughly doubles the rate at which people help again.[^c7-1] The machine can prove who built a thing, but it can't make anyone feel appreciated for building it.
+I assumed the counters would be the motivating part. Then I read the research on gratitude and credit. What I took away was: The automatic half of credit, the counters and the attached names, does almost **nothing** for motivation on its own. A human saying thanks roughly doubles the rate at which people help again.[^c7-1] The machine can prove who built a thing, but it can't make anyone feel appreciated for building it.
 
-So the system splits the job in two. Provenance is automatic, and gratitude is a ritual that Junto prompts for. When a rep uses your play for the first time, and again at milestones, the bot nudges them to say thanks in public, and the thanks stays scarce enough to mean something. The nudge is capped, once per play per thread, three per play per week.[^c7-2]
+So the system splits the job in two. Provenance is automatic, and gratitude is a ritual that Junto prompts for. When someone uses your play for the first time, and again at milestones, Junto nudges them to say thanks in public. At this cadence, hopefully, the thanks stay scarce enough to mean something.
 
 ### Remix
 
-Remix is a button on every play. But pressing it opens a conversation, not a form. Junto already has the play's context: what it watches, what it produces, how it decides. So the rep just says what they would change, in plain words, and the bot builds the variant. There's no blank page to face.
+Remix is a button on every play, and pressing it opens a conversation. Junto already has the play's context: what it watches, what it produces, how it decides, so the user just prompts what they want to change, and Junto builds the variant as 'your remix'.
 
 
 <Diagram
@@ -526,19 +578,23 @@ Remix is a button on every play. But pressing it opens a conversation, not a for
   width={500}
 />
 
-The part I care most about is the lineage. A remix keeps its parent, and the parent's credit goes up every time the remix runs. That flips the usual instinct: building on someone's work pays them, automatically, forever.
-
 ### The offsite
 
-The story that convinced me happened before Junto existed. When we first started as SDRs, a few of us figured out the same trick independently: take the verbiage prospects used on demo calls and put it in your cold outreach. If the person you're writing to has the same persona, the same size company, the same industry as the company that said it, their own words will most likely resonate. Each of us did it alone. Not out of competition, and not because anyone wanted to keep it to themselves. We just never saw each other doing it.
+The story that convinced me that we were siloed happened long before Junto was ever a thought. When I first started as an SDR, a few of us figured out the same trick independently: take the verbiage prospects used on demo calls and put it in your cold outreach.
 
-Then, once we were all together at a company offsite, one of us talked about it and showed a Claude project he had put together for it. And it turned out we had all built separate versions of the same thing. So we collabed and made one version.
+If the person you're writing the email to has the same title, is working at a similarly sized company, in the same industry as the prospect that said it, their own words will most likely resonate.
 
-We never would have known the others were doing it, or that it was working, if we had never ended up in the same room. The discovery mechanism was an accident of geography. Junto's job is to make that offsite conversation structural: the work shows up in the channel the first time it runs, not months later by luck, and the person who builds the shared version gets credited every time it runs.
+Each of us was doing it alone, not out of competition, and not because anyone wanted to keep it to themselves, because we never saw each other do it.
+
+Then, once we were all together at a company offsite, a teammate mentioned the strategy in passing and showed us a Claude project he had put together for it. It turned out that we had all built separate versions of the same thing, so we collabed and made one version.
+
+We never would have known that others were doing this, or that it was working, if we had never ended up in the same room. The discovery mechanism was an accident of geography. Junto's job is to make that offsite conversation structural: the work shows up in the channel the first time it runs, and the person who builds the shared version gets credited every time it runs.
 
 ### Earned, not given
 
-Ramp settled any doubt I had about this direction. In their tooling demo with Deepline, they described their flywheel: expose the central product's data and actions as callable tools, let reps build their own workflows on top, watch what leads to outlier outcomes, and fold the winners back into the core. The slide said "decentralized experiments, centralized gains." The credit layer is my version of watching what wins.
+Ramp settled any doubt I might've had about this. In their demo with Deepline, they described a flywheel: expose the central product's data and actions as callable tools, let reps build their own workflows on top, watch what leads to outlier outcomes, and fold the winners back into the core.
+
+The slide said "decentralized experiments, centralized gains." Junto's credit layer is my version of watching what wins.
 
 
 <Diagram
@@ -546,58 +602,58 @@ Ramp settled any doubt I had about this direction. In their tooling demo with De
   label="Fig. 19"
 />
 
-Two small details I thought about more than I probably should have: Recognition thresholds only count runs by other people, so running your own play a hundred times moves nothing. Status has a single source, which is a teammate finding your work useful enough to run it. And plays are ranked only within their own kind, so the small, sharp thing built for three people is never measured against the daily digest the whole team runs. What a second status number does to a GTM team over a year, I don't know yet.
+2 small details that I thought about more than I probably should've: Recognition thresholds only count runs by *other* people, so running your own play 100 times moves nothing. Status has a single source, which is a teammate finding your work useful enough to run it.
+
+And plays are ranked only within their own kind. So the small, sharp thing built for 3 people is never measured against the daily digest that an entire team runs.
 
 [^c7-1]: Adam Grant and Francesca Gino, "[A Little Thanks Goes a Long Way](https://www.hbs.edu/faculty/Pages/item.aspx?num=38092)" (2010): across four experiments, including a field study of adults doing real work, an expression of gratitude roughly doubled follow-up helping. A separate study of a large online creative community found the automatic half of credit, the counters and attached names, did little for motivation on its own. Two very different settings, same split.
-
-[^c7-2]: The caps are a design choice, not a finding. The study says thanks works. It says nothing about how often a bot should prompt for it.
 
 
 ## Why not just use
 
-Every early demo of Junto ended the same way. Someone nods, waits a polite beat, and asks: why not just use X? It's a fair question, and it deserves a structural answer instead of a feature war, because feature grids are where these arguments go to die. Every tool wins some row.
+Every early demo of Junto ended the same way. Someone nods and asks: why not just use X? It's a fair question, and it deserves a structural answer.
 
 ### What people actually type
 
-Before the answers, it helps to have something concrete in hand. Here are seven things a rep would type into Slack, and what each one needs underneath it to work.
+Before we compare to other tools, I think it'd help to have a few concrete Junto use-cases in mind. Here are 7 things that someone could type into Slack that, to my knowledge, no single tool could answer:
 
-> @junto a former colleague and an SE met with Contoso about six months ago, before this was my account. How did they prep, what did they ask each other beforehand, what did the customer actually say, and what did they conclude afterward?
+@junto a former colleague and an SE met with Contoso about six months ago, before this was my account. How did they prep, what did they ask each other beforehand, what did the customer actually say, and what did they conclude afterward?
 
 One question crossing a Slack thread, a call, and a person who doesn't work here anymore. Slack holds half of it. Gong holds the other half. Neither one knows the other exists, and the person who could have connected them for me is gone.
 
-> @junto someone at Fabrikam raised this pain on a disco call today. Is that specific to their industry, or is everyone saying it?
+@junto someone at Fabrikam raised this pain on a disco call today. Is that specific to their industry, or is everyone saying it?
 
-Call search gives you hits. This needs counts you can trust, which is what the locked vocabulary buys, and it needs to know what industry Fabrikam is in, which is a join to the CRM.
+Call search gives you hits. This needs aggregate counts of trends over multiple years, which is what the locked vocabulary buys, and it needs to know what industry Fabrikam is in, which is a join to the CRM.
 
-> @junto before I build a sequence around this pain, check it's come up on calls with at least three different companies in at least two industries. If it hasn't, say so and I'll drop it.
+@junto before I build a sequence around this pain, check it's come up on calls with at least three different companies in at least two industries. If it hasn't, say so and I'll drop it.
 
 This is the one I'd point at if I only got one. It stops a rep from spending a week on something one person said once. No dashboard has ever told anyone not to bother.
 
-> @junto run signal scanner on my book, and if Contoso turned up anything, fold it into my call prep for them.
+@junto run signal scanner on my book, and if Contoso turned up anything, fold it into my call prep for them.
 
-One play eating another play's output. That's compounding in a single sentence.
+One play eating another play's output, compounding in a single sentence.
 
-> @junto we lost Northwind to Acme. Every Monday, check my open opps for two things. Are they hiring for roles that name Acme's tooling, and is anyone there engaging with Acme on LinkedIn.
+@junto we lost Northwind to Acme. Every Monday, check my open opps for two things. Are they hiring for roles that name Acme's tooling, and is anyone there engaging with Acme on LinkedIn.
 
-> @junto build me a weekly play. Flag an account when three things are true at once. Seats have grown, they've posted a role that touches the problem we solve, and three or more companies within a hundred heads of their size have raised that same problem on a call.
+@junto build me a weekly play. Flag an account when three things are true at once. Seats have grown, they've posted a role that touches the problem we solve, and three or more companies within a hundred heads of their size have raised that same problem on a call.
 
 Today there's one detector that reads two sources at once, usage falling inside a renewal window. The general version, where any three sources agree about one account, is architecture I have and code I haven't written.
 
-> @junto a teammate has been prioritizing off his own signal scanner. Take the accounts it ranked hottest last quarter and line them up against what actually became pipeline. I want to know which signals are worth anything.
+@junto a teammate has been prioritizing accounts based on his signal scanner workflow. Take his accounts that were ranked 'hottest' last quarter, and line them up against what actually became pipeline. The goal is an understanding of which signals were worth looking at.
 
 So I run one test on every X. This journal named four deaths: location, sharing, learning, compounding. For each alternative I ask which of the four it closes, and which it leaves dead.
 
 ### Why not Zapier?
 
-For any single workflow, you could. Zapier and n8n solved workflow execution years ago, and solved it well, which is exactly why Junto stands on an engine instead of shipping its own.[^c8-1] What they lack is a shared memory. Every zap is another private copy of context, owned by one person, invisible to the team, and when that person leaves, the zap keeps firing until it breaks. The graveyard with better uptime. Location half closed at best, and sharing, learning, and compounding all dead.
+For any single workflow, you could. Zapier and n8n solved workflow execution years ago, and solved it well, which is exactly why Junto stands on an engine instead of shipping its own.[^c8-1] What they lack is a shared memory. Every zap is another private copy of context, owned by one person, invisible to the team, and when that person leaves, the zap keeps firing until it breaks. Location is half closed at best, and sharing, learning, and compounding are all dead.
 
 ### Why not a chatbot?
 
-The most common suggestion is the simplest: give every rep an AI chat window and let them go. The reps will love it, and I know because I practically live in one. For one question on one afternoon, the chat wins. But a thousand brilliant private chats compound nothing. My best prompt dies in my history, the next rep's best answer dies in theirs, and nothing anyone figures out today makes tomorrow's work cheaper. Even [Stripe's Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), serving most of their company, still names this problem on its roadmap: context generated in sessions stays locked in, and in their words, that's not how work gets done. That's how strong the default is.
+The most common suggestion is the simplest: give every rep an AI chat window and let them go. The reps will love it, and I know because I practically live in one. For one question on one afternoon, the chat wins. But a thousand brilliant private chats compound nothing. My best prompt dies in my history, the next rep's best answer dies in theirs, and nothing anyone figures out today makes tomorrow's work cheaper. Even [Stripe's Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), serving most of their company, still names this problem on its roadmap: context generated in sessions stays locked in, and in their words, that's not how work gets done.
 
 ### Why not enterprise search?
 
-The objection I take most seriously, because it half sounds like Junto. Products like Glean are genuinely good at what they built. If your problem is that knowledge exists but can't be found, buy one and be done. But retrieval isn't execution. Finding the doc isn't running the play, search carries no credit because nobody runs anything, and it holds no write-safety rules because it never writes. Junto needed all three, which is why search is one primitive inside it and not the product.
+The objection I take most seriously, because it half sounds like Junto. Products like Glean are genuinely good at what they built. If your problem is that knowledge exists but can't be found, buy one and be done. But in this case, retrieval isn't execution. Finding the doc isn't running the play, search carries no credit because nobody runs anything, and it holds no write-safety rules because it never writes. Junto needed all three, which is why search is one primitive inside it and not the product.
 
 ### Why not the internal tier
 
@@ -605,7 +661,15 @@ This one came from inside the building. Our engineers already ship an internal p
 
 ### The caveat
 
-Behind every why-not-just is build versus buy, and I have to answer it against my own interest: I don't think most teams should build this. Three prerequisites, and missing any one flips the answer. Someone has to feel the pain daily, not hear about it from someone else. Someone has to have permission to run infrastructure. And the team has to be one that will actually build on top, because a platform nobody builds on is just a bot with opinions. If that's not you, buy the tools and be happy. Zapier will run your workflows and search will find your docs, and both will do it better than a thing you built in a hurry. What they won't do is close the four loops, and they don't claim to.
+Behind every why-not-just is the build vs buy debate, and I have to answer it against my own interest: I do not think that most teams should build this. In my mind there are 3 prerequisites, and missing any one flips the answer.
+
+Someone has to feel the pain daily, not hear about it from someone else.
+
+Someone has to have permission to run infrastructure.
+
+And the team has to be one that will actually build on top, because a platform nobody builds on is just a bot with opinions.
+
+If that's not you, or you're not willing to spend evenings and weekends reading blog posts, I'd buy.
 
 [^c8-1]: Junto is built on Sim, self-hosted as the execution engine. Standing on an engine that already worked is most of why the four loops, and not the plumbing, got the build effort.
 
@@ -622,52 +686,51 @@ Behind every why-not-just is build versus buy, and I have to answer it against m
 />
 
 
-Four words need pinning down before this section works:
+3 words need pinning down before this section works:
 
 - Engine = Sim, the self-hosted workflow software from earlier. It stores workflows (the steps reps tell it to run, i.e. "check these accounts, filter out the ones with open opps, draft a summary") and, eventually, runs them.
-- Canvas = the engine's visual editor. A workflow shows up as connected blocks you can open and rearrange.
-- Composer = our web view built around that canvas. A rep who wants to remix a play, or draft one from scratch outside Slack, clicks into it here.
-- Mirror = what our setup was for a long stretch. The engine displayed our plays without running them.
+- Canvas = the engine's visual editor. A workflow that's prompted in Slack shows up as connected blocks that you can open, rearrange, edit or add to.
+- Composer = our web view built around that canvas. A rep who wants to remix a play, or draft one from scratch outside Slack, is sent here.
 
-Every play we wrote compiled onto the canvas, node by node, and every one of those nodes was a display block. The real work still ran in my gateway. The engine was our system of record and our canvas, not our executor. It was an architect's scale model of the building: accurate down to the window frames, and nobody lives in it.
+Every play we wrote compiled onto the canvas, node by node, and every one of those nodes was a display block, but the real work still ran in my gateway. The engine was our system of record and our canvas, but not our executor. It was an architect's scale model of the building: accurate down to the window frames, but nobody lived in it.
 
 I was careful with the words, because the words were the claim. "Compiles to" isn't "runs on," and the gap between them is exactly the gap between a demo and a product. Writing this, eight chapters in, I keep the same discipline for exactly the same reason.
 
-A mirror is easy to mistake for a machine. The canvas looked alive: real boxes, real arrows, a play you could open and trace with your finger. But if the engine had vanished, every play would have run the same as before. A mirror can be useful and honest at once, as long as you call it a mirror.
+The canvas looked alive: real boxes, real arrows, a play you could open and trace with your finger. But if the engine had vanished, every play would have run the same as before.
 
 ### Materialize
 
-The first flip was that publish became deploy. A rep describes a play in Slack, in plain language, the way you would explain it to a colleague. Junto drafts it and repeats it back to the rep as it understood it, and the rep confirms. Seconds later the workflow exists on the engine: real nodes, openable on a canvas. A sentence became infrastructure while you watched.
+The first flip was to make *publish* come *deploy*. This means, a rep describes a play in Slack, the same way you'd explain it to a colleague, and Junto drafts it and repeats it back to the rep as it understood it, waiting for the rep to confirm. Seconds later the workflow exists on the engine: real nodes, openable on a canvas. A sentence became infrastructure.
 
 This was the moment the project stopped feeling like a bot and started feeling like a factory. A bot answers you and forgets, but a factory leaves something standing when the conversation ends. The play you described in a sentence was now a thing you could open, point at, and change.
 
 ### The flip
 
-Then execution itself moved onto the engine. The nodes stopped being pictures of the steps and became the steps. When a play ran, the engine ran it, not my gateway.
+Then *execution* moved onto the *engine*. When a play ran, the engine ran it, not the gateway.
 
-But the gateway kept what it must never give up. It still owns the 3-second acknowledgment, so Slack gets its answer on time.[^c9-1] It still owns identity and the paper trail. And it still applies the voice rules to everything posted back into a channel. The division of labor is plain: the engine runs the steps, and the gateway stays the front door and the conscience.
+But the gateway kept what it must never give up. It still owns the 3-second acknowledgment, so Slack gets its answer on time.[^c9-1] It still owns identity and the paper trail and it still applies the voice rules to everything posted back into a channel. The division of labor is: the engine runs the steps, and the gateway stays the front door and the conscience.
 
 ### The guard
 
-Once the canvas became the source of truth, a rep's edit changes the next run. That's the feature. Open the play, change a step, save, and the next run does the new thing. No waiting for me, no asking permission.
+Once the canvas became the source of truth, a rep's edit changes the next run. That's the feature. Open the play, change a step, save, and the next run does the new thing.
 
 It's also the risk. Our plays carry a safety exclusion, the rule that keeps accounts with open opportunities out of outreach lists. What happens when an edit deletes it? Nobody would remove that rule on purpose. But nobody has to. An edit made in good faith can take it out without the rep ever noticing.
 
-The check happens at run time: if a run is requested, after any edits have been saved and before the first step executes, the play is compared against its contract. It works like a pre-flight checklist: the plane doesn't take off with a missing item, no matter who removed it or why. An edit that breaks a safety rule refuses the run. It says exactly why in the thread, and it keeps the last valid version, so the play is never left broken. Edits stick, and safety sticks harder.
+The check happens at run time: if a run is requested, after any edits have been saved and before the first step executes, the play is compared against its contract. It works like a pre-flight checklist: the plane doesn't take off with a missing item, no matter who removed it or why. An edit that breaks a safety rule refuses the run. It says exactly why in the thread, and it keeps the last valid version, so the play is never left broken. Edits stick, but the safety sticks harder.
 
 
 {/* TK: [ASSET: screenshot proving the guard works, e.g. the refusal message in the Slack thread when a required filter is deleted, or the guard's test output] */}
 
 ### The money shot
 
-A claim like "runs on the engine" is cheap to type. So I ran the proof live, with my own account. To try and trick it, I took a play I'd made that scans my accounts for fresh signals from the last 30 days and changed the lookback filter within the canvas from 30 days to 14. Then I went back to Slack and reran it.
+A claim like "runs on the engine" is cheap to type. So I ran the proof live.
+
+In an attempt to trick it, I took a play I'd made that scans my accounts for fresh signals from the last 30 days, and changed the lookback filter within the canvas (the backend visual part that shows the nodes) from 30 days to 14. Then I went back to Slack and reran it.
 
 
 {/* TK: [ASSET: gif of the edit-and-rerun sequence, canvas edit then Slack rerun. Check junto-recruit clips for usable footage] */}
 
-The result came back narrower. The edit lived on the engine, and the engine did the work. That was when the claim upgraded from "compiles to" to "runs on." It was a small win, editing a number and rerunning a play. But it was a big step forward: the canvas was no longer a picture of the system.
-
-One thing I didn't expect: the truer claim was the harder one to keep. When the engine was just a mirror, honesty was easy, because all I had to do was describe it correctly. Once the engine actually ran things, every claim about what it does had to stay true run after run, edit after edit. The guard is what makes that possible. I can let reps edit the machine and still say, in print, exactly what it will refuse to do.
+The result came back narrower. The edit lived on the engine, and the engine did the work. It was a small win, editing a number and rerunning a play, but it was a massive step forward. The canvas was no longer just a picture of the workflow.
 
 [^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
@@ -676,18 +739,15 @@ One thing I didn't expect: the truer claim was the harder one to keep. When the 
 
 ### The temptation
 
-When a play finishes, Junto posts a diagram into the thread. It shows the run's journey: what was asked, what data was touched, what came back. A rep can glance at it and know what the machine just did on their behalf. That was the goal, anyway.
+When a play finishes, Junto posts a diagram of the run's journey into the thread. It shows: what was asked, what data was touched, and what came back. A rep can glance at it and know what the machine just did on their behalf. That was the goal, anyway.
 
-The lazy way, and the way I did it at first, is to ask the model to draw it. The model was there for the whole run. Why not have it sketch what happened? Because a model redrawing its own work will happily draw what should have happened. It draws the plan, not the run, and the two look identical right up until they matter.[^c10-3]
+The lazy way, and the way I did it at first, is to ask the model to draw it. The model was there for the whole run. Why not have it sketch what happened? Because, as I'd learned, a model redrawing its own work will happily draw what *should've* happened. It draws the plan, not the run, and the two often look identical.[^c10-3]
 
-
-{/* TK: [NEEDS FACT: a specific early example where the model drew what should have happened instead of what did] */}
-
-A diagram is a claim. It says: this step ran, this data was read, this many records came back. And claims need evidence. A picture from the model's imagination is testimony from a witness who wasn't in the room.
+A diagram is a claim. It says: this step ran, this data was read, this many records came back, and claims need evidence.
 
 ### The rule
 
-So the rule became: render from the trace. No model anywhere in the picture path. Every run writes an execution record as it goes, and the diagram comes from that record by plain code. Same run, same picture, every time.
+The diagram rule became: render from the trace, no model anywhere in the picture path, every run writes an execution record as it goes, and the diagram comes from that record by plain code. Same run, same picture, every time.
 
 The diagram shows denominators too: scanned 312, matched 6. A bare count invites the obvious question: out of what? The image answers it before anyone can ask.
 
@@ -697,7 +757,7 @@ There's one extension of this rule I've not built yet, and I learned it from Ram
 
 ### The org chart, wrong
 
-The account org chart taught me the second rule, which is that a spec can render fine and still be wrong. My first spec drew department columns, with "reports to" written on every card. It rendered exactly as specified. It read terribly.
+The account org chart taught me the second rule, which is that a spec can render fine and still be wrong. My first spec drew department columns, with "reports to" written on every card. It rendered exactly as specified, and read terribly.
 
 The version worth copying came from a reference: Cursor's internal sales tool, ChatGTM, demo'd by George Hou, Cursor's Head of Enterprise Growth, and covered by Brendan Short in his Substack, [The Signal](https://www.thesignal.club/p/chatgtm). What we took from it was the reporting-graph format. The arrow is the reporting line, and no label does the geometry's job.
 
@@ -713,9 +773,13 @@ When the renderer is deterministic,[^c10-1] a bad spec is cheap, because redoing
 />
 
 
-The version that worked for me was a top-down graph where the arrow is the reporting line. No "reports to" text anywhere, because the geometry says it. Clusters group the functions that matter to the deal. Color marks who's engaged, who's a champion, which role is open.
+The version that worked for me was a top-down graph where the arrows are the reporting lines. No "reports to" text anywhere, just let the geometry say it.
 
-And the chart has an opinion. Functions outside the buying center simply don't render. How does the chart know who the buying center is? The list of functions that count as the buying center is configuration, an allowlist, not a model's guess. The caption says so, with a count,[^c10-2] so nobody mistakes the filter for the whole company. What does render is ranked by relevance, never silently cut. If the chart drops something, it tells you what it dropped, and how much.
+Clusters group the functions that matter to the deal. Color marks who's engaged, who's a champion, which role is open.
+
+And the chart has an opinion. Functions outside the buying center simply don't render. How does the chart know who the buying center is? The list of functions that count as the buying center is configuration, an allowlist, not a model's guess. The caption says so, with a count,[^c10-2] so nobody mistakes the filter for the whole company.
+
+What does render is ranked by relevance, and never silently cut. If the chart drops something, it tells you what it dropped, and how much.
 
 As for where the people come from: the chart doesn't discover anyone. Names, titles, and reporting lines are read from the contact records already in the CRM, and the renderer only draws what those records say. If the CRM is missing a person, so is the chart, and the caption's counts make that visible.
 
@@ -729,14 +793,16 @@ As for where the people come from: the chart doesn't discover anyone. Names, tit
 />
 
 
-If visuals are claims, they can be wrong, and (in my mind) things that can be wrong need tests. So the test suite stores an approved copy of each diagram type, the pinned snapshot. Every build re-renders every diagram from a fixed trace and compares the result against the approved copy. Any pixel-level difference fails the build until a human approves the new picture. The picture is the assertion. The snapshot is the expected value.
+If visuals are claims, then they can be wrong, and (IMHO) things that can be wrong need tests. So the test suite stores an approved copy of each diagram type as a pinned snapshot.
+
+Every build re-renders every diagram from a fixed trace and compares the result against the approved copy. Any pixel-level difference fails the build until a human approves the new picture. The picture is the assertion and the snapshot is the expected value.
 
 
 {/* TK: [ASSET: screenshot of a pinned snapshot test, e.g. the stored PNG beside the test code, or a failing diff] */}
 
-Why be that strict about pictures? Because I saw these diagrams fail differently than code. Bad code throws an error, but a bad diagram just sits there in the thread looking plausible. And a missing diagram is worse, because the only symptom is absence.
+Why be that strict about pictures? Because I saw these diagrams fail differently than code. Bad code throws an error, but a bad diagram just sits there in the thread looking plausible.
 
-So render failures are loud now, the same rule chapter 4 landed on for everything else. When a render dies live, the thread gets an error where the diagram would have been, with the run id attached. It's ugly, and reps see it, and that's the point.
+So render failures are loud now, the same rule chapter 4 landed on for everything else. When a render dies live, the thread gets an error where the diagram would have been, with the run ID attached. It's ugly, users see it, and that's the point.
 
 [^c10-1]: Deterministic here means the same trace yields the same bytes. If layout depended on anything outside the trace, the snapshot tests below wouldn't hold.
 
@@ -749,9 +815,9 @@ So render failures are loud now, the same rule chapter 4 landed on for everythin
 
 ### The notebook for building Junto
 
-Every decision made in this project lives in a numbered file, in one folder. There are nearly fifty of them now, still climbing. A new working session doesn't start by remembering but by reading.
+Every decision made in this project lives in a numbered file, in one folder. There are nearly 50 of them now, still climbing. A new working session doesn't start by remembering but by reading.
 
-That sounds like clerical work, and I suppose it is. It's also the whole method. The project's memory sits on disk, so any session, any tool, any future me can pick up exactly where the last one stopped.
+This sounds like clerical work, and I suppose it mostly is, but it's also the whole method. The project's memory sits on disk, so any session, any tool, any future me can pick up exactly where the last one stopped.
 
 The files outlast the tools. Sessions end, chats scroll off the screen, and whatever lived only in a conversation is quietly gone. But a numbered file doesn't care which tool opens it, or when. So the folder became the one place the project couldn't forget.
 
@@ -771,7 +837,7 @@ But even good evidence isn't the last word. Merges hold on live smoke tests, not
 
 Freezing that merge wasn't fun, because the work looked finished and the numbers said so. But "the numbers say so" is how I think bad software ships. Live use found what the whole suite couldn't.
 
-So were the tests useless? They were necessary and caught every mistake they had ever been taught to catch, but they weren't sufficient, and my thumbs were the last gate.
+So were the tests useless? They were necessary and caught every mistake they had ever been taught to catch, but they weren't sufficient, and I was always the last gate.
 
 ### Bugs become fixtures
 
@@ -779,7 +845,7 @@ What happens to a bug after the fix goes in? In most projects, nothing. The fix 
 
 This is the learning loop from chapter 1, pointed straight at the build itself. A tool that never hears about its failures dies. So every failure got heard, and heard permanently.
 
-The suite got smarter the same way I did, which is to say by getting burned. Each pinned transcript is a scar, and each scar arrives with a test attached to it.
+The suite got smarter the same way I did, which is to say, by getting burned. Each pinned transcript is a scar, and each scar arrives with a test attached to it.
 
 ### The suspect
 
@@ -789,27 +855,16 @@ At times I lost an hour or more to bugs that were actually "the old version is s
 
 Is that too small a lesson to deserve a section? Maybe, but it's the kind of small lesson that ends up paying every single day of the project, and the lesson that I'd want to know if I were an SDR reading this. Boring wisdom compounds too.
 
-### The recursion
-
-Step back far enough and the shape of it's hard to miss. Chapter 1 said projects die four deaths: the work lives in the wrong place, nobody sees it, nothing learns, and nothing compounds. The build itself carried the same four risks, and it got the same four fixes. Decisions were written where the work happened, in files beside the code, instead of in my head. That's location. The files were readable by anyone and any tool. That's sharing. Every live failure became a permanent test. That's learning. And every session started from the last session's notes instead of from zero. That's compounding.
-
-
-{/* TK: [ASSET: possible visual mapping the four loops onto the build process] */}
-
-And the strangest proof of all is the chapter in front of you, which exists because the memory does.
-
-I didn't reconstruct this story from old messages and hindsight. I opened the folder, and the story was already there, in order, numbered. I read it.
-
 [^c11-1]: 417 is where the count stood the morning the merge froze. The suite has grown since. The two bugs turned up in ordinary live use, not in any clever hunt.
 
 
 ## A working demo
 
-Every chapter so far reported something that happened. This closing one has to report what hasn't happened yet. Chapter 1 opened with eight projects that died quietly in a year: nothing broke, nobody complained, and nobody decided anything. This chapter says what would count as the opposite.
+Every chapter so far reported something that happened. This closing one has to report what hasn't happened yet. Chapter 1 opened with projects that died quietly: nothing broke, nobody complained, and nobody decided anything. This chapter says what would count as the opposite.
 
 ### What's proven
 
-Here is what I can show you today, live, with no cuts anywhere in the demo. A sentence typed into Slack becomes a running workflow a moment later. A rep's edit on the canvas changes the next run, and a remix credits the play it came from. The diagrams draw themselves from the evidence. And the rules hold under attack. The transcripts of the attacks are in the notebook.
+Here is what I can show you today, live. A sentence typed into Slack becomes a running workflow a moment later. A rep's edit on the canvas changes the next run, and a remix credits the play it came from. The diagrams draw themselves from the evidence. And the rules hold under attack. The transcripts of the attacks are in the notebook.
 
 
 <Diagram
@@ -824,25 +879,31 @@ Those are outputs. Outputs are real, and they matter, because for a year nothing
 
 ### What isn't
 
-Here is what I can't show you yet: the loops closing on their own. No demo can prove that a second rep will build unprompted, or that credit will change anyone's behavior. None can prove that knowledge deposited this quarter will change a deal next quarter. Those are outcomes, and outcomes only exist in other people's behavior, over time.
+What I can't show you yet, are the loops closing on their own. No demo can prove that a second rep will build unprompted, or that credit will change anyone's behavior. None can prove that knowledge deposited this quarter will change a deal next quarter. Those are outcomes, and outcomes only exist in other people's behavior, over time.
 
-The outcomes are measurable, just not yet by me. Stripe [measures them on Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), their internal knowledge platform: account executives produce twice the sales activity and close 39% more deals in the weeks they use it than the same sellers do in the weeks they don't, and it has shifted 25,000 hours a year from admin work toward revenue work. I'm citing their numbers for one reason. They're what closed loops look like when a whole company keeps them closed, and they're the thing the bet is actually chasing.
+The outcomes are, in fact, measurable, just not yet by me. Stripe [measures them on Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), their internal knowledge platform, here's what they've reported: AEs produce 2x the sales activity and close 39% more deals in the weeks they use it than the same sellers do in the weeks they don't, and it has shifted 25,000 hours a year from admin work toward revenue work.
+
+This is what closed loops look like when a whole company keeps them closed, and they're the thing the bet is actually chasing.
 
 Junto writes down every run as it happens. Who asked, which play ran, which constitution version was in force, whether it finished or failed, and how long it took. Every refusal, every account the filter kept out of an outbound list, every time the answer was that no source covers this.
 
-That record is worth having because it's where the three tests above would first show up.
+That record is worth having because it's where the 3 tests above would first show up.
 
-Could we fake one? Eh. Maybe? But where would the fun in that be? That'd be demo theater, possibly the same thing that eventually buried the vendor tools. Every one of those eight had a demo that worked, and every one died anyway. Here are the outcomes, defined.
+Could we fake one? Eh. Maybe? But where would the fun in that be? That'd be demo theater, possibly the same thing that eventually buried the vendor tools. Every one of those tools had a demo that worked, and every one died anyway. Here are the outcomes, defined.
 
 ### The real test
 
-Success, defined now, in writing, so I can't move the goalposts later. First, a second rep builds a play without being asked, not invited and not assigned. Second, a play outlives its builder: it keeps running, and keeps getting edited, after the person who made it has moved on. Third, an answer cites something a teammate learned, and names them.
+My success criteria for Junto, defined now, in writing:
 
-Each test maps to one of the deaths from chapter 1. A second rep building unasked means sharing worked, because nobody builds on a thing they can't find. A play outliving its builder means location and compounding worked. The work sat somewhere durable and kept accruing. An answer that names a teammate means the learning stuck.
+First, a second rep builds a play without being asked, not invited and not assigned.
 
-What do these three have in common? None of them is a feature, so I can't ship them, and I can't demo them. Each is a thing another person does or doesn't do, and all I control is whether the layer makes doing it easy. That's the honest shape of the bet.
+Second, a play outlives its builder: it keeps running, and keeps getting edited, after the person who made it has moved on.
 
-The infrastructure is running. Now we find out if anyone builds.
+Third, an answer cites something a teammate learned, and names them.
+
+Each test maps to one of the deaths from the beginning of this essay. A second rep building unasked means sharing worked, because nobody builds on a thing they can't find. A play outliving its builder means location and compounding worked. The work sat somewhere durable and kept accruing. An answer that names a teammate means the learning stuck.
+
+None of these are features, so I can't ship them, nor could I demo them. Each is a thing that another person does or doesn't do, and all I control is whether the layer makes doing it easy.
 
 ### At a glance
 
