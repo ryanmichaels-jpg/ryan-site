@@ -466,7 +466,7 @@ If the vocabulary didn't have a tag for 'monitoring gaps', the record would land
 
 Every record also has to cite a verbatim quote. A model can assert a pain that's not there, but it has a much harder time producing a quote that's not there, and a script can check the quote against the transcript. No quote, no tag.
 
-Then the gate. Every record carries a confidence score, the model's own 0-1 rating of how sure it is that the tag fits, reported alongside the tag. Anything under 0.7, or anything the vocabulary couldn't place, goes to a review queue instead of being committed silently. About 35% of records hit the <0.7 queue.
+Then the gate. Every record carries a confidence score, the model's own 0-1 rating of how sure it is that the tag fits, reported alongside the tag. Anything under 0.7, or anything the vocabulary couldn't place, goes to a review queue instead of being committed silently. About 35% of records hit the &lt;0.7 queue.
 
 The shared knowledge layer version is the same method, with me removed from the middle and left at the edges. A connector polls for new calls, routes each one by lane, runs the extractor, validates every row against the contract, and applies the same gate into the same queue.[^c6-2]
 
