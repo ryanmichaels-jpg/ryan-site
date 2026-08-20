@@ -22,6 +22,7 @@ I built a shared, GTM context layer, after watching countless AI projects/tools 
 - The argument: I believe that what all of the projects were missing were 'relationships'. Relationships to the workday, to teammates, to the tool's own failures, and to every other piece of GTM work.
 - The fix: A shared, compounding knowledge layer. The aforementioned dead projects were places you had to go to, and they competed with your day for time. We built Junto as the layer for what any project could be built on, native to the one place that GTM was already in.
 - The output: 2 surfaces, Slack as the front door, and a backend where plays are editable blocks on a canvas, built from 1,000+ triggers and integrations. Underneath, an open source engine, a constitution injected at exactly one seam, a deterministic linter that outranks the model, and a set of rules living below the model that must always hold. Every answer comes back with a diagram drawn from the run's own trace, and every play carries who built it.
+- The results: I pressure-tested it with a simulated 120-person GTM team. 0 permission leaks across 432 requests, the 6 accounts planted to bait a cross-channel read refused 6 of 6 times, lookups at 13 milliseconds at the 95th percentile, and 100% of cited facts verified word for word against the data.
 
 Five examples of prompts that could only be answered from a system like Junto:
 
@@ -786,6 +787,18 @@ The objection I take most seriously, because it half sounds like Junto. Products
 
 This one came from inside the building. Our engineers already ship an internal path for hosting static apps, and it's excellent. It's also front-ends only: no data, no actions. Junto is the tier next to it, data plus action plus Slack, and the two compose the way layers should.
 
+### The money question
+
+A model call on every question, for a whole org, sounds like a bill that grows with every person you add.
+
+The layer prices the other way. One corpus, one index, one set of detectors, shared by everyone. The work of ingesting, tagging, and indexing the business is paid once, however many people ask questions of it. Cost grows with the data, not the team.
+
+The fake company gave me the receipt. The structural sweep, 120 people, 432 requests, scoping and channel checks on every one, ran in 418 milliseconds and cost $0.00, because everything checkable is deterministic code that never touches a model. The graded sample, 148 full exchanges, cost $3.83. The expensive part of this system is the model call at the end.
+
+And we were wasting exactly that part. The eval harness caught the prompt carrying the current wall-clock time, so every prompt was byte-different and the prompt cache never hit once. The fixes were: caching the fixed prefix, routing easy asks to a cheaper model, and trimming the payload to rows-only evidence.
+
+The principle underneath is the one this post keeps arriving at: shrink the surface that depends on the model. Scoping, retrieval, rules, and grounding live in deterministic layers that are free to run. The model gets used as narrowly as possible.
+
 ### The caveat
 
 Behind every why-not-just is the build vs buy debate, and I have to answer it against my own interest: I do not think that most teams should build this. In my mind there are 3 prerequisites, and missing any one flips the answer.
@@ -866,6 +879,24 @@ The result came back narrower. The edit lived on the engine, and the engine did 
   caption="In on the held-open websocket, out on a plain web call. Sim mirrors every run onto its canvas and can run a published play, but it never speaks to Slack."
 />
 
+
+### Monday morning
+
+Say you're reading this and you think I want my whole go to market team on Junto by next Monday. What actually has to happen?
+
+Less than you'd think, at first. Nothing gets installed on anyone's laptop and the repo goes nowhere. The gateway, the queue, the worker, and the engine already run on the server. The team's client is Slack. There's no new login either, because Slack is the login: when a rep types @junto, Slack says who they are, and that maps to their book. One workspace admin approves the app and the whole team has it at once. Socket Mode keeps even that step small, the server dials out, so IT opens no ports. The forty-first user costs nothing to add, because there's nothing per-user to add.
+
+The simulation says the structure would hold. 120 people in 30 channels, zero permission leaks in 432 requests, the six planted cross-channel baits refused all six times, latency flat at 4 milliseconds typical and 13 at the 95th percentile. And the websocket never becomes the bottleneck, since Socket Mode is one connection per app. The load lands on the worker and the model calls behind it, not the socket.
+
+Here's what stands between that Monday and getting an entire org on Junto.
+
+Your data. You'd connect your own sources with your own API credentials, Gong, Salesforce, marketing, each stamping visibility at write time, and you'd map each Slack user to their CRM ownership so each rep's book is their real book. The simulation proved the enforcement holds once the books exist. Building the books is the work.
+
+The datastore. Run outputs land in one SQLite database, one writer. Fine for one team's traffic, not an org's.
+
+The composer door. Everything above happens in Slack, where no public door exists. But a rep who wants to open a play, edit it, or build one lands in the composer, in a browser, and a browser needs a door that exists and locks. Today that door is a server address over plain HTTP with the engine's own login. You'd give it a domain with TLS, decide whether it sits behind your VPN or in the open, and give reps accounts. The run-time guard still protects the safety rules and provenance still tracks every edit.
+
+The principle that runs through this whole build, shrink the surface that depends on the model, is also what makes it scale, because everything outside that surface is deterministic code that treats 120 people the same as one.
 
 [^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
