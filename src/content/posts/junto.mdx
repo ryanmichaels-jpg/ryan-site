@@ -774,14 +774,6 @@ So I run one test on every X. This journal named four deaths: location, sharing,
 
 For any single workflow, you could. Zapier and n8n solved workflow execution years ago, and solved it well, which is exactly why Junto stands on an engine instead of shipping its own.[^c8-1] What they lack is a shared memory. Every zap is another private copy of context, owned by one person, invisible to the team, and when that person leaves, the zap keeps firing until it breaks. Location is half closed at best, and sharing, learning, and compounding are all dead.
 
-
-<Diagram
-  src="junto-webhook-explainer.png"
-  label="Fig. 20"
-  caption="In on the held-open websocket, out on a plain web call. Sim mirrors every run onto its canvas and can run a published play, but it never speaks to Slack."
-/>
-
-
 ### Why not a chatbot?
 
 The most common suggestion is the simplest: give every rep an AI chat window and let them go. The reps will love it, and I know because I practically live in one. For one question on one afternoon, the chat wins. But a thousand brilliant private chats compound nothing. My best prompt dies in my history, the next rep's best answer dies in theirs, and nothing anyone figures out today makes tomorrow's work cheaper. Even [Stripe's Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), serving most of their company, still names this problem on its roadmap: context generated in sessions stays locked in, and in their words, that's not how work gets done.
@@ -816,7 +808,7 @@ If that's not you, or you're not willing to spend evenings and weekends reading 
 
 <Diagram
   src="junto-sim-composer.gif"
-  label="Fig. 21"
+  label="Fig. 20"
   caption="The composer. Tables hold the rows, files hold the documents, and knowledge bases hold what a play can search."
 />
 
@@ -866,6 +858,14 @@ In an attempt to trick it, I took a play I'd made that scans my accounts for fre
 {/* TK: [ASSET: gif of the edit-and-rerun sequence, canvas edit then Slack rerun. Check junto-recruit clips for usable footage] */}
 
 The result came back narrower. The edit lived on the engine, and the engine did the work. It was a small win, editing a number and rerunning a play, but it was a massive step forward. The canvas was no longer just a picture of the workflow.
+
+
+<Diagram
+  src="junto-webhook-explainer.png"
+  label="Fig. 21"
+  caption="In on the held-open websocket, out on a plain web call. Sim mirrors every run onto its canvas and can run a published play, but it never speaks to Slack."
+/>
+
 
 [^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
