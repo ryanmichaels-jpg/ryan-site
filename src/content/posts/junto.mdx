@@ -776,10 +776,9 @@ For any single workflow, you could. Zapier and n8n solved workflow execution yea
 
 
 <Diagram
-  src="junto-webhook-explainer.html"
+  src="junto-webhook-explainer.png"
   label="Fig. 20"
-  caption="A webhook is Slack knocking on a public door you put up. A websocket is a line your own app dials out and holds open. The queue, the worker, and the executor in the middle are the custom backend an off-the-shelf connector doesn't have, and Sim watches and draws without ever speaking to Slack."
-  height={1700}
+  caption="In on the held-open websocket, out on a plain web call. Sim mirrors every run onto its canvas and can run a published play, but it never speaks to Slack."
 />
 
 
