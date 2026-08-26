@@ -42,19 +42,17 @@ All of the AI projects I saw our GTM team built ended up dying. Off the top of m
 
 In my mind there were 3 kinds of dead projects.
 
-First, the scattered ones: Claude projects, spreadsheets, dashboards. Most of them are still running right now, pulling fresh lists of accounts every morning that nobody ever looks at.
+First, the scattered ones: Claude projects, spreadsheets, dashboards. Most of them are still running right now, pulling fresh lists of accounts every morning that nobody ever looks at. They were set-and-forget artifacts, and nobody was monitoring whether they still mattered.
 
 Second, my projects. A teammate and I built a dashboard that read our accounts out of Salesforce, showed which ones had been outbounded, and laid the week's work out in a single view. It did exactly what we had asked it to do and it lived three weeks. The last time either of us opened it was August 6th, 2025.
 
 Third, paid platforms. Actual products, from actual vendors, bought with actual money.
 
-The part that took me a while to realize was that none of the projects had 'exploded'. There was no incident, postmortem, or angry thread in Slack.
-
 ### The wrong question
 
 My first question was: what were they not doing correctly? That went nowhere.
 
-Dashboards displayed, Claude projects produced output (the outputs are usually great!), and the vendor platforms showed us data. Every one of them did the job it was built to do.
+Dashboards displayed, Claude projects produced output (the outputs are usually great!), and the vendor platforms showed us data. Every one of them did the job it was built to do, yet within a month or two they were abandoned.
 
 The vendor platforms were what convinced me to dig into this. Those things had design teams, roadmaps, support addresses and onboarding calls, and they died the same death as a dashboard that a couple of us threw together.
 
@@ -66,9 +64,9 @@ As I do for most of the problems I face nowadays, I started reading. Albert Ruth
 
 A 'systems thinker' asks about connections instead of features. Neat, I guessed. So in an attempt to be one of these profound 'systems thinkers' myself, I started to ask about the 'inputs' that fed the projects and what their eventual 'outputs' fed. This inputs/outputs reframing might seem abstract or vague right now, but I think it's arguably the most important pivot of this project and it will be the basis for everything that's written below.
 
-The realization: Every dead project consumed inputs and produced outputs, and that part worked just fine. The problem was that the outputs weren't anybody's inputs.
+My realization: Every dead project consumed inputs and produced outputs, and that part worked just fine. The problem was that the outputs weren't anybody's inputs.
 
-My hypothesis was: the failures were structural, stemming from how the projects were situated, not from what they were made of.
+My hypothesis became: the failures were structural, stemming from how the projects were situated, not from what they were made of.
 
 Which led us to our final (and I think best) question: What did each of the projects lack a relationship to?
 
@@ -86,7 +84,7 @@ Location. Location is a relationship to the workday. Most of the projects lived 
 
 Sharing. Sharing is a relationship to teammates. Nobody could see the majority of projects, so nobody could build on top of the projects or see what outputs others were getting.
 
-Learning. Learning is a relationship to your own failures. For most of the projects, if they answered wrong on Tuesday, they answered exactly as wrong on Wednesday.
+Learning. Learning is a relationship to your own failures. For most of the projects, if they answered wrong on Tuesday, they answered exactly as wrong on Wednesday. It doesn't help that GTM's native feedback loop is the quarterly pipeline review, so a bad targeting call can run for a quarter before anything tells you it was bad. A system that hears about its failures daily compresses that loop from a quarter to days.
 
 Compounding. Compounding is a relationship to every other piece of work. Nothing anyone built made the next thing easier to build.
 
@@ -148,7 +146,7 @@ You didn't have to leave Slack to spawn an agent.
 
 You never discovered the same thing twice.
 
-[^c1-3]: The older evidence is [a 2007 study of copied code](https://doi.org/10.1109/WCRE.2007.7) (Jens Krinke) finding roughly half of later changes landed in one copy and not the other, and [a 2009 study across five industrial systems](https://doi.org/10.1109/ICSE.2009.5070547) (Juergens et al.) where inconsistent changes to clones were frequent enough to cause real faults. The newer version is the AGENTS.md movement: one canonical instruction file per repo. [A 2025 study of 2,303 of those files](https://arxiv.org/abs/2511.12884) (NAIST and Queen's) found they aren't static documentation but artifacts that evolve like configuration code, which is the same drift in a new costume. Neither paper proves why the convention caught on, and [one 2026 ablation](https://arxiv.org/abs/2602.11988) found context files can slightly reduce agent success, so take this as a pattern rhyming rather than a question settled.
+[^c1-3]: [A 2025 study of 2,303 of those files](https://arxiv.org/abs/2511.12884) (NAIST and Queen's) found they aren't static documentation but artifacts that evolve like configuration code, which is the same drift in a new costume. The study doesn't prove why the convention caught on, and [one 2026 ablation](https://arxiv.org/abs/2602.11988) found context files can slightly reduce agent success, so take this as a pattern rhyming rather than a question settled.
 
 [^c1-4]: Stripe's engineering write-up of Kai, "[Meet Stripe's Knowledge AI Platform](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform)" (stripe.dev, 2026). It's the largest public deployment of the shape this post is about, and the adoption numbers are worth the read on their own: most of Stripe using it within two weeks of launch, and 83% of the company weekly active, including nearly all of GTM.
 
@@ -186,9 +184,11 @@ The platform had to meet the user where they were. At this point I firmly believ
 
 ### The principle
 
+If I was going to create something that agents could pull data from and take actions with, the first step in my mind was going to be compiling all of the necessary data.
+
 Centralize the data. Decentralize the builders.
 
-One shared memory underneath, and many hands building on top.
+One shared memory underneath, and many hands building on top. The two multiply, too. Data nobody else has, times plays nobody else runs, is worth more than either one alone.
 
 The phrasing comes from a talk Chris Prinz, a former colleague, now a GTM Engineer at Modal, gave in [Modal's session with Deepline](https://www.youtube.com/watch?v=C-7NljdnSR0), where he put his team's core philosophy on a slide:
 
@@ -415,7 +415,7 @@ First, every 'event' that makes its way into the context layer is qualified: ded
 
 So: four questions, four shapes of row. And every row carries the same spine: what it's about, when it happened, where it came from, who's allowed to see it.
 
-Two of those fields do more work than they look like they should. Visibility is stamped when the row is written, inherited from wherever the data was born, so a thread from a private channel stays private without anyone remembering to make it so.[^c6-3] And the link back to the source is required.
+Two of those fields do more work than they look like they should. Visibility is stamped when the row is written, inherited from wherever the data was born, so a thread from a private channel stays private without anyone remembering to make it so. And the link back to the source is required.
 
 ### Acting and asking
 
@@ -522,11 +522,9 @@ Where I diverge from them is: their system answers questions, so everything can 
 
 [^c6-2]: Two honesty notes on the automated version. The hand-tagged corpus was new-business calls only, so the post-sale lane is specified and seeded, not proven against a year of real conversations. And the demo corpus is fictional end to end: the categories are structurally real, and every quote in it's invented.
 
-[^c6-3]: [Buttcher and Clarke](https://www.usenix.org/conference/fast-05/security-model-full-text-file-system-search-multi-user-environments) (USENIX FAST 2005) showed that a shared index over many people's content has to enforce permissions inside query processing, because filtering after retrieval leaks. Junto does both, stamping at write and filtering at ask. The stamp is the weaker half and it's worth saying why: if a channel later goes public, or someone loses access to a source, a stamp written months ago is quietly wrong now. [Bailey and colleagues](https://doi.org/10.1145/1183614.1183686) wrote that tradeoff up in 2006 and I haven't solved it.
-
 [^c6-4]: [UniK-QA](https://aclanthology.org/2022.findings-naacl.115/) (Meta AI, 2022) is the catalog measured: flatten text, tables, lists and knowledge-base triples into one index, search it with a single retriever, and beat the specialized per-source systems by as much as eleven points. Their setting is open questions over Wikipedia and mine is a permissioned corpus of calls and threads, so it's the shape I'm taking and not the number. Doing the flattening late instead of early is the column-store instinct ([Abadi et al.](https://www.cs.umd.edu/~abadi/papers/abadiicde2007.pdf), ICDE 2007), and the precise version of my claim is that the index is a derived projection while the typed stores stay canonical.
 
-[^c6-5]: [Cho and Garcia-Molina](https://oak.cs.ucla.edu/~cho/papers/cho-tods03.pdf) (ACM TODS 2003) is the foundational result here, and it says something more awkward than "match the rate." Under a fixed budget, reading in proportion to change isn't optimal, and the fastest-changing sources should be read deliberately less often than their churn suggests. [Azar and colleagues](https://erichorvitz.com/Crawl_1801519115.full.pdf) (PNAS 2018) gave it a shape, with optimal frequency rising sublinearly with change rate. The Slack rule above is the clearest case of this: threads change constantly and I wait two quiet hours anyway, because a thread isn't a knowledge unit until it stops moving.
+[^c6-5]: [Azar and colleagues](https://erichorvitz.com/Crawl_1801519115.full.pdf) (PNAS 2018) found that the optimal reading frequency rises sublinearly with how fast a source changes. The Slack rule above is the clearest case of this: threads change constantly and I wait two quiet hours anyway, because a thread isn't a knowledge unit until it stops moving.
 
 
 ## Thank You as a feature
@@ -556,7 +554,7 @@ I think that this part will end up mattering more than it sounds. Asking for cre
 
 ### The ritual
 
-I assumed the counters would be the motivating part. Then I read the research on gratitude and credit. What I took away was: The automatic half of credit, the counters and the attached names, does almost **nothing** for motivation on its own. A human saying thanks roughly doubles the rate at which people help again.[^c7-1] The machine can prove who built a thing, but it can't make anyone feel appreciated for building it.
+I assumed the counters would be the motivating part. Then I read the research on gratitude and credit. What I took away was: The automatic half of credit, the counters and the attached names, does almost **nothing** for motivation on its own. A human saying thanks roughly doubles the rate at which people help again. The machine can prove who built a thing, but it can't make anyone feel appreciated for building it.
 
 So the system splits the job in two. Provenance is automatic, and gratitude is a ritual that Junto prompts for. When someone uses your play for the first time, and again at milestones, Junto nudges them to say thanks in public. At this cadence, hopefully, the thanks stay scarce enough to mean something.
 
@@ -598,8 +596,6 @@ The slide said "decentralized experiments, centralized gains." Junto's credit la
 2 small details that I thought about more than I probably should've: Recognition thresholds only count runs by *other* people, so running your own play 100 times moves nothing. Status has a single source, which is a teammate finding your work useful enough to run it.
 
 And plays are ranked only within their own kind. So the small, sharp thing built for 3 people is never measured against the daily digest that an entire team runs.
-
-[^c7-1]: Adam Grant and Francesca Gino, "[A Little Thanks Goes a Long Way](https://www.hbs.edu/faculty/Pages/item.aspx?num=38092)" (2010): across four experiments, including a field study of adults doing real work, an expression of gratitude roughly doubled follow-up helping. A separate study of a large online creative community found the automatic half of credit, the counters and attached names, did little for motivation on its own. Two very different settings, same split.
 
 
 ## The company that doesn't exist
@@ -872,15 +868,15 @@ The result came back narrower. The edit lived on the engine, and the engine did 
 />
 
 
-### Monday morning
+### How this scales
 
-Say you're reading this and you think I want my whole go to market team on Junto by next Monday. What actually has to happen?
+If you're reading this and thinking "I could make something like this, but how would I deliver it to my entire GTM team?", here's what actually has to happen.
 
-Less than you'd think, at first. Nothing gets installed on anyone's laptop and the repo goes nowhere. The gateway, the queue, the worker, and the engine already run on the server. The team's client is Slack. There's no new login either, because Slack is the login: when a rep types @junto, Slack says who they are, and that maps to their book. One workspace admin approves the app and the whole team has it at once. Socket Mode keeps even that step small, the server dials out, so IT opens no ports. The forty-first user costs nothing to add, because there's nothing per-user to add.
+Less than you'd think. Nothing gets installed on anyone's laptop and the repo goes nowhere. The gateway, the queue, the worker, and the engine already run on the server. The team's client is Slack. There's no new login either, because Slack is the login: when a rep types @junto, Slack says who they are, and that maps to their book. One workspace admin approves the app and the whole team has it at once. Socket Mode keeps even that step small, the server dials out, so IT opens no ports. The forty-first user costs nothing to add, because there's nothing per-user to add.
 
 The simulation says the structure would hold. 120 people in 30 channels, zero permission leaks in 432 requests, the six planted cross-channel baits refused all six times, latency flat at 4 milliseconds typical and 13 at the 95th percentile. And the websocket never becomes the bottleneck, since Socket Mode is one connection per app. The load lands on the worker and the model calls behind it, not the socket.
 
-Here's what stands between that Monday and getting an entire org on Junto.
+Here's what stands between you and getting an entire org on Junto.
 
 Your data. You'd connect your own sources with your own API credentials, Gong, Salesforce, marketing, each stamping visibility at write time, and you'd map each Slack user to their CRM ownership so each rep's book is their real book. The simulation proved the enforcement holds once the books exist. Building the books is the work.
 
@@ -889,6 +885,8 @@ The datastore. Run outputs land in one SQLite database, one writer. Fine for one
 The composer door. Everything above happens in Slack, where no public door exists. But a rep who wants to open a play, edit it, or build one lands in the composer, in a browser, and a browser needs a door that exists and locks. Today that door is a server address over plain HTTP with the engine's own login. You'd give it a domain with TLS, decide whether it sits behind your VPN or in the open, and give reps accounts. The run-time guard still protects the safety rules and provenance still tracks every edit.
 
 The principle that runs through this whole build, shrink the surface that depends on the model, is also what makes it scale, because everything outside that surface is deterministic code that treats 120 people the same as one.
+
+The question I'd put to any GTM stack is simple: is it scaling by adding labor, or by building systems?
 
 [^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
@@ -927,7 +925,7 @@ When the renderer is deterministic,[^c10-1] a bad spec is cheap, because redoing
 <Diagram
   src="junto-org-chart.png"
   label="Fig. 21"
-  caption="The org chart the demo drew for CoreFlow, rendered from the fetched rows. Color is state: engaged, champion, open role. No model in this path."
+  caption="The org chart Junto drew for CoreFlow, a fictional account, rendered from the fetched rows. Color is state: engaged, champion, open role. No model in this path."
 />
 
 
@@ -978,6 +976,8 @@ Every decision made in this project lives in a numbered file, in one folder. The
 This sounds like clerical work, and I suppose it mostly is, but it's also the whole method. The project's memory sits on disk, so any session, any tool, any future me can pick up exactly where the last one stopped.
 
 The files outlast the tools. Sessions end, chats scroll off the screen, and whatever lived only in a conversation is quietly gone. But a numbered file doesn't care which tool opens it, or when. So the folder became the one place the project couldn't forget.
+
+The run record is episodic memory, what happened during this run, kept while the work is in flight. The numbered files and the typed stores are persistent memory, conclusions that survive the session that produced them. And the constitution and the locked vocabulary are semantic memory, the rules and definitions everything else gets read through.
 
 ### Three roles
 
