@@ -504,14 +504,6 @@ All in all: state stays federated, knowledge gets materialized. The memory holds
 />
 
 
-
-<Diagram
-  src="junto-widget-normalize-event.html"
-  label="Fig. 16"
-  height={900}
-/>
-
-
 ### The name
 
 I already said in the layer section that I read about how Cerebras built their internal knowledge base before I designed a thing, and this section is where their shape and mine actually meet. Here are my takeaways from their blog:
@@ -556,7 +548,7 @@ Every output a play produces carries its origin with it: who built it, how many 
 
 <Diagram
   src="junto-thank-builder.png"
-  label="Fig. 17"
+  label="Fig. 16"
   width={520}
 />
 
@@ -575,7 +567,7 @@ Remix is a button on every play, and pressing it opens a conversation. Junto alr
 
 <Diagram
   src="junto-remix-button.png"
-  label="Fig. 18"
+  label="Fig. 17"
   width={500}
 />
 
@@ -600,7 +592,7 @@ The slide said "decentralized experiments, centralized gains." Junto's credit la
 
 <Diagram
   src="junto-ramp-flywheel.png"
-  label="Fig. 19"
+  label="Fig. 18"
 />
 
 2 small details that I thought about more than I probably should've: Recognition thresholds only count runs by *other* people, so running your own play 100 times moves nothing. Status has a single source, which is a teammate finding your work useful enough to run it.
@@ -821,7 +813,7 @@ If that's not you, or you're not willing to spend evenings and weekends reading 
 
 <Diagram
   src="junto-sim-composer.gif"
-  label="Fig. 20"
+  label="Fig. 19"
   caption="The composer. Tables hold the rows, files hold the documents, and knowledge bases hold what a play can search."
 />
 
@@ -875,7 +867,7 @@ The result came back narrower. The edit lived on the engine, and the engine did 
 
 <Diagram
   src="junto-webhook-explainer.png"
-  label="Fig. 21"
+  label="Fig. 20"
   caption="In on the held-open websocket, out on a plain web call. Sim mirrors every run onto its canvas and can run a published play, but it never speaks to Slack."
 />
 
@@ -934,7 +926,7 @@ When the renderer is deterministic,[^c10-1] a bad spec is cheap, because redoing
 
 <Diagram
   src="junto-org-chart.png"
-  label="Fig. 22"
+  label="Fig. 21"
   caption="The org chart the demo drew for CoreFlow, rendered from the fetched rows. Color is state: engaged, champion, open role. No model in this path."
 />
 
@@ -954,7 +946,7 @@ As for where the people come from: the chart doesn't discover anyone. Names, tit
 
 <Diagram
   src="junto-run-journey.png"
-  label="Fig. 23"
+  label="Fig. 22"
   caption="A run journey card, rendered deterministically from the run's own trace. This one is the account pov: 12 signals in, 6 sourced claims out."
 />
 
@@ -1022,63 +1014,3 @@ At times I lost an hour or more to bugs that were actually "the old version is s
 Is that too small a lesson to deserve a section? Maybe, but it's the kind of small lesson that ends up paying every single day of the project, and the lesson that I'd want to know if I were an SDR reading this. Boring wisdom compounds too.
 
 [^c11-1]: 417 is where the count stood the morning the merge froze. The suite has grown since. The two bugs turned up in ordinary live use, not in any clever hunt.
-
-
-## A working demo
-
-Every chapter so far reported something that happened. This closing one has to report what hasn't happened yet. Chapter 1 opened with projects that died quietly: nothing broke, nobody complained, and nobody decided anything. This chapter says what would count as the opposite.
-
-### What's proven
-
-Here is what I can show you today, live. A sentence typed into Slack becomes a running workflow a moment later. A rep's edit on the canvas changes the next run, and a remix credits the play it came from. The diagrams draw themselves from the evidence. And the rules hold under attack. The transcripts of the attacks are in the notebook.
-
-
-<Diagram
-  src="junto-slack.html"
-  label="Fig. 24"
-  caption="The demo, wearing the surface it was built for. The seeded thread is a recording and says so, with its date. The pre-set messages run live against the real service when it is up, and the badge tells you which one you are getting."
-  height={800}
-/>
-
-
-Those are outputs. Outputs are real, and they matter, because for a year nothing I built lived long enough to have any. But outputs are the easy part of this whole story. A demo proves the machine runs and nothing about what people will do with it.
-
-### What isn't
-
-What I can't show you yet, are the loops closing on their own. No demo can prove that a second rep will build unprompted, or that credit will change anyone's behavior. None can prove that knowledge deposited this quarter will change a deal next quarter. Those are outcomes, and outcomes only exist in other people's behavior, over time.
-
-The outcomes are, in fact, measurable, just not yet by me. Stripe [measures them on Kai](https://stripe.dev/blog/meet-stripes-knowledge-ai-platform), their internal knowledge platform, here's what they've reported: AEs produce 2x the sales activity and close 39% more deals in the weeks they use it than the same sellers do in the weeks they don't, and it has shifted 25,000 hours a year from admin work toward revenue work.
-
-This is what closed loops look like when a whole company keeps them closed, and they're the thing the bet is actually chasing.
-
-Junto writes down every run as it happens. Who asked, which play ran, which constitution version was in force, whether it finished or failed, and how long it took. Every refusal, every account the filter kept out of an outbound list, every time the answer was that no source covers this.
-
-That record is worth having because it's where the 3 tests above would first show up.
-
-Could we fake one? Eh. Maybe? But where would the fun in that be? That'd be demo theater, possibly the same thing that eventually buried the vendor tools. Every one of those tools had a demo that worked, and every one died anyway. Here are the outcomes, defined.
-
-### The real test
-
-My success criteria for Junto, defined now, in writing:
-
-First, a second rep builds a play without being asked, not invited and not assigned.
-
-Second, a play outlives its builder: it keeps running, and keeps getting edited, after the person who made it has moved on.
-
-Third, an answer cites something a teammate learned, and names them.
-
-Each test maps to one of the deaths from the beginning of this essay. A second rep building unasked means sharing worked, because nobody builds on a thing they can't find. A play outliving its builder means location and compounding worked. The work sat somewhere durable and kept accruing. An answer that names a teammate means the learning stuck.
-
-None of these are features, so I can't ship them, nor could I demo them. Each is a thing that another person does or doesn't do, and all I control is whether the layer makes doing it easy.
-
-### At a glance
-
-Here is the whole post in one box, for whoever scrolled straight to the end.
-
-- Projects die four deaths: location, sharing, learning, compounding. Creating was never the problem.
-- The fix isn't a better tool. It's a layer: centralize the data, decentralize the builders.
-- Stand on engines for what is solved. Spend yourself only on what makes you different.
-- Rules that must hold live below the model. Failures must be loud. Pictures come from evidence.
-- Outputs are proven. Outcomes are behavioral. Judge me on the outcomes.
-
-Every decision in this post has a receipt: a dated file, a transcript, a test, or a log line. The notebook is the bibliography, and this post is itself a deposit into the layer.

@@ -81,17 +81,6 @@ One rule kept the whole thing honest.
 
 If a mechanical check says this is a request to run a play, then no amount of model cleverness gets to overrule it.[^5] The classifier proposes and the rules dispose. And every misroute that happened live became a pinned transcript in the test suite,[^2] an actual test containing the real words a real person typed. The router can't quietly regress to a mistake it has already made once. That's a cheap property to buy and I'd buy it again.
 
-You can watch the whole front door work, and the five rules pass or get the last word, in the demo below.
-
-
-<Diagram
-  src="junto-widget-seven-steps.html"
-  label="Fig. 3"
-  caption="Pick a message and it sends for real. Seven cards settle as the run reaches each phase, and the routing card opens onto the five rules that get the last word."
-  height={840}
-/>
-
-
 ## Loud beats silent
 
 There's a gate in front of all of this, deciding whether a given Slack message is even meant for the bot. It has to exist, because the bot lives in shared channels where most of the traffic is people talking to each other.
@@ -120,7 +109,7 @@ The obvious way to apply a spec like that's to paste it into every prompt. I had
 
 <Diagram
   src="junto-one-seam.png"
-  label="Fig. 4"
+  label="Fig. 3"
   caption="Every prompt passes through the same wrapper. One place to audit, one version in every run log. The non-ideal version: 40 dialects of the same law."
 />
 
@@ -149,7 +138,7 @@ Why not let the model review its own work? Because a reviewer you can persuade i
 
 <Diagram
   src="checkpoint.png"
-  label="Fig. 5"
+  label="Fig. 4"
   caption="The four places that get a vote between a mention and a reply. Three of them are code and can refuse. The one written in words can only ask."
   width={816}
 />
