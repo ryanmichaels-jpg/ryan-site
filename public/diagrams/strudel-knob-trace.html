@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a knob turn actually is</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --ink: #1a1a1f; --muted: #77777e; --line: #d9d9d4;
+    --blue: #2456c8; --green: #1e7e4c; --amber: #b0781a; --orange: #d1651b;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--sans);
+    padding: 32px 24px 26px; -webkit-font-smoothing: antialiased;
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 21px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; font-size: 13.5px; color: var(--muted); line-height: 1.5; margin-bottom: 26px; }
+
+  .flow { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; justify-content: center; }
+  .step {
+    flex: 1 1 150px; min-width: 150px; background: #fff; border: 1.5px solid var(--ink);
+    border-top-width: 4px; border-radius: 9px; padding: 12px 13px 14px;
+  }
+  .step.s1 { border-top-color: var(--blue); }
+  .step.s2 { border-top-color: var(--green); }
+  .step.s3 { border-top-color: var(--amber); }
+  .step.s4 { border-top-color: var(--orange); }
+
+  .kind { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .step.s1 .kind { color: var(--blue); }
+  .step.s2 .kind { color: var(--green); }
+  .step.s3 .kind { color: var(--amber); }
+  .step.s4 .kind { color: var(--orange); }
+  .step b { display: block; font-size: 14px; line-height: 1.3; margin-bottom: 7px; }
+  .step .code {
+    font-family: var(--mono); font-size: 11px; line-height: 1.5; color: var(--ink);
+    background: #f2f2ee; border-radius: 5px; padding: 6px 8px; word-break: break-word;
+  }
+
+  .arrow {
+    flex: 0 0 30px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--muted); font-weight: 700;
+  }
+  @media (max-width: 620px) {
+    .flow { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .arrow { display: none; }
+    .step { min-width: 0; }
+  }
+
+  .foot { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 14px; text-align: center; }
+  .foot p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+  .foot b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>What a knob turn actually is</h1>
+  <p class="sub">One drawn circle, one number, one instant. No polling, no save button.</p>
+
+  <div class="flow">
+    <div class="step s1">
+      <div class="kind">on the canvas</div>
+      <b>You twist a drawn knob.</b>
+      <div class="code">a circle you sketched, blessed into a control</div>
+    </div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="step s2">
+      <div class="kind">the database</div>
+      <b>A number changes in the store.</b>
+      <div class="code">{ type: 'knob',<br>&nbsp;&nbsp;cutoff: 1215 }</div>
+    </div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="step s3">
+      <div class="kind">the same instant</div>
+      <b>The store fires an event.</b>
+      <div class="code">a listener catches it,<br>calls engine.update()</div>
+    </div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="step s4">
+      <div class="kind">the sound</div>
+      <b>A number changes on an audio node.</b>
+      <div class="code">filter.frequency<br>&nbsp;&nbsp;.value = 1215</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <p>
+      Every shape on the canvas, even a freehand scribble, is <b>a row in a little database</b>:
+      type, position, size, points. Reading your drawing is just querying it. So the picture and the
+      sound are never two things kept in sync. They are <b>the same number, seen twice</b>.
+    </p>
+  </div>
+</div>
+</body>
+</html>
