@@ -21,7 +21,7 @@ I built a shared, GTM context layer, after watching countless AI projects/tools 
 - The problem: Projects, whether they were Claude projects, dashboards, or purchased platforms, all eventually died. The result was that everyone had their own version of what worked, minimal visibility into what others were building, and no compounding knowledge.
 - The argument: I believe that what all of the projects were missing were 'relationships'. Relationships to the workday, to teammates, to the tool's own failures, and to every other piece of GTM work.
 - The fix: A shared, compounding knowledge layer. The aforementioned dead projects were places you had to go to, and they competed with your day for time. We built Junto as the layer for what any project could be built on, native to the one place that GTM was already in.
-- The output: 2 surfaces, Slack as the front door, and a backend where plays are editable blocks on a canvas, built from 1,000+ triggers and integrations. Underneath, an open source engine, a constitution injected at exactly one seam, a deterministic linter that outranks the model, and a set of rules living below the model that must always hold. Every answer comes back with a diagram drawn from the run's own trace, and every play carries who built it.
+- The output: 2 surfaces, Slack as the front door, and a backend where plays are editable blocks on a canvas, built from 1,000+ triggers and integrations. Underneath, an open source engine, a constitution injected at exactly one seam, a deterministic linter that outranks the model, and a set of rules living below the model that must always hold. Every answer comes back with a diagram drawn from the run's own trace, and every play carries who built it. Data arrives through one validated funnel and waits for human sign-off before it's real, and outbound never sends: it drafts.
 - The results: I pressure-tested it with a simulated 120-person GTM team. 0 permission leaks across 432 requests, the 6 accounts planted to bait a cross-channel read refused 6 of 6 times, lookups at 13 milliseconds at the 95th percentile, and 100% of cited facts verified word for word against the data.
 
 Five examples of prompts that could only be answered from a system like Junto:
@@ -504,6 +504,26 @@ All in all: state stays federated, knowledge gets materialized. The memory holds
 />
 
 
+### How data gets in
+
+Signals arrive over a broker (Redpanda, one topic per source) into one consumer whose only job is to be the door. Every message is validated against the signal contract before anything is written. Bad messages go to a dead-letter topic with the reason attached. Good ones land in a pending batch, and pending means invisible: not retrievable, not citable. Offsets commit only after the write, so a crash re-delivers instead of losing rows. I tested this by killing the consumer mid-stream and counting on restart: no duplicates, nothing lost.
+
+
+<Diagram
+  src="junto-ingest-door.png"
+  label="Fig. 15a"
+/>
+
+Downstream of the stores is a small warehouse: dbt models over DuckDB, with tests. One catch worth telling: replayed ids collided with corpus ids, so for a while zero live rows survived dedupe and the lineage claim was untested. It's tested now.
+
+Every run stamps a corpus watermark into its recorded context versions: a hash of the frozen seed plus the high-water mark of approved live rows. If two answers differ across a week, you can look up exactly what each run saw.
+
+
+<Diagram
+  src="junto-watermark.png"
+  label="Fig. 15b"
+/>
+
 ### The name
 
 I already said in the layer section that I read about how Cerebras built their internal knowledge base before I designed a thing, and this section is where their shape and mine actually meet. Here are my takeaways from their blog:
@@ -518,7 +538,7 @@ Normalize your business into a set of events.
 
 Where I diverge from them is: their system answers questions, so everything can be one shape. Junto acts, and acting needs types, which is why there are four stores for acting and one index for asking. And nothing in their write-up touches provenance, credit, or feedback, because a Q&A system doesn't need them.
 
-[^c6-1]: One divergence is better named than hidden: there's no event bus. Plays and distillers pull rows newer than a watermark instead of subscribing to a stream. At today's volumes a bus is machinery without a customer, and every write already passes through one validated funnel, so the seam is clean if that day comes. But a queue at the edges isn't an event-driven architecture, and I'd rather say so than imply otherwise.
+[^c6-1]: One boundary is better named than hidden: the broker feeds one validated funnel, and nothing subscribes to it. Plays and distillers still pull rows newer than a watermark. A queue at the edges isn't an event-driven architecture, and I'd rather say so than imply otherwise.
 
 [^c6-2]: Two honesty notes on the automated version. The hand-tagged corpus was new-business calls only, so the post-sale lane is specified and seeded, not proven against a year of real conversations. And the demo corpus is fictional end to end: the categories are structurally real, and every quote in it's invented.
 
@@ -891,6 +911,54 @@ The question I'd put to any GTM stack is simple: is it scaling by adding labor, 
 [^c9-1]: The gateway as the front door, why the 3-second answer to Slack isn't negotiable, and the rest of the survival mechanics live in [What I learned creating a Slack bot](/slack-bot/).
 
 
+## Two ways to run a play
+
+### The pipeline
+
+Most plays run as a pipeline: fetch the data the play declares, generate once against the constitution, pass the output through the linter and the judges, the deterministic checks that grade an answer before Slack sees it. One generation per run. The model can't leak what it never saw; an outbound run never fetches accounts in active cycles.
+
+### The loop
+
+Some plays run as a loop. The pipeline's fetch steps are exposed to the model as tools with typed schemas. The model calls a tool, reads the result, calls again, until it's done or hits the caps: six iterations, twenty-five cents.
+
+
+<Diagram
+  src="junto-two-ways.png"
+  label="Fig. 19a"
+/>
+
+### Every rule inside every tool
+
+In a loop the model picks the tools, so every rule lives inside every tool. Each tool returns data that is already filtered, in the same clause as the query. Nothing downstream re-checks it. Tool results are untrusted text and are rendered as inert data.
+
+
+<Diagram
+  src="junto-inside-every-tool.png"
+  label="Fig. 19b"
+/>
+
+### Judging the trajectory
+
+The judges check the loop's trajectory, not just its final text. The trajectory judge rescans the raw tool payloads against the corpus itself; it does not trust the ids the tools record. An early version did, and a test that tampered with the trace showed that check caught nothing. The tampered trace is a fixture now.
+
+The pipeline earns stronger guarantees. Its citation gate checks quotes against the rows that were fetched; the loop's gate works from summaries. The loop costs verification effort, so Junto pays it per play, not everywhere.
+
+
+## Where humans sign off
+
+### Outbound never sends
+
+Outreach copy lands as drafts in Gmail, labeled per rep, created with no recipient header; the "to" is a hint line in the body, so a stray send goes nowhere. The rep edits, addresses, and sends.
+
+### Held for review
+
+Failed outputs are held, not posted and not dropped. If the judges fail an output twice, or the linter can't repair it, a card goes to a review channel with the failing judge, the excerpt, and two buttons: release or suppress. Infrastructure errors still dead-letter. Judgment failures get a human.
+
+### Data earns its way in
+
+Ingested batches stay pending until someone approves them from a summary of what's in them. Pending rows are invisible to retrieval, to the tools, and to the watermark. I run the same control in a CRM at my day job. Bad data doesn't announce itself.
+
+
 ## Making Junto draw
 
 ### The temptation
@@ -1004,6 +1072,14 @@ What happens to a bug after the fix goes in? In most projects, nothing. The fix 
 This is the learning loop from chapter 1, pointed straight at the build itself. A tool that never hears about its failures dies. So every failure got heard, and heard permanently.
 
 The suite got smarter the same way I did, which is to say, by getting burned. Each pinned transcript is a scar, and each scar arrives with a test attached to it.
+
+### The lockdown
+
+Before an autonomous run starts, the Slack tokens are commented out of the environment, and the run's first step verifies they don't resolve, halting if they do. A brief that says never touch live Slack is an instruction. A missing token is enforcement. A wrong boot fails at startup instead of connecting to a real workspace.
+
+### The disclosure
+
+Every run ends with a forced disclosure: everything weaker than it may have read. One run's list had ten items. Two turned into tests. The run diagram had never actually been rendered from a loop run, and the first render said "checked 0 signals." The trajectory judge trusted the tools' own records. Half the week's real bugs came from that list, none from the green suite. A suite shows what you thought to check. The disclosure shows what the builder knew and didn't say.
 
 ### The suspect
 
