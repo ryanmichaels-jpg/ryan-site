@@ -8,7 +8,7 @@ tags: ['build journal', 'gtm engineering']
 
 import Diagram from '../../components/Diagram.astro';
 
-This is about a system I built that lets one SDR send 1,000 tailored emails a day, starting from nothing but Salesforce and Outreach. To do that, the first thing we had to do was get all of the company's data into one place. Everything after that was deciding what to do with it, and it broke into steps: how to score the contacts, how to get them out of Salesforce, how to model and score and exclude them, how to distribute them, and how to make all of it work on an interface a rep would actually use.[^1]
+This is about a system I built that lets one SDR send 1,000 tailored emails a day, starting from nothing but Salesforce and Outreach. To do that, the first thing we had to do was get all of the company's data into one place. Everything after that was deciding what to do with it, and it broke into steps: how to score the contacts, how to get them out of Salesforce, how to model and score and exclude them, how to distribute them, and how to make all of it work on an interface a rep would actually use.
 
 Every two weeks each rep gets a patch[^patch] of 2,000 people worth writing to, ranked, with the reason each one is there and the emails drafted from facts the system can show. The rep sends them. The same tools that build the pages are exposed as an MCP server, so a rep can ask Claude "who in my patch has product usage and no phone" and get the same answer the page would give.
 
@@ -176,8 +176,6 @@ Every decision the system makes, who to write to, what to say, who to skip, whet
 The numbers I care about are the two numbers on the Queue page: how many drafts a rep accepts as written, and how many seconds each release takes. If those hold, the 1,000 takes care of itself.
 
 ---
-
-[^1]: The system runs from seed to sync to score to patch to draft on synthetic data: 5,000 accounts (4,000 prospects, 500 customers, 500 churned), 26,378 contacts, 3,200 Gong calls over eight months of history, two SDRs. The generator plants an answer key: a hidden persona-by-size ordering, 614 past-customer links, and injected mess such as stale still-at-company flags, domain mismatches and opted-out contacts still in sequence, so the tests have something to catch. Every vendor is an interface with a fixture implementation and a stub for the real one that spells out the credentials it needs, switched in a config file, so nothing here touches real data. The screens in this essay are a design prototype restyled to the product's visual system; the web app, the MCP server and the logging tables they write to are the next two stages of the build. The repo is at github.com/ryanmichaels-jpg/thousand-emails.
 
 [^patch]: A patch here is a list of contacts, essentially your book of business.
 
